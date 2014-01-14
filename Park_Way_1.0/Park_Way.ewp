@@ -3143,7 +3143,7 @@
         <name>$PROJ_DIR$\Components\simpliciti\nwk\nwk_globals.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\Components\simpliciti\nwk\nwk_globals.h</name>
+        <name>$PROJ_DIR$\Components\SimpliciTI\nwk\nwk_globals.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\Components\simpliciti\nwk\nwk_QMgmt.c</name>
@@ -3185,7 +3185,7 @@
         <name>$PROJ_DIR$\Components\simpliciti\nwk_applications\nwk_mgmt.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\Components\simpliciti\nwk_applications\nwk_mgmt.h</name>
+        <name>$PROJ_DIR$\Components\SimpliciTI\nwk_applications\nwk_mgmt.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\Components\simpliciti\nwk_applications\nwk_ping.c</name>

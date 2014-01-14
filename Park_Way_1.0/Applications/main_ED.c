@@ -1,4 +1,4 @@
-/*******************************************************************
+/*****************************************************************************
 	Project: Park Way
 	
 	Ver.: 1.0
@@ -9,7 +9,7 @@
 	ao selecionar o ap o .dat adicionado muda e ao selecionar o ED
 	também.	
 
-*******************************************************************/
+*****************************************************************************/
 
 //Headers and libraries
 #include "bsp.h"
@@ -28,15 +28,17 @@
 #define MISSES  5
 #define EXTENED_API
 #define LED     BIT5
+#define SETPOINT_RESET 5
 //Peer TAG
 #define PEER_1	'E'
 #define PEER_2	'D'
-#define PEER_3	'1'
+#define PEER_3	'3'
 //Must be in centimeters
 #define SETPOINT_ULTRA  150 
 
 //Prototypes
 static void linkTo(void);
+static uint8_t sCB(linkID_t);
 uint8_t read_bat(void);
 void 	init_t(void);
 uint8_t read_ultra(void);
@@ -50,9 +52,9 @@ char * Flash_Addr = (char *)0x10F0;
 volatile int * tempOffset = (int *)0x10F4;
 static volatile uint8_t sSelfMeasureSem = 0;
 
-/*------------------------------------------------------------------------------
- * Main
- *----------------------------------------------------------------------------*/
+static volatile uint8_t        sAPstatus=0;
+
+//Main
 void main (void)
 {
 	init_t();
@@ -60,7 +62,9 @@ void main (void)
 	/* Keep trying to join (a side effect of successful initialization) until
 	* successful. Toggle LEDS to indicate that joining has not occurred.
 	*/
-	while (SMPL_SUCCESS != SMPL_Init(0))
+	//Configure the RX for max power
+	SMPL_Ioctl(IOCTL_OBJ_RADIO, IOCTL_ACT_RADIO_SETPWR,(void *) IOCTL_LEVEL_2);
+	while (SMPL_SUCCESS != SMPL_Init(sCB))
 	{
 		BSP_TOGGLE_LED1();
 		BSP_TOGGLE_LED2();
@@ -117,34 +121,76 @@ static void linkTo()
 			msg[4]=read_bat();
 			
 			SMPL_Ioctl( IOCTL_OBJ_RADIO, IOCTL_ACT_RADIO_AWAKE, 0);
-			test=SMPL_Send(sLinkID1,  msg, sizeof msg);	
+			SMPL_Send(sLinkID1,  msg, sizeof msg);
 			test=SMPL_Ping(sLinkID1);
 			
-			if(test!=SMPL_SUCCESS)
+			if(sAPstatus==SETPOINT_RESET)
 			{
-				test=0;
-				if(timeout>MISSES)
-				{
-					WDTCTL &= ~WDTHOLD;  
-					WDTCTL &= ~WDTNMI; 
-					WDTCTL &= ~WDTTMSEL;
-					IE1 |= WDTIE;   
-				}
-				else
-				{
-                    BSP_TOGGLE_LED2();
-					timeout++;
-				}
+				WDTCTL &= ~WDTHOLD;  
+				WDTCTL &= ~WDTNMI; 
+				WDTCTL &= ~WDTTMSEL;
+				IE1 |= WDTIE;  
 			}
 			else
 			{
-				test=0;
-				timeout = 0;
+				sAPstatus++;
 			}
+			// switch(test)
+			// {
+				// case SMPL_SUCCESS:
+					// TXString("\n\rSMPL_SUCCESS",14);
+				// break;
+				// case SMPL_BAD_PARAM:
+					// TXString("\n\rSMPL_BAD_PARAM",16);
+				// break;
+				// case SMPL_NOMEM:
+					// TXString("\n\rSMPL_NOMEM",12);
+				// break;
+				// case SMPL_TX_CCA_FAIL:
+					// TXString("\n\rSMPL_TX_CCA_FAIL",18);
+				// break;
+				// default:
+					// TXString("\n\rSMPL_DEFAULT",14);
+				// break;
+			// }
+			
+			// if(test!=SMPL_SUCCESS)
+			// {
+				// TXString("\n\rSMPL_DEFAULT",14);
+				// // test=0;
+				// // if(timeout>MISSES)
+				// // {
+					// WDTCTL &= ~WDTHOLD;  
+					// WDTCTL &= ~WDTNMI; 
+					// WDTCTL &= ~WDTTMSEL;
+					// IE1 |= WDTIE;   
+				// // }
+				// // else
+				// // {
+                    // // BSP_TOGGLE_LED2();
+					// // timeout++;
+				// // }
+			// }
+			// // else
+			// // {
+				// // test=0;
+				// // timeout = 0;
+			// // }
+			// test=0;
 		}
 		SMPL_Ioctl( IOCTL_OBJ_RADIO, IOCTL_ACT_RADIO_SLEEP, 0);
 		sSelfMeasureSem = 0;
     }
+}
+
+static uint8_t sCB(linkID_t lid)
+{
+	if(lid==sLinkID1)
+	{
+		sAPstatus = 0;
+	}
+	/* leave frame to be read by application. */
+	return 0;
 }
 
 uint8_t read_ultra()

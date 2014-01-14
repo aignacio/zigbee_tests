@@ -80,6 +80,14 @@
 /* Store and forward support: number of clients */
 -DNUM_STORE_AND_FWD_CLIENTS=3
 
+
+/* default Link token */
+-DDEFAULT_LINK_TOKEN=0x00020304
+
+/* default Join token */
+-DDEFAULT_JOIN_TOKEN=0x05060708
+
+
 -DSTARTUP_JOINCONTEXT_ON
 
 

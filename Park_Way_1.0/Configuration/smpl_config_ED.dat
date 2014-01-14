@@ -77,3 +77,10 @@
  */
 /* -DRX_POLLS */
 
+/* default Link token */
+-DDEFAULT_LINK_TOKEN=0x01020304
+
+/* default Join token */
+-DDEFAULT_JOIN_TOKEN=0x05060708
+
+

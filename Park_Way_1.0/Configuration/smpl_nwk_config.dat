@@ -53,10 +53,10 @@
 -DMAX_APP_PAYLOAD=10
 
 /* default Link token */
--DDEFAULT_LINK_TOKEN=0x01020304
+//-DDEFAULT_LINK_TOKEN=0x01020304
 
 /* default Join token */
--DDEFAULT_JOIN_TOKEN=0x05060708
+//-DDEFAULT_JOIN_TOKEN=0x05060708
 
 /* Remove comment to enable Frequency Agility */
 /*-DFREQUENCY_AGILITY*/
