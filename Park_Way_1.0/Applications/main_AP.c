@@ -25,18 +25,26 @@
 #include "stdbool.h"
 
 //Defines
+#define AP_GROUP		   'C'
+#define AP_GROUP_1		   "C"
 #define EXTENED_API
 #define TIMEOUT_CHECK_PEERS 3
+#define TIMEOUT_JOIN 		2
 
 //Prototypes
 __interrupt void Timer_A (void);
 static uint8_t sCB(linkID_t); 
 void   init_t(void);
 void   process_message(uint8_t i,uint8_t msg[MAX_APP_PAYLOAD]);
+void   con_t(void);
 
 //Globals
 static linkID_t sLID[NUM_CONNECTIONS] = {0};
-static uint8_t  sNumCurrentPeers = 0;						
+static linkID_t LD_AP[2]={0};
+static uint8_t  sNumCurrentPeers = 0;
+static uint8_t	AP_send_inf,AP_receive_inf,AP=0,vector_send,vector_receive;	
+bspIState_t intState;				
+
 typedef struct peerFrame
 {
 	char frame[6];
@@ -45,15 +53,29 @@ typedef struct peerFrame
 
 typedef enum 
 {
-	con_manager,
+	con_1,
+	con_2,
+	con_3,
+	con_4,
 	ready,
 	error
 }fsm_states;
 
-fsm_states	fsm_ap=con_manager;
+typedef enum 
+{
+	link_1,
+	frame_1,
+	link_2,
+	frame_2,
+	ready_con,
+	error_con
+}con_states;
+
+con_states	fsm_con=link_1;
+fsm_states	fsm_ap=con_1;		//Just for debug initial
 
 volatile peerFrame_t	peer_list[NUM_CONNECTIONS];
-
+   
 
 // Work Loop semaphores 
 static volatile uint8_t sPeerFrameSem = 0;
@@ -61,28 +83,19 @@ static volatile uint8_t sJoinSem = 0;
 static volatile uint8_t sTable = 0;
 static volatile uint8_t sCheck = 0;
 static volatile uint8_t sTimeout = 0;
+static volatile uint8_t sApRequest = 0;
 
 //Globals to serial
-const char initial_message[] = {"\r\n-- MVP1 - ACCESS POINT --\r\n"};
+const char initial_message[] = {"\n\r-- PARK WAY - ACCESS POINT = "};
+const char initial_ED[] = {"\n\r Entrando no modo de conexao com as Vagas \n\r"};
 
 //Main
 void main (void)
 {
-	bspIState_t intState;
 	init_t();
+	con_t();
 	
-	// //Connecting to manager
-	// switch(fsm_ap)
-	// {
-		// case con_manager:
-		// break;
-		// case:
-		// break;
-		// case:
-		// break;
-		// default:
-		// break;
-	// }
+	TXString((char *)initial_ED, sizeof initial_ED);
 	
 	/* main work loop */
 	while (1)
@@ -93,11 +106,11 @@ void main (void)
 			sTimeout = 0;
 			TXString("\n\rSolicitacao de conexao   ",27);
 			/* listen for a new connection */
-			while (sTimeout < 3)
+			while (sTimeout < TIMEOUT_JOIN)
 			{
 				if (SMPL_SUCCESS == SMPL_LinkListen(&sLID[sNumCurrentPeers]))
 				{
-					TXString("peer conectado com sucesso!",27);
+					TXString("conectado com sucesso!",22);
 					sNumCurrentPeers++;
 					break;
 				}
@@ -108,7 +121,7 @@ void main (void)
 				}
 				/* Implement fail-to-link policy here. otherwise, listen again. */
 			}  
-			if(sTimeout>=3)	TXString("Timeout!",8);
+			if(sTimeout>TIMEOUT_JOIN)	TXString("Timeout!",8);
 			BSP_ENTER_CRITICAL_SECTION(intState);
 			sJoinSem--;
 			BSP_EXIT_CRITICAL_SECTION(intState);
@@ -134,7 +147,23 @@ void main (void)
 			}
 		}
 		
+		if(sApRequest)
+		{
+			uint8_t     msg[MAX_APP_PAYLOAD], len, i;
+			
+			BSP_TOGGLE_LED2();
+			/* process all frames waiting */
+			for (i=0; i<AP; ++i)
+			{
+				if (SMPL_SUCCESS == SMPL_Receive(LD_AP[i], msg, &len))
+				{
+					SMPL_Send(LD_AP[vector_send],msg,len);
+					sApRequest--;
+				}
+			}
+		}
 		//Check if the peer is online or not
+		
 		if(sCheck==TIMEOUT_CHECK_PEERS)
 		{
 			sCheck = 0;
@@ -214,7 +243,10 @@ static uint8_t sCB(linkID_t lid)
 {
   if (lid)
   {
-    sPeerFrameSem++;
+	if(lid==LD_AP[0]||lid==LD_AP[1])
+		sApRequest++;
+	else if(lid!=SMPL_LINKID_USER_UUD)
+			sPeerFrameSem++;
   }
   else
   {
@@ -228,14 +260,35 @@ static uint8_t sCB(linkID_t lid)
 void init_t()
 {
 	/* Initialize board */
+	addr_t lAddr;
+
+	/* Initialize board-specific hardware */
 	BSP_Init();
+
+	// /* Check flash for previously stored address */
+	// if(Flash_Addr[0] == 0xFF && Flash_Addr[1] == 0xFF &&
+	 // Flash_Addr[2] == 0xFF && Flash_Addr[3] == 0xFF )
+	// {
+	// createRandomAddress(); // Create and store a new random address
+	// }
+
+	/* Read out address from flash */
+	lAddr.addr[0] = 0x7A;
+	lAddr.addr[1] = 0x56+(int)AP_GROUP;
+	lAddr.addr[2] = 0x34+(int)AP_GROUP;
+	lAddr.addr[3] = 0x12;
+
+	/* Tell network stack the device address */
+	SMPL_Ioctl(IOCTL_OBJ_ADDR, IOCTL_ACT_SET, &lAddr);	
+	
+
 	BSP_TURN_OFF_LED1();
 	BSP_TURN_OFF_LED2();
 
 	/* Initialize TimerA and oscillator */
 	BCSCTL3 |= LFXT1S_2;                      // LFXT1 = VLO
 	TACCTL0 = CCIE;                           // TACCR0 interrupt enabled
-	TACCR0 = 12000;                           // ~1 second in 8MHz
+	TACCR0 = 500;                           // ~1 second in 8MHz
 	TACTL = TASSEL_1 + MC_1;                  // ACLK, upmode
   
   
@@ -244,7 +297,10 @@ void init_t()
 
 	//Transmit initial_message screen and network init notification
 	TXString( (char*)initial_message, sizeof initial_message);
-	char ini[]={"Inicizalizando a rede..."};
+	TXString(AP_GROUP_1,1);
+	TXString(" -- \n\r",6);
+	
+	char ini[]={"Inicizalizando o SIMPLICITI..."};
 	TXString((char *)ini,sizeof ini);
 
 	// Initialize the SimpliciTI protocol stack  - sCB is the callback handler
@@ -266,6 +322,102 @@ void init_t()
 		for(j=0;j<5;j++)	peer_list[i].frame[j]='0';
 		peer_list[i].active=0;
 	}	
+}
+
+void con_t()
+{
+	/*
+		Frame broadcast by the NM-Network Manager
+		20 Frames - Each frame has the information of connection of each AP(Access Point)
+		and the AP needs to know your frame and how he must connect on your FSM. While the
+		
+		Default frame inf.:
+		buffer[0]-	Letter of the AP
+		buffer[1]-	Letter of the send AP
+		buffer[2]-  Letter of the receive AP
+	*/
+	
+	uint8_t buffer[MAX_APP_PAYLOAD],len;
+	bool	flag_select=0;
+	
+	if(((int)AP_GROUP)%2)
+	{
+		TXString("\n\rAP-JOIN",9);
+	}
+	else
+	{
+		flag_select = 1;
+		TXString("\n\rAP-LINK",9);
+	}
+
+	//Connecting to manager
+	while(fsm_ap!=ready)
+		switch(fsm_ap)
+		{
+			case con_1:
+				TXString("\n\rAguardando o Broadcast do NM  ",32);
+				while(buffer[0]!=AP_GROUP)
+					while(SMPL_SUCCESS!=SMPL_Receive(SMPL_LINKID_USER_UUD,buffer,&len));	
+				AP_send_inf = buffer[1];
+				AP_receive_inf = buffer[2];
+				TXString("Recebido!",9);
+				fsm_ap = con_2;
+			break;
+			case con_2:
+				bool flag_out=0,flag_1=0,flag_2=0;
+				TXString("\n\rAguardando conexao com os APs  \n\r",35);
+				while(!flag_out)
+				{
+					if(flag_1&&flag_2)	flag_out = 1;
+					
+					switch(fsm_con)
+					{
+						case link_1:
+							if(flag_select)		while(SMPL_SUCCESS!=SMPL_LinkListen(&LD_AP[AP]));
+							else	while(SMPL_SUCCESS!=SMPL_Link(&LD_AP[AP]));
+							AP++;
+							fsm_con = frame_1;
+							TXString("\n\rConectei me a algum AP",24);
+						break;
+						case frame_1:
+							while(SMPL_SUCCESS!=SMPL_Receive(LD_AP[AP-1], buffer, &len))
+								SMPL_Send(LD_AP[AP-1],AP_GROUP_1,1);
+							//TXString((char *)buffer[0],1);
+							if(buffer[0]==AP_send_inf)
+							{
+								TXString("\n\rConectado ao AP SENDER",24);
+								flag_1=1;
+								vector_send = AP-1;
+							}
+							else	if(buffer[0]==AP_receive_inf)
+									{
+										TXString("\n\rConectado ao AP RECEIVER",26);
+										flag_2=1;
+										vector_receive = AP-1;
+									}
+									else
+									{
+										AP--;
+										SMPL_Unlink(LD_AP[AP]);
+										fsm_con = link_1;
+									}
+						break;
+						default:
+						break;
+					}
+				}			
+				TXString("\n\rConectado aos APs!",20);
+				fsm_ap = con_3;
+			break;
+			case con_3:
+				fsm_ap = ready;
+			break;
+			default:
+				fsm_ap = con_1;
+			break;
+		}
+		
+	sJoinSem = 0;
 }
 
 /*------------------------------------------------------------------------------

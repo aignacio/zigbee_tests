@@ -38,7 +38,7 @@
  * communication.  Access Points and Range Extenders can set this to 0 if they
  * do not host End Device objects.
  */
--DNUM_CONNECTIONS=20
+-DNUM_CONNECTIONS=22
 
 /*  ***  Size of low level queues for sent and received frames. Affects RAM usage  ***  */
 
