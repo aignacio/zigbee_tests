@@ -28,11 +28,11 @@
 #define MISSES  5
 #define EXTENED_API
 #define LED     BIT5
-#define SETPOINT_RESET 5
+#define SETPOINT_RESET 15
 //Peer TAG
 #define PEER_1	'E'
 #define PEER_2	'D'
-#define PEER_3	'3'
+#define PEER_3	'2'
 //Must be in centimeters
 #define SETPOINT_ULTRA  150 
 
@@ -195,29 +195,31 @@ static uint8_t sCB(linkID_t lid)
 
 uint8_t read_ultra()
 {
-	char aux[5];
-	int cent;
 	
-	cent = getEcho();
-	aux[0] = (cent/10000) + 0x30;
-	aux[1] = (cent%10000)/1000 + 0x30;
-	aux[2] = (((cent%10000)%1000)/100) + 0x30;
-	aux[3] = ((((cent%10000)%1000)%100)/10) +0x30; 
-	aux[4] = ((((cent%10000)%1000)%100)%10) + 0x30;
+	// char aux[5];
+	// int cent;
 	
-	TXString("\n\rUltrasom:",11);
-	TXString((char *)aux,sizeof aux);
+	// cent = getEcho();
+	// aux[0] = (cent/10000) + 0x30;
+	// aux[1] = (cent%10000)/1000 + 0x30;
+	// aux[2] = (((cent%10000)%1000)/100) + 0x30;
+	// aux[3] = ((((cent%10000)%1000)%100)/10) +0x30; 
+	// aux[4] = ((((cent%10000)%1000)%100)%10) + 0x30;
+	
+	// TXString("\n\rUltrasom:",11);
+	// TXString((char *)aux,sizeof aux);
 
-	if(cent <= SETPOINT_ULTRA )
-	{
-		P4OUT |= LED;
-		return '1'; 
-	}  
-	else
-	{
-		P4OUT &= ~LED;
-		return '0'; 
-	}
+	// if(cent <= SETPOINT_ULTRA )
+	// {
+		// P4OUT |= LED;
+		// return '1'; 
+	// }  
+	// else
+	// {
+		// P4OUT &= ~LED;
+		// return '0'; 
+	// }
+	return 0;
 }
 
 uint8_t read_bat()
@@ -305,7 +307,7 @@ void init_t()
 	TACTL = TASSEL_1 + MC_1;                  // ACLK, upmode
 
 	//Starts the ultrasound sensor
-	start_usens();
+	//start_usens();
 	
 	//Initialize the COM-Serial
 	COM_Init();

@@ -25,10 +25,10 @@
 #include "stdbool.h"
 
 //Defines
-#define AP_GROUP		   'C'
-#define AP_GROUP_1		   "C"
+#define AP_GROUP		   'A'
+#define AP_GROUP_1		   "A"
 #define EXTENED_API
-#define TIMEOUT_CHECK_PEERS 3
+#define TIMEOUT_CHECK_PEERS 5
 #define TIMEOUT_JOIN 		2
 
 //Prototypes
@@ -93,7 +93,7 @@ const char initial_ED[] = {"\n\r Entrando no modo de conexao com as Vagas \n\r"}
 void main (void)
 {
 	init_t();
-	con_t();
+	
 	
 	TXString((char *)initial_ED, sizeof initial_ED);
 	
@@ -139,7 +139,7 @@ void main (void)
 				if (SMPL_SUCCESS == SMPL_Receive(sLID[i], msg, &len))
 				{
 					process_message(i,msg);
-					SMPL_Send(sLID[i],"OK",2);
+					SMPL_Send(sLID[i],".",1);
 					BSP_ENTER_CRITICAL_SECTION(intState);
 					sPeerFrameSem--;
 					BSP_EXIT_CRITICAL_SECTION(intState);
@@ -147,26 +147,24 @@ void main (void)
 			}
 		}
 		
-		if(sApRequest)
-		{
-			uint8_t     msg[MAX_APP_PAYLOAD], len, i;
-			
-			BSP_TOGGLE_LED2();
-			/* process all frames waiting */
-			for (i=0; i<AP; ++i)
-			{
-				if (SMPL_SUCCESS == SMPL_Receive(LD_AP[i], msg, &len))
-				{
-					SMPL_Send(LD_AP[vector_send],msg,len);
-					sApRequest--;
-				}
-			}
-		}
 		//Check if the peer is online or not
-		
-		if(sCheck==TIMEOUT_CHECK_PEERS)
+		if(sCheck>=TIMEOUT_CHECK_PEERS)
 		{
 			sCheck = 0;
+			
+			TXString("\n\r",2);
+			TXString("*AP1",3);
+			TXString("\n\r",2);
+			int i;
+			for(i=0;i<sNumCurrentPeers;i++)
+			{
+				if(peer_list[i].active)
+				{
+					TXString((char *)peer_list[i].frame,sizeof peer_list[i].frame);
+					TXString("\n\r",2);
+				}
+			}
+			TXString("*AP1",3);
 			
 			int j,k;
 			for(j=0;j<sNumCurrentPeers;j++)
@@ -177,24 +175,7 @@ void main (void)
 				}
 				peer_list[j].active=0;
 			}
-			
 		}
-		
-		/*Just demo of Struct of peers - Uncomment if you want to see on the terminal the table that will be sent to the manager
-		if(sTable==5)
-		{
-			sTable=0;
-			TXString("\n\r",2);
-			int i;
-			for(i=0;i<sNumCurrentPeers;i++)
-			{
-				// if(peer_list[i].active)
-				// {
-					TXString((char *)peer_list[i].frame,sizeof peer_list[i].frame);
-					TXString("\n\r",2);
-				// }
-			}
-		} */
 	}
 
 }
@@ -234,7 +215,7 @@ void process_message(uint8_t i,uint8_t msg[MAX_APP_PAYLOAD])
 	peer_list[i].frame[4]=output_serial[44];
 	peer_list[i].frame[5]=output_serial[46];
 	
-	TXString(output_serial,sizeof output_serial);					
+	//TXString(output_serial,sizeof output_serial);					
 }
 
 /* Runs in ISR context. Reading the frame should be done in the
@@ -243,10 +224,7 @@ static uint8_t sCB(linkID_t lid)
 {
   if (lid)
   {
-	if(lid==LD_AP[0]||lid==LD_AP[1])
-		sApRequest++;
-	else if(lid!=SMPL_LINKID_USER_UUD)
-			sPeerFrameSem++;
+	sPeerFrameSem++;
   }
   else
   {
@@ -288,7 +266,7 @@ void init_t()
 	/* Initialize TimerA and oscillator */
 	BCSCTL3 |= LFXT1S_2;                      // LFXT1 = VLO
 	TACCTL0 = CCIE;                           // TACCR0 interrupt enabled
-	TACCR0 = 500;                           // ~1 second in 8MHz
+	TACCR0 = 1200;                           // ~1 second in 8MHz
 	TACTL = TASSEL_1 + MC_1;                  // ACLK, upmode
   
   
@@ -322,102 +300,6 @@ void init_t()
 		for(j=0;j<5;j++)	peer_list[i].frame[j]='0';
 		peer_list[i].active=0;
 	}	
-}
-
-void con_t()
-{
-	/*
-		Frame broadcast by the NM-Network Manager
-		20 Frames - Each frame has the information of connection of each AP(Access Point)
-		and the AP needs to know your frame and how he must connect on your FSM. While the
-		
-		Default frame inf.:
-		buffer[0]-	Letter of the AP
-		buffer[1]-	Letter of the send AP
-		buffer[2]-  Letter of the receive AP
-	*/
-	
-	uint8_t buffer[MAX_APP_PAYLOAD],len;
-	bool	flag_select=0;
-	
-	if(((int)AP_GROUP)%2)
-	{
-		TXString("\n\rAP-JOIN",9);
-	}
-	else
-	{
-		flag_select = 1;
-		TXString("\n\rAP-LINK",9);
-	}
-
-	//Connecting to manager
-	while(fsm_ap!=ready)
-		switch(fsm_ap)
-		{
-			case con_1:
-				TXString("\n\rAguardando o Broadcast do NM  ",32);
-				while(buffer[0]!=AP_GROUP)
-					while(SMPL_SUCCESS!=SMPL_Receive(SMPL_LINKID_USER_UUD,buffer,&len));	
-				AP_send_inf = buffer[1];
-				AP_receive_inf = buffer[2];
-				TXString("Recebido!",9);
-				fsm_ap = con_2;
-			break;
-			case con_2:
-				bool flag_out=0,flag_1=0,flag_2=0;
-				TXString("\n\rAguardando conexao com os APs  \n\r",35);
-				while(!flag_out)
-				{
-					if(flag_1&&flag_2)	flag_out = 1;
-					
-					switch(fsm_con)
-					{
-						case link_1:
-							if(flag_select)		while(SMPL_SUCCESS!=SMPL_LinkListen(&LD_AP[AP]));
-							else	while(SMPL_SUCCESS!=SMPL_Link(&LD_AP[AP]));
-							AP++;
-							fsm_con = frame_1;
-							TXString("\n\rConectei me a algum AP",24);
-						break;
-						case frame_1:
-							while(SMPL_SUCCESS!=SMPL_Receive(LD_AP[AP-1], buffer, &len))
-								SMPL_Send(LD_AP[AP-1],AP_GROUP_1,1);
-							//TXString((char *)buffer[0],1);
-							if(buffer[0]==AP_send_inf)
-							{
-								TXString("\n\rConectado ao AP SENDER",24);
-								flag_1=1;
-								vector_send = AP-1;
-							}
-							else	if(buffer[0]==AP_receive_inf)
-									{
-										TXString("\n\rConectado ao AP RECEIVER",26);
-										flag_2=1;
-										vector_receive = AP-1;
-									}
-									else
-									{
-										AP--;
-										SMPL_Unlink(LD_AP[AP]);
-										fsm_con = link_1;
-									}
-						break;
-						default:
-						break;
-					}
-				}			
-				TXString("\n\rConectado aos APs!",20);
-				fsm_ap = con_3;
-			break;
-			case con_3:
-				fsm_ap = ready;
-			break;
-			default:
-				fsm_ap = con_1;
-			break;
-		}
-		
-	sJoinSem = 0;
 }
 
 /*------------------------------------------------------------------------------
