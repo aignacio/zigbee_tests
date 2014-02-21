@@ -139,6 +139,7 @@ void main (void)
 				if (SMPL_SUCCESS == SMPL_Receive(sLID[i], msg, &len))
 				{
 					process_message(i,msg);
+                                        //TXString((char *)msg,len);
 					SMPL_Send(sLID[i],".",1);
 					BSP_ENTER_CRITICAL_SECTION(intState);
 					sPeerFrameSem--;
@@ -190,7 +191,7 @@ void process_message(uint8_t i,uint8_t msg[MAX_APP_PAYLOAD])
 	transmitData( i, sigInfo.sigInfo.rssi,0,&rssiString[0]);
 	
 	int j;
-	for(j=0;j<5;j++)	peer_list[i].frame[j]=msg[j];
+	for(j=0;j<=5;j++)	peer_list[i].frame[j]=msg[j];
 	peer_list[i].active=1;
 
 	//TXString(output_serial,sizeof output_serial);					

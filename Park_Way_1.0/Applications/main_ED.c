@@ -28,12 +28,12 @@
 #define MISSES  5
 #define EXTENED_API
 #define LED     BIT5
-#define SETPOINT_RESET 15
+#define SETPOINT_RESET 40
 //Peer TAG
 #define PEER_1	'E'
 #define PEER_2	'D'
 #define PEER_3	'0'
-#define PEER_4	'2'
+#define PEER_4	'3'
 //Must be in centimeters
 #define SETPOINT_ULTRA  150 
 
@@ -86,7 +86,7 @@ void main (void)
 
 static void linkTo()
 {
-	uint8_t msg[6];
+	uint8_t msg[5];
 	int timeout=0;
 	smplStatus_t test;
 
@@ -121,11 +121,11 @@ static void linkTo()
 		{
 			msg[4]='-';
 			msg[5]=read_ultra();
-			msg[6]=read_bat();
+			//msg[6]=read_bat();
 			
 			SMPL_Ioctl( IOCTL_OBJ_RADIO, IOCTL_ACT_RADIO_AWAKE, 0);
 			SMPL_Send(sLinkID1,  msg, sizeof msg);
-			test=SMPL_Ping(sLinkID1);
+			//test=SMPL_Ping(sLinkID1);
 			
 			if(sAPstatus==SETPOINT_RESET)
 			{
@@ -138,48 +138,6 @@ static void linkTo()
 			{
 				sAPstatus++;
 			}
-			// switch(test)
-			// {
-				// case SMPL_SUCCESS:
-					// TXString("\n\rSMPL_SUCCESS",14);
-				// break;
-				// case SMPL_BAD_PARAM:
-					// TXString("\n\rSMPL_BAD_PARAM",16);
-				// break;
-				// case SMPL_NOMEM:
-					// TXString("\n\rSMPL_NOMEM",12);
-				// break;
-				// case SMPL_TX_CCA_FAIL:
-					// TXString("\n\rSMPL_TX_CCA_FAIL",18);
-				// break;
-				// default:
-					// TXString("\n\rSMPL_DEFAULT",14);
-				// break;
-			// }
-			
-			// if(test!=SMPL_SUCCESS)
-			// {
-				// TXString("\n\rSMPL_DEFAULT",14);
-				// // test=0;
-				// // if(timeout>MISSES)
-				// // {
-					// WDTCTL &= ~WDTHOLD;  
-					// WDTCTL &= ~WDTNMI; 
-					// WDTCTL &= ~WDTTMSEL;
-					// IE1 |= WDTIE;   
-				// // }
-				// // else
-				// // {
-                    // // BSP_TOGGLE_LED2();
-					// // timeout++;
-				// // }
-			// }
-			// // else
-			// // {
-				// // test=0;
-				// // timeout = 0;
-			// // }
-			// test=0;
 		}
 		SMPL_Ioctl( IOCTL_OBJ_RADIO, IOCTL_ACT_RADIO_SLEEP, 0);
 		sSelfMeasureSem = 0;
@@ -198,7 +156,6 @@ static uint8_t sCB(linkID_t lid)
 
 uint8_t read_ultra()
 {
-	
 	char aux[5];
 	int cent;
 	
@@ -222,7 +179,6 @@ uint8_t read_ultra()
 		P4OUT &= ~LED;
 		return '0'; 
 	}
-	return 0;
 }
 
 uint8_t read_bat()
