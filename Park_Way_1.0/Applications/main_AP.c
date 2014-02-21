@@ -153,18 +153,17 @@ void main (void)
 			sCheck = 0;
 			
 			TXString("\n\r",2);
-			TXString("*AP1",3);
-			TXString("\n\r",2);
+			TXString("AP-0001",7);
 			int i;
 			for(i=0;i<sNumCurrentPeers;i++)
 			{
 				if(peer_list[i].active)
 				{
+					TXString(",",1);
 					TXString((char *)peer_list[i].frame,sizeof peer_list[i].frame);
-					TXString("\n\r",2);
 				}
 			}
-			TXString("*AP1",3);
+			TXString("OK\n\r",4);
 			
 			int j,k;
 			for(j=0;j<sNumCurrentPeers;j++)
@@ -191,30 +190,9 @@ void process_message(uint8_t i,uint8_t msg[MAX_APP_PAYLOAD])
 	transmitData( i, sigInfo.sigInfo.rssi,0,&rssiString[0]);
 	
 	int j;
-	for(j=0;j<4;j++)	peer_list[i].frame[j]=msg[j];
+	for(j=0;j<5;j++)	peer_list[i].frame[j]=msg[j];
 	peer_list[i].active=1;
-	
-	output_serial[8]=msg[0];
-	output_serial[9]=msg[1];
-	output_serial[10]=msg[2];
-	output_serial[12]=msg[3];
-	
-	output_serial[19]='0';
-	output_serial[20]=rssiString[0];
-	output_serial[21]=rssiString[1];
-	
-	output_serial[30] = (i/10000) + 0x30;
-	output_serial[31] = (i%10000)/1000 + 0x30;
-	output_serial[32] = (((i%10000)%1000)/100) + 0x30;
-	output_serial[33] = ((((i%10000)%1000)%100)/10) +0x30; 
-	output_serial[34] = ((((i%10000)%1000)%100)%10) + 0x30;
-	
-	output_serial[44]='0'+(msg[4]/10)%10;
-	output_serial[46]='0'+(msg[4]%10);
-	
-	peer_list[i].frame[4]=output_serial[44];
-	peer_list[i].frame[5]=output_serial[46];
-	
+
 	//TXString(output_serial,sizeof output_serial);					
 }
 

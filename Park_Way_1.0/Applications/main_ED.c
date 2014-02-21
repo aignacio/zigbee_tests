@@ -32,7 +32,8 @@
 //Peer TAG
 #define PEER_1	'E'
 #define PEER_2	'D'
-#define PEER_3	'2'
+#define PEER_3	'0'
+#define PEER_4	'2'
 //Must be in centimeters
 #define SETPOINT_ULTRA  150 
 
@@ -85,13 +86,14 @@ void main (void)
 
 static void linkTo()
 {
-	uint8_t msg[5];
+	uint8_t msg[6];
 	int timeout=0;
 	smplStatus_t test;
 
 	msg[0]= PEER_1;
 	msg[1]= PEER_2;
 	msg[2]= PEER_3;
+	msg[3]= PEER_4;
 	
 	/* Keep trying to link... */
 	while (SMPL_SUCCESS != SMPL_Link(&sLinkID1))
@@ -117,8 +119,9 @@ static void linkTo()
 		__bis_SR_register(LPM3_bits);																																																																	
 		if (sSelfMeasureSem) 
 		{
-			msg[3]=read_ultra();
-			msg[4]=read_bat();
+			msg[4]='-';
+			msg[5]=read_ultra();
+			msg[6]=read_bat();
 			
 			SMPL_Ioctl( IOCTL_OBJ_RADIO, IOCTL_ACT_RADIO_AWAKE, 0);
 			SMPL_Send(sLinkID1,  msg, sizeof msg);
