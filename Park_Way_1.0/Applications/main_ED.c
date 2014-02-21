@@ -196,29 +196,29 @@ static uint8_t sCB(linkID_t lid)
 uint8_t read_ultra()
 {
 	
-	// char aux[5];
-	// int cent;
+	char aux[5];
+	int cent;
 	
-	// cent = getEcho();
-	// aux[0] = (cent/10000) + 0x30;
-	// aux[1] = (cent%10000)/1000 + 0x30;
-	// aux[2] = (((cent%10000)%1000)/100) + 0x30;
-	// aux[3] = ((((cent%10000)%1000)%100)/10) +0x30; 
-	// aux[4] = ((((cent%10000)%1000)%100)%10) + 0x30;
+	cent = getEcho();
+	aux[0] = (cent/10000) + 0x30;
+	aux[1] = (cent%10000)/1000 + 0x30;
+	aux[2] = (((cent%10000)%1000)/100) + 0x30;
+	aux[3] = ((((cent%10000)%1000)%100)/10) +0x30; 
+	aux[4] = ((((cent%10000)%1000)%100)%10) + 0x30;
 	
-	// TXString("\n\rUltrasom:",11);
-	// TXString((char *)aux,sizeof aux);
+	TXString("\n\rUltrasom:",11);
+	TXString((char *)aux,sizeof aux);
 
-	// if(cent <= SETPOINT_ULTRA )
-	// {
-		// P4OUT |= LED;
-		// return '1'; 
-	// }  
-	// else
-	// {
-		// P4OUT &= ~LED;
-		// return '0'; 
-	// }
+	if(cent <= SETPOINT_ULTRA )
+	{
+		P4OUT |= LED;
+		return '1'; 
+	}  
+	else
+	{
+		P4OUT &= ~LED;
+		return '0'; 
+	}
 	return 0;
 }
 
@@ -307,7 +307,7 @@ void init_t()
 	TACTL = TASSEL_1 + MC_1;                  // ACLK, upmode
 
 	//Starts the ultrasound sensor
-	//start_usens();
+	start_usens();
 	
 	//Initialize the COM-Serial
 	COM_Init();

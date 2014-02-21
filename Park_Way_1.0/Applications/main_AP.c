@@ -28,7 +28,7 @@
 #define AP_GROUP		   'A'
 #define AP_GROUP_1		   "A"
 #define EXTENED_API
-#define TIMEOUT_CHECK_PEERS 5
+#define TIMEOUT_CHECK_PEERS 40
 #define TIMEOUT_JOIN 		2
 
 //Prototypes
