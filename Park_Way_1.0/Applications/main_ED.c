@@ -29,7 +29,7 @@
 #define EXTENED_API
 #define LED     BIT5
 #define SETPOINT_RESET 40
-//Peer TAG
+//Peer TAG - Cuidar ao trocar estes endereços pois eles geram o ADDRESS MAC DO smp
 #define PEER_1	'E'
 #define PEER_2	'D'
 #define PEER_3	'0'
@@ -86,7 +86,7 @@ void main (void)
 
 static void linkTo()
 {
-	uint8_t msg[5];
+	uint8_t msg[6];
 	int timeout=0;
 	smplStatus_t test;
 
@@ -248,8 +248,8 @@ void init_t()
 
 	/* Read out address from flash */
 	lAddr.addr[0] = 0x7A;
-	lAddr.addr[1] = 0x56+(int)PEER_3;
-	lAddr.addr[2] = 0x34+(int)PEER_3;
+	lAddr.addr[1] = 0x56+(int)PEER_4;
+	lAddr.addr[2] = 0x34+(int)PEER_4;
 	lAddr.addr[3] = 0x12;
 
 	/* Tell network stack the device address */
