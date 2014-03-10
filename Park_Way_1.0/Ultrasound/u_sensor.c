@@ -8,6 +8,10 @@ unsigned int
   centimeter = 0,
   store_cap[NUM_CAP];
 
+bool cap_st = 0;
+int written = 0;
+
+
 typedef enum 
 {
   idle,
@@ -20,8 +24,7 @@ typedef enum
 FSM fsm_usens;
 
 
-bool cap_st = 0;
-int written = 0;
+
 
 void start_usens(void)
 {
@@ -31,31 +34,28 @@ void start_usens(void)
   P4OUT &= ~TRIGGER;
   P4DIR &= ~ECHO;
   P4SEL |= ECHO;
-  TBCCTL0 = CCIE + CM_3 + SCS + CCIS_1 + CAP + ID_3;                           
-  TBCTL = TBSSEL_2 + MC_2;
-
 }
 void trigger(void)
 {
-  volatile int i,j;
+  volatile int i;
   P4OUT |= TRIGGER;
   for(i = 0; i < 50; i++);
   P4OUT &= ~TRIGGER;
   for(i = 0; i < 50; i++);
   count++;
+  __delay_cycles(1);
 }
 
 int getEcho(void)
 {
-  int i, echoValue = 0;
+  int i, echoValue;
   bool fsm_control = 1;
   bool flag_start = 1;
  
-  //__disable_interrupt();
-  //TBCCTL0 = CCIE;
-  
-  count = 0;
   fsm_usens = idle;
+  
+  __istate_t s = __get_interrupt_state();
+  
   while(fsm_control == 1)
   {
     switch(fsm_usens)
@@ -63,67 +63,88 @@ int getEcho(void)
       case idle: 
                   if(flag_start)
                   {
-                    //__disable_interrupt();
-                    //TBCCTL0 = CCIE + CM_3 + SCS + CCIS_1 + CAP;
-                    for(i = 0; i < 1; i++)
+                    for(i = 0; i < NUM_CAP; i++)
                       store_cap[i] = 0;
                     fsm_usens = start;
-                    cap_st = 1;
                     written = 0;
+                    flag_start = 0;
+                    count = 0;
+                    echoValue = 0;
                   }
                   else
                     fsm_usens = capturing;
                   break;
       case start: 
-                  if(flag_start)
-                  {
+                    __disable_interrupt();
+                    TBCCTL0 = CCIE + CM_3 + SCS + CCIS_1 + CAP + ID_1;                           
+                    TBCTL = TBSSEL_2 + MC_2;
+                    __bis_SR_register(GIE);
                     flag_start = 0;
                     P2OUT |= VCC_ULTRA;
                     __delay_cycles(100000);
-                  }
-                  fsm_usens = capturing;
-                  break;
+                    fsm_usens = capturing;
+                    break;
       case capturing:
+                  cap_st = 1;
+                  //TBCCR0 = 0;
+                  //new_cap = 0;
+                  //old_cap = 0;
+                  //cap_diff = 0;
                   trigger();
-                  __delay_cycles(100000);
-                    fsm_usens = end_cap;
+                  fsm_usens = end_cap;
                   break;
       case end_cap:
-                  for(i = 0; i < NUM_CAP; i++)
-                    echoValue = echoValue + store_cap[i];
-                    fsm_control = 0;
+                  if(written > 0)
+                  {
                     cap_st = 0;
-                    count = 0;
-                    P4OUT &= ~TRIGGER;
-                    P2OUT &= ~VCC_ULTRA;
+                    written = 0;
+                    if(count == NUM_CAP)
+                    {
+                      count = 0;
+                      fsm_control = 0;
+                      for(i = 0; i < NUM_CAP; i++)
+                        echoValue = echoValue + store_cap[count];
+                      P4OUT &= ~TRIGGER;
+                      P2OUT &= ~VCC_ULTRA;
+                      __delay_cycles(100);
+                      __disable_interrupt();
+                      __set_interrupt_state(s);
+                    }  
+                    else
+                    {
+                      __delay_cycles(100);
+                      fsm_usens = capturing;
+                    }
+                  }
                   break;
       default: 
                   break;
     }
     
   }
-  //__enable_interrupt();
   return (echoValue/(60*NUM_CAP));
 }
 #pragma vector=TIMERB0_VECTOR
 __interrupt void Timer_B(void)
 {
-  if(cap_st)
-  {
-    new_cap = TBCCR0;
-    cap_diff = new_cap - old_cap;
-    old_cap = new_cap; 
-    if(cap_diff > 21000)
+    if(cap_st)
     {
-      store_cap[count-1] = 21000;
-      written++;
+        new_cap = TBCCR0;  
+        cap_diff = new_cap - old_cap; 
+        old_cap = new_cap; 
+        if(cap_diff > 21000 & !(P4IN & ECHO))
+        {
+          TBCCR0 = 0;
+          store_cap[count-1] = 21000;
+          written++;
+        }
+        else if(!(P4IN & ECHO))
+        {
+            TBCCR0 = 0;
+            store_cap[count-1] = cap_diff;
+            written++;
+        }
     }
-    else if(!(P4IN & ECHO))
-    {
-        store_cap[count-1] = cap_diff;
-        written++;
-    }
-  }
 }
 
 
