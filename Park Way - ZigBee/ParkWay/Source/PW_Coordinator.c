@@ -13,6 +13,9 @@
     programmer because the NV_RESTORE option is enabled  to restore the  End 
     Devices after the coordinator power down
 
+    -When the board has PA_LNA RANGE EXTENDER, it must be necessary to cut off
+    the 'x' from the defines of #define xHAL_PA_LNA of the hal_board_cfg.h
+
   Pre-processor directives:
     ZTOOL_P1
     MT_TASK
