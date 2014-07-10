@@ -4,7 +4,7 @@
 
   Ver.: 1.0
   Date: 27/06/14
-  Developer:  Ânderson Ignácio da Silva
+  Developer:  Ã‚nderson IgnÃ¡cio da Silva
   Obs.:
     -LCD_SUPPORTED=DEBUG or LCD_SUPPORTED must be disable in the CC2530 China 
     modules to work
@@ -237,7 +237,7 @@ uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
         }
       }
     } 
-    SendUART("@",1);
+    SendUART("@OK",3);
   }  
  
   return 0;
