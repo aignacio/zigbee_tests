@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:27:51 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:23 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Components\osal\c #
 #                          ommon\OSAL.c" -D NWK_AUTO_POLL -D ZTOOL_P1 -D      #
 #                          MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC -D           #
-#                          xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC           #
+#                          xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC          #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -3013,7 +3013,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\osal\common\OSAL.c
    \   00002C   E5..         MOV     A,?V0
    \   00002E   C3           CLR     C
    \   00002F   98           SUBB    A,R0
-   \   000030   506C         JNC     ??osal_run_system_2
+   \   000030   506A         JNC     ??osal_run_system_2
    1059            {
    1060              uint16 events;
    1061              halIntState_t intState;
@@ -3102,15 +3102,11 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\osal\common\OSAL.c
    \   000096   A2E7         MOV     C,0xE0 /* A   */.7
    \   000098   A2E7         MOV     C,0xE0 /* A   */.7
    \   00009A   92AF         MOV     0xa8.7,C
-   \   00009C   8003         SJMP    ??osal_run_system_3
    1075            }
    1076          #if defined( POWER_SAVING )
    1077            else  // Complete pass through all task events with no activity?
    1078            {
    1079              osal_pwrmgr_powerconserve();  // Put the processor/system into sleep
-   \                     ??osal_run_system_2:
-   \   00009E                ; Setup parameters for call to function osal_pwrmgr_powerconserve
-   \   00009E   12....       LCALL   ??osal_pwrmgr_powerconserve?relay; Banked call to: osal_pwrmgr_powerconserve
    1080            }
    1081          #endif
    1082          
@@ -3121,9 +3117,9 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\osal\common\OSAL.c
    1087            }
    1088          #endif
    1089          }
-   \                     ??osal_run_system_3:
-   \   0000A1   02....       LJMP    ?Subroutine4 & 0xFFFF
-   \   0000A4                REQUIRE _A_IEN0
+   \                     ??osal_run_system_2:
+   \   00009C   02....       LJMP    ?Subroutine4 & 0xFFFF
+   \   00009F                REQUIRE _A_IEN0
    1090          
    1091          /*********************************************************************
    1092           * @fn      osal_buffer_uint32
@@ -3602,7 +3598,6 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\osal\common\OSAL.c
       0     12   osal_run_system
         0     12   -> Hal_ProcessPoll
         0     12   -> osalTimeUpdate
-        0     12   -> osal_pwrmgr_powerconserve
       2      0   osal_self
       0     21   osal_set_event
       2      0   osal_start_system
@@ -3720,14 +3715,14 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\osal\common\OSAL.c
        2  osal_qHead
        9  osal_rand
       57  osal_revmemcpy
-     164  osal_run_system
+     159  osal_run_system
       12  osal_self
       64  osal_set_event
        9  osal_start_system
       10  osal_strlen
 
  
- 2 646 bytes in segment BANKED_CODE
+ 2 641 bytes in segment BANKED_CODE
    192 bytes in segment BANK_RELAYS
      1 byte  in segment SFR_AN
      1 byte  in segment XDATA_I
@@ -3735,7 +3730,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\osal\common\OSAL.c
     40 bytes in segment XDATA_ROM_C
      2 bytes in segment XDATA_Z
  
- 2 839 bytes of CODE  memory
+ 2 834 bytes of CODE  memory
     32 bytes of CONST memory (+ 8 bytes shared)
      0 bytes of DATA  memory (+ 1 byte  shared)
      3 bytes of XDATA memory

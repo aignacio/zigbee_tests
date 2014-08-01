@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:28:01 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:36 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Components\hal\ta #
 #                          rget\CC2530EB\hal_dma.c" -D NWK_AUTO_POLL -D       #
 #                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC  #
-#                          -D xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC        #
+#                          -D xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC       #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -376,18 +376,17 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_dma
     159          #endif // (defined HAL_IRGEN) && (HAL_IRGEN == TRUE)
     160          
     161            CLEAR_SLEEP_MODE();
-   \                     ??halDmaIsr_0:
-   \   000019   75..00       MOV     halSleepPconValue,#0x0
     162            HAL_EXIT_ISR();
-   \   00001C   EE           MOV     A,R6
-   \   00001D   A2E0         MOV     C,0xE0 /* A   */.0
-   \   00001F   92AF         MOV     0xa8.7,C
+   \                     ??halDmaIsr_0:
+   \   000019   EE           MOV     A,R6
+   \   00001A   A2E0         MOV     C,0xE0 /* A   */.0
+   \   00001C   92AF         MOV     0xa8.7,C
     163          }
-   \   000021   7F01         MOV     R7,#0x1
-   \   000023   02....       LJMP    ?INTERRUPT_LEAVE_XSP
-   \   000026                REQUIRE _A_IEN0
-   \   000026                REQUIRE _A_IRCON
-   \   000026                REQUIRE DMAIRQ
+   \   00001E   7F01         MOV     R7,#0x1
+   \   000020   02....       LJMP    ?INTERRUPT_LEAVE_XSP
+   \   000023                REQUIRE _A_IEN0
+   \   000023                REQUIRE _A_IRCON
+   \   000023                REQUIRE DMAIRQ
 
    \                                 In  segment INTVEC, offset 0x43, root
    \                     `??halDmaIsr??INTVEC 67`:
@@ -428,17 +427,17 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_dma
        1  _A_IRCON
        8  dmaCh0
       32  dmaCh1234
-      38  halDmaIsr
+      35  halDmaIsr
 
  
  19 bytes in segment BANKED_CODE
   6 bytes in segment BANK_RELAYS
   3 bytes in segment INTVEC
- 38 bytes in segment NEAR_CODE
+ 35 bytes in segment NEAR_CODE
   8 bytes in segment SFR_AN
  40 bytes in segment XDATA_Z
  
- 63 bytes of CODE  memory (+ 3 bytes shared)
+ 60 bytes of CODE  memory (+ 3 bytes shared)
   0 bytes of DATA  memory (+ 8 bytes shared)
  40 bytes of XDATA memory
 

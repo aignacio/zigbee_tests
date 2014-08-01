@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:51:38 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:30:36 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -478,9 +478,6 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     163            /* Raises the CCA threshold from about -108 dBm to about -80 dBm input level.
     164             */
     165            CCACTRL0 = CCA_THR;
-   \   00001A   906196       MOV     DPTR,#0x6196
-   \   00001D   74FC         MOV     A,#-0x4
-   \   00001F   F0           MOVX    @DPTR,A
     166          #endif
     167          
     168          #ifdef CC2591_COMPRESSION_WORKAROUND
@@ -494,99 +491,99 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     176             * details available in datasheet.
     177             */
     178            MDMCTRL0 = 0x85;
-   \   000020   9061A8       MOV     DPTR,#0x61a8
-   \   000023   7485         MOV     A,#-0x7b
-   \   000025   F0           MOVX    @DPTR,A
+   \   00001A   9061A8       MOV     DPTR,#0x61a8
+   \   00001D   7485         MOV     A,#-0x7b
+   \   00001F   F0           MOVX    @DPTR,A
     179          #endif /* CC2591_COMPRESSION_WORKAROUND */
     180          
     181            if (*(uint8 *)(P_INFOPAGE+0x03) == 0x95)  // Device is a CC2533
-   \   000026   907803       MOV     DPTR,#0x7803
-   \   000029   E0           MOVX    A,@DPTR
-   \   00002A   6495         XRL     A,#0x95
-   \   00002C   7006         JNZ     ??macMcuInit_0
+   \   000020   907803       MOV     DPTR,#0x7803
+   \   000023   E0           MOVX    A,@DPTR
+   \   000024   6495         XRL     A,#0x95
+   \   000026   7006         JNZ     ??macMcuInit_0
     182            {
     183              /* In case the device is a 2533, just update the IVCTRL regoster which is 2533 specific */
     184              #define IVCTRL          XREG( 0x6265 )  
     185              IVCTRL = 0xF;
-   \   00002E   906265       MOV     DPTR,#0x6265
-   \   000031   740F         MOV     A,#0xf
-   \   000033   F0           MOVX    @DPTR,A
+   \   000028   906265       MOV     DPTR,#0x6265
+   \   00002B   740F         MOV     A,#0xf
+   \   00002D   F0           MOVX    @DPTR,A
     186            }
     187            /* Adjust current in VCO; details available in datasheet. */
     188            FSCAL1 = 0x00;
    \                     ??macMcuInit_0:
-   \   000034   9061AE       MOV     DPTR,#0x61ae
-   \   000037   E4           CLR     A
-   \   000038   F0           MOVX    @DPTR,A
+   \   00002E   9061AE       MOV     DPTR,#0x61ae
+   \   000031   E4           CLR     A
+   \   000032   F0           MOVX    @DPTR,A
     189          
     190            /* Adjust target value for AGC control loop; details available in datasheet. */
     191            AGCCTRL1 = 0x15;
-   \   000039   9061B2       MOV     DPTR,#0x61b2
-   \   00003C   7415         MOV     A,#0x15
-   \   00003E   F0           MOVX    @DPTR,A
+   \   000033   9061B2       MOV     DPTR,#0x61b2
+   \   000036   7415         MOV     A,#0x15
+   \   000038   F0           MOVX    @DPTR,A
     192          
     193            /* Disable source address matching an autopend for now */
     194            SRCMATCH = 0;
-   \   00003F   906182       MOV     DPTR,#0x6182
-   \   000042   E4           CLR     A
-   \   000043   F0           MOVX    @DPTR,A
+   \   000039   906182       MOV     DPTR,#0x6182
+   \   00003C   E4           CLR     A
+   \   00003D   F0           MOVX    @DPTR,A
     195          
     196            /* Tune ADC performance, details available in datasheet. */
     197            ADCTEST0 = 0x10;
-   \   000044   9061B5       MOV     DPTR,#0x61b5
-   \   000047   7410         MOV     A,#0x10
-   \   000049   F0           MOVX    @DPTR,A
+   \   00003E   9061B5       MOV     DPTR,#0x61b5
+   \   000041   7410         MOV     A,#0x10
+   \   000043   F0           MOVX    @DPTR,A
     198            ADCTEST1 = 0x0E;
-   \   00004A   A3           INC     DPTR
-   \   00004B   740E         MOV     A,#0xe
-   \   00004D   F0           MOVX    @DPTR,A
+   \   000044   A3           INC     DPTR
+   \   000045   740E         MOV     A,#0xe
+   \   000047   F0           MOVX    @DPTR,A
     199            ADCTEST2 = 0x03;
-   \   00004E   A3           INC     DPTR
-   \   00004F   7403         MOV     A,#0x3
-   \   000051   F0           MOVX    @DPTR,A
+   \   000048   A3           INC     DPTR
+   \   000049   7403         MOV     A,#0x3
+   \   00004B   F0           MOVX    @DPTR,A
     200          
     201            /* Sets TX anti-aliasing filter to appropriate bandwidth.
     202             * Reduces spurious emissions close to signal.
     203             */
     204            TXFILTCFG = TXFILTCFG_RESET_VALUE;
-   \   000052   9061FA       MOV     DPTR,#0x61fa
-   \   000055   7409         MOV     A,#0x9
-   \   000057   F0           MOVX    @DPTR,A
+   \   00004C   9061FA       MOV     DPTR,#0x61fa
+   \   00004F   7409         MOV     A,#0x9
+   \   000051   F0           MOVX    @DPTR,A
     205          
     206            /* disable the CSPT register compare function */
     207            CSPT = 0xFF;
-   \   000058   9061E5       MOV     DPTR,#0x61e5
-   \   00005B   74FF         MOV     A,#-0x1
-   \   00005D   F0           MOVX    @DPTR,A
+   \   000052   9061E5       MOV     DPTR,#0x61e5
+   \   000055   74FF         MOV     A,#-0x1
+   \   000057   F0           MOVX    @DPTR,A
     208          
     209            /* enable general RF interrupts */
     210            IEN2 |= RFIE;
-   \   00005E   439A01       ORL     0x9a,#0x1
+   \   000058   439A01       ORL     0x9a,#0x1
     211          
     212            /* enable general REERR interrupts */
     213            IEN0 |= RFERRIE;
-   \   000061   D2A8         SETB    0xa8.0
+   \   00005B   D2A8         SETB    0xa8.0
     214          
     215            /* set RF interrupts one notch above lowest priority (four levels available) */
     216            IP0 |=  IP_RFERR_RF_DMA_BV;
-   \   000063   43A901       ORL     0xa9,#0x1
+   \   00005D   43A901       ORL     0xa9,#0x1
     217            IP1 &= ~IP_RFERR_RF_DMA_BV;
-   \   000066   53B9FE       ANL     0xb9,#0xfe
+   \   000060   53B9FE       ANL     0xb9,#0xfe
     218          
     219            /* set T2 interrupts one notch above lowest priority (four levels available)
     220             * This effectively turned off nested interrupt between T2 and RF.
     221             */
     222            IP0 |=  IP_RXTX0_T2_BV;
-   \   000069   43A904       ORL     0xa9,#0x4
+   \   000063   43A904       ORL     0xa9,#0x4
     223            IP1 &= ~IP_RXTX0_T2_BV;
-   \   00006C   53B9FB       ANL     0xb9,#0xfb
+   \   000066   53B9FB       ANL     0xb9,#0xfb
     224          
     225            /* read chip version */
     226            macChipVersion = CHVER;
-   \   00006F   906249       MOV     DPTR,#0x6249
-   \   000072   E0           MOVX    A,@DPTR
-   \   000073   90....       MOV     DPTR,#macChipVersion
-   \   000076   F0           MOVX    @DPTR,A
+   \   000069   906249       MOV     DPTR,#0x6249
+   \   00006C   E0           MOVX    A,@DPTR
+   \   00006D   90....       MOV     DPTR,#macChipVersion
+   \   000070   F0           MOVX    @DPTR,A
     227          
     228            /*-------------------------------------------------------------------------------
     229             *  Initialize MAC timer.
@@ -594,39 +591,39 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     231          
     232            /* set timer rollover */
     233            HAL_ENTER_CRITICAL_SECTION(s);
-   \   000077   E5A8         MOV     A,0xa8
-   \   000079   C2AF         CLR     0xa8.7
+   \   000071   E5A8         MOV     A,0xa8
+   \   000073   C2AF         CLR     0xa8.7
     234            MAC_MCU_T2_ACCESS_PERIOD_VALUE();
-   \   00007B   75C302       MOV     0xc3,#0x2
+   \   000075   75C302       MOV     0xc3,#0x2
     235            T2M0 = MAC_RADIO_TIMER_TICKS_PER_BACKOFF() & 0xFF;
-   \   00007E   75A200       MOV     0xa2,#0x0
+   \   000078   75A200       MOV     0xa2,#0x0
     236            T2M1 = MAC_RADIO_TIMER_TICKS_PER_BACKOFF() >> 8;
-   \   000081   75A328       MOV     0xa3,#0x28
+   \   00007B   75A328       MOV     0xa3,#0x28
     237            HAL_EXIT_CRITICAL_SECTION(s);
-   \   000084   A2E7         MOV     C,0xE0 /* A   */.7
-   \   000086   A2E7         MOV     C,0xE0 /* A   */.7
-   \   000088   92AF         MOV     0xa8.7,C
+   \   00007E   A2E7         MOV     C,0xE0 /* A   */.7
+   \   000080   A2E7         MOV     C,0xE0 /* A   */.7
+   \   000082   92AF         MOV     0xa8.7,C
     238          
     239            /* start timer */
     240            MAC_RADIO_TIMER_WAKE_UP();
    \                     ??macMcuInit_1:
-   \   00008A   E59E         MOV     A,0x9e
-   \   00008C   70FC         JNZ     ??macMcuInit_1
-   \   00008E   439403       ORL     0x94,#0x3
+   \   000084   E59E         MOV     A,0x9e
+   \   000086   70FC         JNZ     ??macMcuInit_1
+   \   000088   439403       ORL     0x94,#0x3
    \                     ??macMcuInit_2:
-   \   000091   E594         MOV     A,0x94
-   \   000093   A2E2         MOV     C,0xE0 /* A   */.2
-   \   000095   50FA         JNC     ??macMcuInit_2
+   \   00008B   E594         MOV     A,0x94
+   \   00008D   A2E2         MOV     C,0xE0 /* A   */.2
+   \   00008F   50FA         JNC     ??macMcuInit_2
     241          
     242            /* Enable latch mode and T2 SYNC start. OSAL timer is based on MAC timer. 
     243             * The SYNC start msut be on when POWER_SAVING is on for this design to work.
     244             */
     245            T2CTRL |= (LATCH_MODE | TIMER2_SYNC);
-   \   000097   43940A       ORL     0x94,#0xa
+   \   000091   43940A       ORL     0x94,#0xa
     246            
     247            /* enable timer interrupts */
     248            T2IE = 1;
-   \   00009A   D2BA         SETB    0xb8.2
+   \   000094   D2BA         SETB    0xb8.2
     249          
     250           /*----------------------------------------------------------------------------------------------
     251            *  Initialize random seed value.
@@ -637,14 +634,14 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     256             *  it will stay in receive mode regardless RF activity.
     257             */
     258            FRMCTRL0 = FRMCTRL0_RESET_VALUE | RX_MODE_INFINITE_RECEPTION;
-   \   00009C   906189       MOV     DPTR,#0x6189
-   \   00009F   7448         MOV     A,#0x48
-   \   0000A1   F0           MOVX    @DPTR,A
+   \   000096   906189       MOV     DPTR,#0x6189
+   \   000099   7448         MOV     A,#0x48
+   \   00009B   F0           MOVX    @DPTR,A
     259          
     260            /* turn on the receiver */
     261            macRxOn();
-   \   0000A2                ; Setup parameters for call to function macRxOn
-   \   0000A2   12....       LCALL   ??macRxOn?relay      ; Banked call to: macRxOn
+   \   00009C                ; Setup parameters for call to function macRxOn
+   \   00009C   12....       LCALL   ??macRxOn?relay      ; Banked call to: macRxOn
     262          
     263            /*
     264             *  Wait for radio to reach infinite reception state by checking RSSI valid flag.
@@ -652,10 +649,10 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     266             */
     267            while (!(RSSISTAT & 0x01));
    \                     ??macMcuInit_3:
-   \   0000A5   906199       MOV     DPTR,#0x6199
-   \   0000A8   E0           MOVX    A,@DPTR
-   \   0000A9   A2E0         MOV     C,0xE0 /* A   */.0
-   \   0000AB   50F8         JNC     ??macMcuInit_3
+   \   00009F   906199       MOV     DPTR,#0x6199
+   \   0000A2   E0           MOVX    A,@DPTR
+   \   0000A3   A2E0         MOV     C,0xE0 /* A   */.0
+   \   0000A5   50F8         JNC     ??macMcuInit_3
     268          
     269            /* put 16 random bits into the seed value */
     270            {
@@ -663,32 +660,32 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     272              uint8  i;
     273          
     274              rndSeed = 0;
-   \   0000AD   7800         MOV     R0,#0x0
-   \   0000AF   7900         MOV     R1,#0x0
+   \   0000A7   7800         MOV     R0,#0x0
+   \   0000A9   7900         MOV     R1,#0x0
     275          
     276              for(i=0; i<16; i++)
-   \   0000B1   7C10         MOV     R4,#0x10
+   \   0000AB   7C10         MOV     R4,#0x10
     277              {
     278                /* use most random bit of analog to digital receive conversion to populate the random seed */
     279                rndSeed = (rndSeed << 1) | (RFRND & 0x01);
    \                     ??macMcuInit_4:
-   \   0000B3   E8           MOV     A,R0
-   \   0000B4   25E0         ADD     A,0xE0 /* A   */
-   \   0000B6   F8           MOV     R0,A
-   \   0000B7   E9           MOV     A,R1
-   \   0000B8   33           RLC     A
-   \   0000B9   F9           MOV     R1,A
-   \   0000BA   9061A7       MOV     DPTR,#0x61a7
-   \   0000BD   E0           MOVX    A,@DPTR
-   \   0000BE   A2E0         MOV     C,0xE0 /* A   */.0
-   \   0000C0   E4           CLR     A
-   \   0000C1   33           RLC     A
-   \   0000C2   FA           MOV     R2,A
-   \   0000C3   E8           MOV     A,R0
-   \   0000C4   4A           ORL     A,R2
-   \   0000C5   F8           MOV     R0,A
+   \   0000AD   E8           MOV     A,R0
+   \   0000AE   25E0         ADD     A,0xE0 /* A   */
+   \   0000B0   F8           MOV     R0,A
+   \   0000B1   E9           MOV     A,R1
+   \   0000B2   33           RLC     A
+   \   0000B3   F9           MOV     R1,A
+   \   0000B4   9061A7       MOV     DPTR,#0x61a7
+   \   0000B7   E0           MOVX    A,@DPTR
+   \   0000B8   A2E0         MOV     C,0xE0 /* A   */.0
+   \   0000BA   E4           CLR     A
+   \   0000BB   33           RLC     A
+   \   0000BC   FA           MOV     R2,A
+   \   0000BD   E8           MOV     A,R0
+   \   0000BE   4A           ORL     A,R2
+   \   0000BF   F8           MOV     R0,A
     280              }
-   \   0000C6   DCEB         DJNZ    R4,??macMcuInit_4
+   \   0000C0   DCEB         DJNZ    R4,??macMcuInit_4
     281          
     282              /*
     283               *  The seed value must not be zero or 0x0380 (0x8003 in the polynomial).  If it is, the psuedo
@@ -696,21 +693,21 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     285               *  be zero or 0x0380.  The following check makes sure this does not happen.
     286               */
     287              if (rndSeed == 0x0000 || rndSeed == 0x0380)
-   \   0000C8   E8           MOV     A,R0
-   \   0000C9   49           ORL     A,R1
-   \   0000CA   600A         JZ      ??macMcuInit_5
-   \   0000CC   7480         MOV     A,#-0x80
-   \   0000CE   68           XRL     A,R0
-   \   0000CF   7003         JNZ     ??macMcuInit_6
-   \   0000D1   7403         MOV     A,#0x3
-   \   0000D3   69           XRL     A,R1
+   \   0000C2   E8           MOV     A,R0
+   \   0000C3   49           ORL     A,R1
+   \   0000C4   600A         JZ      ??macMcuInit_5
+   \   0000C6   7480         MOV     A,#-0x80
+   \   0000C8   68           XRL     A,R0
+   \   0000C9   7003         JNZ     ??macMcuInit_6
+   \   0000CB   7403         MOV     A,#0x3
+   \   0000CD   69           XRL     A,R1
    \                     ??macMcuInit_6:
-   \   0000D4   7004         JNZ     ??macMcuInit_7
+   \   0000CE   7004         JNZ     ??macMcuInit_7
     288              {
     289                rndSeed = 0xBABE; /* completely arbitrary "random" value */
    \                     ??macMcuInit_5:
-   \   0000D6   78BE         MOV     R0,#-0x42
-   \   0000D8   79BA         MOV     R1,#-0x46
+   \   0000D0   78BE         MOV     R0,#-0x42
+   \   0000D2   79BA         MOV     R1,#-0x46
     290              }
     291          
     292              /*
@@ -719,136 +716,136 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
     295               */
     296              RNDL = rndSeed & 0xFF;
    \                     ??macMcuInit_7:
-   \   0000DA   E8           MOV     A,R0
-   \   0000DB   F5BC         MOV     0xbc,A
+   \   0000D4   E8           MOV     A,R0
+   \   0000D5   F5BC         MOV     0xbc,A
     297              RNDL = rndSeed >> 8;
-   \   0000DD   E9           MOV     A,R1
-   \   0000DE   F5BC         MOV     0xbc,A
+   \   0000D7   E9           MOV     A,R1
+   \   0000D8   F5BC         MOV     0xbc,A
     298            }
     299          
     300            /* Read 16*8 random bits and store them in flash for future use in random
     301               key generation for CBKE key establishment */
     302            if( pRandomSeedCB )
-   \   0000E0   90....       MOV     DPTR,#pRandomSeedCB
-   \   0000E3   E0           MOVX    A,@DPTR
-   \   0000E4   F8           MOV     R0,A
-   \   0000E5   A3           INC     DPTR
-   \   0000E6   E0           MOVX    A,@DPTR
-   \   0000E7   F9           MOV     R1,A
-   \   0000E8   E8           MOV     A,R0
-   \   0000E9   49           ORL     A,R1
-   \   0000EA   6040         JZ      ??macMcuInit_8
+   \   0000DA   90....       MOV     DPTR,#pRandomSeedCB
+   \   0000DD   E0           MOVX    A,@DPTR
+   \   0000DE   F8           MOV     R0,A
+   \   0000DF   A3           INC     DPTR
+   \   0000E0   E0           MOVX    A,@DPTR
+   \   0000E1   F9           MOV     R1,A
+   \   0000E2   E8           MOV     A,R0
+   \   0000E3   49           ORL     A,R1
+   \   0000E4   6040         JZ      ??macMcuInit_8
     303            {
     304              uint8 randomSeed[MAC_RANDOM_SEED_LEN];
     305              uint8 i,j;
     306          
     307              for(i = 0; i < 16; i++)
-   \   0000EC   7800         MOV     R0,#0x0
+   \   0000E6   7800         MOV     R0,#0x0
     308              {
     309                uint8 rndByte = 0;
    \                     ??macMcuInit_9:
-   \   0000EE   7B00         MOV     R3,#0x0
+   \   0000E8   7B00         MOV     R3,#0x0
     310                for(j = 0; j < 8; j++)
-   \   0000F0   7A08         MOV     R2,#0x8
+   \   0000EA   7A08         MOV     R2,#0x8
     311                {
     312                  /* use most random bit of analog to digital receive conversion to
     313                     populate the random seed */
     314                  rndByte = (rndByte << 1) | (RFRND & 0x01);
    \                     ??macMcuInit_10:
-   \   0000F2   9061A7       MOV     DPTR,#0x61a7
-   \   0000F5   E0           MOVX    A,@DPTR
-   \   0000F6   A2E0         MOV     C,0xE0 /* A   */.0
-   \   0000F8   E4           CLR     A
-   \   0000F9   33           RLC     A
-   \   0000FA   F9           MOV     R1,A
-   \   0000FB   EB           MOV     A,R3
-   \   0000FC   33           RLC     A
-   \   0000FD   49           ORL     A,R1
-   \   0000FE   FB           MOV     R3,A
+   \   0000EC   9061A7       MOV     DPTR,#0x61a7
+   \   0000EF   E0           MOVX    A,@DPTR
+   \   0000F0   A2E0         MOV     C,0xE0 /* A   */.0
+   \   0000F2   E4           CLR     A
+   \   0000F3   33           RLC     A
+   \   0000F4   F9           MOV     R1,A
+   \   0000F5   EB           MOV     A,R3
+   \   0000F6   33           RLC     A
+   \   0000F7   49           ORL     A,R1
+   \   0000F8   FB           MOV     R3,A
     315                }
-   \   0000FF   DAF1         DJNZ    R2,??macMcuInit_10
+   \   0000F9   DAF1         DJNZ    R2,??macMcuInit_10
     316                randomSeed[i] = rndByte;
-   \   000101   85..82       MOV     DPL,?XSP + 0
-   \   000104   85..83       MOV     DPH,?XSP + 1
-   \   000107   E582         MOV     A,DPL
-   \   000109   28           ADD     A,R0
-   \   00010A   F582         MOV     DPL,A
-   \   00010C   E4           CLR     A
-   \   00010D   3583         ADDC    A,DPH
-   \   00010F   F583         MOV     DPH,A
-   \   000111   EB           MOV     A,R3
-   \   000112   F0           MOVX    @DPTR,A
+   \   0000FB   85..82       MOV     DPL,?XSP + 0
+   \   0000FE   85..83       MOV     DPH,?XSP + 1
+   \   000101   E582         MOV     A,DPL
+   \   000103   28           ADD     A,R0
+   \   000104   F582         MOV     DPL,A
+   \   000106   E4           CLR     A
+   \   000107   3583         ADDC    A,DPH
+   \   000109   F583         MOV     DPH,A
+   \   00010B   EB           MOV     A,R3
+   \   00010C   F0           MOVX    @DPTR,A
     317          
     318              }
-   \   000113   08           INC     R0
-   \   000114   E8           MOV     A,R0
-   \   000115   C3           CLR     C
-   \   000116   9410         SUBB    A,#0x10
-   \   000118   40D4         JC      ??macMcuInit_9
+   \   00010D   08           INC     R0
+   \   00010E   E8           MOV     A,R0
+   \   00010F   C3           CLR     C
+   \   000110   9410         SUBB    A,#0x10
+   \   000112   40D4         JC      ??macMcuInit_9
     319              pRandomSeedCB( randomSeed );
-   \   00011A                ; Setup parameters for indirect call
-   \   00011A   AA..         MOV     R2,?XSP + 0
-   \   00011C   AB..         MOV     R3,?XSP + 1
-   \   00011E   90....       MOV     DPTR,#pRandomSeedCB
-   \   000121   E0           MOVX    A,@DPTR
-   \   000122   F8           MOV     R0,A
-   \   000123   A3           INC     DPTR
-   \   000124   E0           MOVX    A,@DPTR
-   \   000125   F583         MOV     DPH,A
-   \   000127   8882         MOV     DPL,R0
-   \   000129   12....       LCALL   ?CALL_IND
+   \   000114                ; Setup parameters for indirect call
+   \   000114   AA..         MOV     R2,?XSP + 0
+   \   000116   AB..         MOV     R3,?XSP + 1
+   \   000118   90....       MOV     DPTR,#pRandomSeedCB
+   \   00011B   E0           MOVX    A,@DPTR
+   \   00011C   F8           MOV     R0,A
+   \   00011D   A3           INC     DPTR
+   \   00011E   E0           MOVX    A,@DPTR
+   \   00011F   F583         MOV     DPH,A
+   \   000121   8882         MOV     DPL,R0
+   \   000123   12....       LCALL   ?CALL_IND
     320            }
     321          
     322            /* turn off the receiver */
     323            macRxOff();
    \                     ??macMcuInit_8:
-   \   00012C                ; Setup parameters for call to function macRxOff
-   \   00012C   12....       LCALL   ??macRxOff?relay     ; Banked call to: macRxOff
+   \   000126                ; Setup parameters for call to function macRxOff
+   \   000126   12....       LCALL   ??macRxOff?relay     ; Banked call to: macRxOff
     324          
     325            /* take receiver out of infinite reception mode; set back to normal operation */
     326            FRMCTRL0 = FRMCTRL0_RESET_VALUE | RX_MODE_NORMAL_OPERATION;
-   \   00012F   906189       MOV     DPTR,#0x6189
-   \   000132   7440         MOV     A,#0x40
-   \   000134   F0           MOVX    @DPTR,A
+   \   000129   906189       MOV     DPTR,#0x6189
+   \   00012C   7440         MOV     A,#0x40
+   \   00012E   F0           MOVX    @DPTR,A
     327          
     328            /* Turn on autoack */
     329            MAC_RADIO_TURN_ON_AUTO_ACK();
-   \   000135   E0           MOVX    A,@DPTR
-   \   000136   D2E5         SETB    0xE0 /* A   */.5
-   \   000138   F0           MOVX    @DPTR,A
+   \   00012F   E0           MOVX    A,@DPTR
+   \   000130   D2E5         SETB    0xE0 /* A   */.5
+   \   000132   F0           MOVX    @DPTR,A
     330          
     331            /* Initialize SRCEXTPENDEN and SRCSHORTPENDEN to zeros */
     332            MAC_RADIO_SRC_MATCH_INIT_EXTPENDEN();
-   \   000139   906164       MOV     DPTR,#0x6164
-   \   00013C   E4           CLR     A
+   \   000133   906164       MOV     DPTR,#0x6164
+   \   000136   E4           CLR     A
+   \   000137   F0           MOVX    @DPTR,A
+   \   000138   A3           INC     DPTR
+   \   000139   F0           MOVX    @DPTR,A
+   \   00013A   A3           INC     DPTR
+   \   00013B   F0           MOVX    @DPTR,A
+    333            MAC_RADIO_SRC_MATCH_INIT_SHORTPENDEN();
+   \   00013C   A3           INC     DPTR
    \   00013D   F0           MOVX    @DPTR,A
    \   00013E   A3           INC     DPTR
    \   00013F   F0           MOVX    @DPTR,A
    \   000140   A3           INC     DPTR
    \   000141   F0           MOVX    @DPTR,A
-    333            MAC_RADIO_SRC_MATCH_INIT_SHORTPENDEN();
-   \   000142   A3           INC     DPTR
-   \   000143   F0           MOVX    @DPTR,A
-   \   000144   A3           INC     DPTR
-   \   000145   F0           MOVX    @DPTR,A
-   \   000146   A3           INC     DPTR
-   \   000147   F0           MOVX    @DPTR,A
     334          }
-   \   000148   7410         MOV     A,#0x10
-   \   00014A   12....       LCALL   ?DEALLOC_XSTACK8
-   \   00014D   7F02         MOV     R7,#0x2
-   \   00014F   02....       LJMP    ?BANKED_LEAVE_XDATA
-   \   000152                REQUIRE IEN2
-   \   000152                REQUIRE _A_IEN0
-   \   000152                REQUIRE IP0
-   \   000152                REQUIRE IP1
-   \   000152                REQUIRE T2MSEL
-   \   000152                REQUIRE T2M0
-   \   000152                REQUIRE T2M1
-   \   000152                REQUIRE CLKCONSTA
-   \   000152                REQUIRE T2CTRL
-   \   000152                REQUIRE _A_IEN1
-   \   000152                REQUIRE RNDL
+   \   000142   7410         MOV     A,#0x10
+   \   000144   12....       LCALL   ?DEALLOC_XSTACK8
+   \   000147   7F02         MOV     R7,#0x2
+   \   000149   02....       LJMP    ?BANKED_LEAVE_XDATA
+   \   00014C                REQUIRE IEN2
+   \   00014C                REQUIRE _A_IEN0
+   \   00014C                REQUIRE IP0
+   \   00014C                REQUIRE IP1
+   \   00014C                REQUIRE T2MSEL
+   \   00014C                REQUIRE T2M0
+   \   00014C                REQUIRE T2M1
+   \   00014C                REQUIRE CLKCONSTA
+   \   00014C                REQUIRE T2CTRL
+   \   00014C                REQUIRE _A_IEN1
+   \   00014C                REQUIRE RNDL
     335          
     336          
     337          /**************************************************************************************************
@@ -2568,7 +2565,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
        4  accumulatedOverflowCount
        1  macChipVersion
       49  macMcuAccumulatedOverFlow
-     338  macMcuInit
+     332  macMcuInit
       20  macMcuOverflowCapture
       22  macMcuOverflowCount
       92  macMcuOverflowSetCompare
@@ -2592,7 +2589,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
        1  updateRolloverflag
 
  
- 1 330 bytes in segment BANKED_CODE
+ 1 324 bytes in segment BANKED_CODE
     96 bytes in segment BANK_RELAYS
      9 bytes in segment INTVEC
    228 bytes in segment NEAR_CODE
@@ -2600,7 +2597,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\single_
      4 bytes in segment XDATA_ROM_C
     17 bytes in segment XDATA_Z
  
- 1 654 bytes of CODE  memory (+  9 bytes shared)
+ 1 648 bytes of CODE  memory (+  9 bytes shared)
      0 bytes of CONST memory (+  4 bytes shared)
      0 bytes of DATA  memory (+ 22 bytes shared)
     17 bytes of XDATA memory

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:04 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:40 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          igh_level\mac_pib.c" -D NWK_AUTO_POLL -D          /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -585,7 +585,7 @@ macPibDefaults:
         DB 0
         DB 1
         DB 0
-        DB 0
+        DB 19
         DB 11
         DATA16
         DW 0
@@ -1559,7 +1559,7 @@ MAC_MlmeSetReq:
         DEC     A
         JZ      ??MAC_MlmeSetReq_14
         ADD     A,#-0x3
-        JZ      ??MAC_MlmeSetReq_15
+        JZ      ??MAC_MlmeSetReq_12
         SJMP    ??MAC_MlmeSetReq_1
 //  389   {
 //  390     case MAC_PAN_ID:
@@ -1599,7 +1599,7 @@ MAC_MlmeSetReq:
         MOV     DPTR,#macPib + 32
         MOVX    A,@DPTR
         MOV     R1,#0x2
-        JZ      ??MAC_MlmeSetReq_16
+        JZ      ??MAC_MlmeSetReq_15
 //  403       {
 //  404         macRxEnable(MAC_RX_WHEN_IDLE);
         ; Setup parameters for call to function macRxEnable
@@ -1609,7 +1609,7 @@ MAC_MlmeSetReq:
 //  406       else
 //  407       {
 //  408         macRxDisable(MAC_RX_WHEN_IDLE);
-??MAC_MlmeSetReq_16:
+??MAC_MlmeSetReq_15:
         ; Setup parameters for call to function macRxDisable
         LCALL   ??macRxDisable?relay ; Banked call to: macRxDisable
         SJMP    ??MAC_MlmeSetReq_1
@@ -1651,12 +1651,6 @@ MAC_MlmeSetReq:
 //  431        * with HAL_PA_LNAxxx definition (without runtime selection)
 //  432        * the attribute value is not a negative absolute value. */
 //  433       macPib.phyTransmitPower = (uint8)(-(int8)macPib.phyTransmitPower);
-??MAC_MlmeSetReq_12:
-        MOV     DPTR,#macPib + 47
-        MOVX    A,@DPTR
-        CPL     A
-        INC     A
-        MOVX    @DPTR,A
 //  434 #endif /* !defined HAL_MAC_USE_REGISTER_POWER_VALUES && ... */
 //  435       /* pass through to next case -- do not break*/
 //  436 
@@ -1664,7 +1658,7 @@ MAC_MlmeSetReq:
 //  438 
 //  439     case MAC_PHY_TRANSMIT_POWER_SIGNED:
 //  440       (void)macRadioSetTxPower(macPib.phyTransmitPower);
-??MAC_MlmeSetReq_15:
+??MAC_MlmeSetReq_12:
         ; Setup parameters for call to function macRadioSetTxPower
         MOV     DPTR,#macPib + 47
         MOVX    A,@DPTR
@@ -1889,13 +1883,13 @@ MAC_MlmeSetReq:
         END
 //  449 
 // 
-// 607 bytes in segment BANKED_CODE
+// 600 bytes in segment BANKED_CODE
 //  24 bytes in segment BANK_RELAYS
 // 204 bytes in segment CODE_C
 //   1 byte  in segment SFR_AN
 //  60 bytes in segment XDATA_Z
 // 
-// 835 bytes of CODE  memory
+// 828 bytes of CODE  memory
 //   0 bytes of DATA  memory (+ 1 byte shared)
 //  60 bytes of XDATA memory
 //

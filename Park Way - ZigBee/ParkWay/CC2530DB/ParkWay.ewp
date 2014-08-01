@@ -180,7 +180,7 @@
         </option>
         <option>
           <name>General Idata Stack Size</name>
-          <state>0xCA</state>
+          <state>0xCD</state>
         </option>
         <option>
           <name>General Pdata Stack Size</name>
@@ -2459,7 +2459,7 @@
           <state>MT_SYS_FUNC</state>
           <state>MT_ZDO_FUNC</state>
           <state>xLCD_SUPPORTED=DEBUG</state>
-          <state>POWER_SAVING</state>
+          <state>xPOWER_SAVING</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -3344,14 +3344,14 @@
         <group>
           <name>Config</name>
           <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_adc.c</name>
+          </file>
+          <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_board_cfg.h</name>
           </file>
         </group>
         <group>
           <name>Drivers</name>
-          <file>
-            <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_adc.c</name>
-          </file>
           <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Components\hal\target\CC2530EB\hal_dma.c</name>
           </file>

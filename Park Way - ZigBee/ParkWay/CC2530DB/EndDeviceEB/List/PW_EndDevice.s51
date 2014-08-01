@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  17:16:24 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  22:00:50 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          Samples\ParkWay\Source\PW_EndDevice.c" -D         /
 //                          NWK_AUTO_POLL -D ZTOOL_P1 -D MT_TASK -D           /
 //                          MT_SYS_FUNC -D MT_ZDO_FUNC -D                     /
-//                          xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC          /
+//                          xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC         /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
 //                          ts\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\Li /
 //                          st\" -lA "C:\Texas Instruments\ZStack-CC2530-2.5. /
@@ -164,16 +164,20 @@
         EXTERN ?XSTACK_DISP0_8
         EXTERN ?XSTACK_DISP100_8
         EXTERN ?XSTACK_DISP101_8
+        EXTERN __INIT_XDATA_I
         EXTERN __INIT_XDATA_Z
 
         PUBLIC ??ParkWay_Init?relay
         FUNCTION ??ParkWay_Init?relay,0203H
         PUBLIC ??ParkWay_ProcessEvent?relay
         FUNCTION ??ParkWay_ProcessEvent?relay,0203H
-        FUNCTION ??ParkWay_SendTheMessage?relay,0203H
         PUBLIC ??SendUART?relay
         FUNCTION ??SendUART?relay,0203H
         FUNCTION ??UART_CallBack?relay,0203H
+        PUBLIC ??control_fifo?relay
+        FUNCTION ??control_fifo?relay,0203H
+        PUBLIC ??read_ultrasonic?relay
+        FUNCTION ??read_ultrasonic?relay,0203H
         PUBLIC ??uart_init?relay
         FUNCTION ??uart_init?relay,0203H
         PUBWEAK P0DIR
@@ -188,13 +192,8 @@
         PUBLIC ParkWay_ProcessEvent
         FUNCTION ParkWay_ProcessEvent,0a1203H
         ARGFRAME XSTACK, 0, STACK
-        LOCFRAME XSTACK, 31, STACK
-        FUNCTION ParkWay_SendTheMessage,0a1203H
-        ARGFRAME XSTACK, 23, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
         LOCFRAME ISTACK, 1, STACK
-        LOCFRAME XSTACK, 25, STACK
+        LOCFRAME XSTACK, 38, STACK
         PUBLIC ParkWay_SimpleDesc
         PUBLIC ParkWay_TaskID
         PUBLIC ParkWay_TransID
@@ -209,11 +208,26 @@
         ARGFRAME XSTACK, 0, STACK
         LOCFRAME XSTACK, 10, STACK
         PUBWEAK _A_P0
+        PUBLIC control_fifo
+        FUNCTION control_fifo,0a1203H
+        ARGFRAME XSTACK, 9, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        LOCFRAME XSTACK, 10, STACK
+        PUBLIC fifo_ultra
+        PUBLIC index_flag
+        PUBLIC read_ultrasonic
+        FUNCTION read_ultrasonic,021203H
+        ARGFRAME XSTACK, 29, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        LOCFRAME XSTACK, 9, STACK
         PUBLIC uart_init
         FUNCTION uart_init,021203H
         ARGFRAME XSTACK, 0, STACK
         LOCFRAME ISTACK, 2, STACK
         LOCFRAME XSTACK, 29, STACK
+        PUBLIC vaga
         
           CFI Names cfiNames0
           CFI StackFrame CFA_SP SP IDATA
@@ -294,6 +308,65 @@
           CFI ?RET_LOW Frame(CFA_SP, 1)
           CFI EndCommon cfiCommon0
         
+        
+          CFI Common cfiCommon1 Using cfiNames0
+          CFI CodeAlign 1
+          CFI DataAlign -1
+          CFI ReturnAddress ?RET CODE
+          CFI CFA_DOVERLAY Used
+          CFI CFA_IOVERLAY Used
+          CFI CFA_SP SP+-2
+          CFI CFA_PSP16 PSP16+0
+          CFI CFA_XSP16 XSP16+0
+          CFI `PSW.CY` SameValue
+          CFI `B.BR0` SameValue
+          CFI `B.BR1` SameValue
+          CFI `B.BR2` SameValue
+          CFI `B.BR3` SameValue
+          CFI `B.BR4` SameValue
+          CFI `B.BR5` SameValue
+          CFI `B.BR6` SameValue
+          CFI `B.BR7` SameValue
+          CFI `VB.BR8` SameValue
+          CFI `VB.BR9` SameValue
+          CFI `VB.BR10` SameValue
+          CFI `VB.BR11` SameValue
+          CFI `VB.BR12` SameValue
+          CFI `VB.BR13` SameValue
+          CFI `VB.BR14` SameValue
+          CFI `VB.BR15` SameValue
+          CFI VB SameValue
+          CFI B SameValue
+          CFI A SameValue
+          CFI PSW SameValue
+          CFI DPL0 SameValue
+          CFI DPH0 SameValue
+          CFI R0 SameValue
+          CFI R1 SameValue
+          CFI R2 SameValue
+          CFI R3 SameValue
+          CFI R4 SameValue
+          CFI R5 SameValue
+          CFI R6 SameValue
+          CFI R7 SameValue
+          CFI V0 SameValue
+          CFI V1 SameValue
+          CFI V2 SameValue
+          CFI V3 SameValue
+          CFI V4 SameValue
+          CFI V5 SameValue
+          CFI V6 SameValue
+          CFI V7 SameValue
+          CFI PSPH Undefined
+          CFI PSPL Undefined
+          CFI XSPH Undefined
+          CFI XSPL Undefined
+          CFI ?RET Concat
+          CFI ?BRET_EXT SameValue
+          CFI ?RET_HIGH Frame(CFA_SP, 2)
+          CFI ?RET_LOW Frame(CFA_SP, 1)
+          CFI EndCommon cfiCommon1
+        
 AF_DataRequest      SYMBOL "AF_DataRequest"
 ??AF_DataRequest?relay SYMBOL "?relay", AF_DataRequest
 HalLedSet           SYMBOL "HalLedSet"
@@ -304,6 +377,8 @@ HalUARTRead         SYMBOL "HalUARTRead"
 ??HalUARTRead?relay SYMBOL "?relay", HalUARTRead
 HalUARTWrite        SYMBOL "HalUARTWrite"
 ??HalUARTWrite?relay SYMBOL "?relay", HalUARTWrite
+Onboard_wait        SYMBOL "Onboard_wait"
+??Onboard_wait?relay SYMBOL "?relay", Onboard_wait
 RegisterForKeys     SYMBOL "RegisterForKeys"
 ??RegisterForKeys?relay SYMBOL "?relay", RegisterForKeys
 ZDO_ParseEPListRsp  SYMBOL "ZDO_ParseEPListRsp"
@@ -332,6 +407,10 @@ ParkWay_ProcessEvent SYMBOL "ParkWay_ProcessEvent"
 ??ParkWay_ProcessEvent?relay SYMBOL "?relay", ParkWay_ProcessEvent
 SendUART            SYMBOL "SendUART"
 ??SendUART?relay    SYMBOL "?relay", SendUART
+control_fifo        SYMBOL "control_fifo"
+??control_fifo?relay SYMBOL "?relay", control_fifo
+read_ultrasonic     SYMBOL "read_ultrasonic"
+??read_ultrasonic?relay SYMBOL "?relay", read_ultrasonic
 uart_init           SYMBOL "uart_init"
 ??uart_init?relay   SYMBOL "?relay", uart_init
 
@@ -345,6 +424,8 @@ uart_init           SYMBOL "uart_init"
         FUNCTION ??HalUARTRead?relay,00H
         EXTERN ??HalUARTWrite?relay
         FUNCTION ??HalUARTWrite?relay,00H
+        EXTERN ??Onboard_wait?relay
+        FUNCTION ??Onboard_wait?relay,00H
         EXTERN ??RegisterForKeys?relay
         FUNCTION ??RegisterForKeys?relay,00H
         EXTERN ??ZDO_ParseEPListRsp?relay
@@ -371,14 +452,14 @@ uart_init           SYMBOL "uart_init"
         FUNCTION AF_DataRequest,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 25, STACK
+        ARGFRAME XSTACK, 38, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN HalLedSet
         FUNCTION HalLedSet,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN HalUARTOpen
@@ -402,6 +483,13 @@ uart_init           SYMBOL "uart_init"
         ARGFRAME XSTACK, 10, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
+        EXTERN Onboard_wait
+        FUNCTION Onboard_wait,0202H
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 10, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
         EXTERN RegisterForKeys
         FUNCTION RegisterForKeys,0202H
         ARGFRAME ISTACK, 0, STACK
@@ -413,7 +501,7 @@ uart_init           SYMBOL "uart_init"
         FUNCTION ZDO_ParseEPListRsp,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN ZDO_RegisterForZDOMsg
@@ -427,7 +515,7 @@ uart_init           SYMBOL "uart_init"
         FUNCTION ZDP_MatchDescReq,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 31, STACK
+        ARGFRAME XSTACK, 37, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN afRegister
@@ -441,42 +529,42 @@ uart_init           SYMBOL "uart_init"
         FUNCTION osal_mem_free,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN osal_msg_deallocate
         FUNCTION osal_msg_deallocate,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN osal_msg_receive
         FUNCTION osal_msg_receive,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN osal_start_timerEx
         FUNCTION osal_start_timerEx,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN osal_stop_timerEx
         FUNCTION osal_stop_timerEx,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN osal_strlen
         FUNCTION osal_strlen,0202H
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 21, STACK
+        ARGFRAME XSTACK, 34, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
 
@@ -486,7 +574,7 @@ uart_init           SYMBOL "uart_init"
 //    3   End Device Firmware
 //    4 
 //    5   Ver.: 1.0
-//    6   Date: 27/06/14
+//    6   Date: 31/07/14
 //    7   Developer:  Ânderson Ignácio da Silva
 //    8   Obs.:
 //    9     -LCD_SUPPORTED=DEBUG or LCD_SUPPORTED must be disable in the CC2530 China 
@@ -496,28 +584,31 @@ uart_init           SYMBOL "uart_init"
 //   13     programmer because the NV_RESTORE option is enabled  to restore the  End 
 //   14     Devices after the coordinator power down
 //   15 
-//   16   Pre-processor directives:
-//   17     NWK_AUTO_POLL
-//   18     ZTOOL_P1
-//   19     MT_TASK
-//   20     MT_SYS_FUNC
-//   21     MT_ZDO_FUNC
-//   22     xLCD_SUPPORTED=DEBUG
-//   23     POWER_SAVING
-//   24 
-//   25 *****************************************************************************/
-//   26 
-//   27 /*********************************************************************
-//   28  * INCLUDES
-//   29  */
-//   30 #include "OSAL.h"
-//   31 #include "AF.h"
-//   32 #include "ZDApp.h"
-//   33 #include "ZDObject.h"
-//   34 #include "ZDProfile.h"
-//   35 #include "ParkWay.h"
-//   36 #include "DebugTrace.h"
-//   37 #include "OnBoard.h"
+//   16     -When the board has PA_LNA RANGE EXTENDER, it must be necessary to cut off
+//   17     the 'x' from the defines of #define xHAL_PA_LNA of the hal_board_cfg.h
+//   18 
+//   19   Pre-processor directives:
+//   20     NWK_AUTO_POLL
+//   21     ZTOOL_P1
+//   22     MT_TASK
+//   23     MT_SYS_FUNC
+//   24     MT_ZDO_FUNC
+//   25     xLCD_SUPPORTED=DEBUG
+//   26     xPOWER_SAVING
+//   27 
+//   28 *****************************************************************************/
+//   29 
+//   30 /*********************************************************************
+//   31  * INCLUDES
+//   32  */
+//   33 #include "OSAL.h"
+//   34 #include "AF.h"
+//   35 #include "ZDApp.h"
+//   36 #include "ZDObject.h"
+//   37 #include "ZDProfile.h"
+//   38 #include "ParkWay.h"
+//   39 #include "DebugTrace.h"
+//   40 #include "OnBoard.h"
 
         ASEGN SFR_AN:DATA:NOROOT,080H
 // union <unnamed> volatile __sfr _A_P0
@@ -536,45 +627,51 @@ P0SEL:
 P0DIR:
         DATA8
         DS 1
-//   38 /* HAL */
-//   39 #include "hal_lcd.h"
-//   40 #include "hal_led.h"
-//   41 #include "hal_key.h"
-//   42 #include "hal_uart.h"
-//   43 
-//   44 /*********************************************************************
-//   45  * MACROS
-//   46  */
-//   47 
-//   48 /*********************************************************************
-//   49  * CONSTANTS
-//   50  */
-//   51 #define   DEVICE_PW_1                  '0'     //(first char)Tag of the device 
-//   52 #define   DEVICE_PW_2                  '1'     //(second char)Tag of the device
-//   53 #define   ParkWay_SEND_MSG_TIMEOUT    1500     //Time to send data to the coordinator(poll ultrasound)
-//   54 #define   TIME_TO_CONNECT_COORD       1000     //Time to connect (auto bind) the device to the coord.
-//   55 /*********************************************************************
-//   56  * TYPEDEFS
-//   57  */
-//   58 
-//   59 /*********************************************************************
-//   60  * GLOBAL VARIABLES
-//   61  */
-//   62 // This list should be filled with Application specific Cluster IDs.
+//   41 /* HAL */
+//   42 #include "hal_lcd.h"
+//   43 #include "hal_led.h"
+//   44 #include "hal_key.h"
+//   45 #include "hal_uart.h"
+//   46 
+//   47 /*********************************************************************
+//   48  * MACROS
+//   49  */
+//   50 
+//   51 /*********************************************************************
+//   52  * CONSTANTS
+//   53  */
+//   54 #define   DEVICE_PW_1                  '0'     //(first char)Tag of the device 
+//   55 #define   DEVICE_PW_2                  '6'     //(second char)Tag of the device
+//   56 #define   ParkWay_SEND_MSG_TIMEOUT     800     //Time to send data to the coordinator(poll ultrasound-ms)
+//   57 #define   TIME_TO_CONNECT_COORD       1000     //Time to connect (auto bind) the device to the coord(ms).
+//   58 #define   PIN_TRIGGER                 0x02     //Ultrasonic pin trigger - P0.1
+//   59 #define   PIN_ECHO                    0x04     //Ultrasonic pin trigger - P0.2
+//   60 #define   DISTANCE_CONSTANT          10000     //Distance measured by the ultrasonic
+//   61 #define   PIN_GREEN_LED               0x08     //P0.3
+//   62 #define   PIN_RED_LED                 0x10     //P0.4
+//   63 #define   TIME_ULTRA                   200     //Poll time to read ultrasonic
+//   64 /*********************************************************************
+//   65  * TYPEDEFS
+//   66  */
+//   67 
+//   68 /*********************************************************************
+//   69  * GLOBAL VARIABLES
+//   70  */
+//   71 // This list should be filled with Application specific Cluster IDs.
 
         RSEG XDATA_ROM_C:CONST:REORDER:NOROOT(0)
         DATA16
-//   63 const cId_t ParkWay_ClusterList[ParkWay_MAX_CLUSTERS] =
+//   72 const cId_t ParkWay_ClusterList[ParkWay_MAX_CLUSTERS] =
 ParkWay_ClusterList:
         DW 1
-//   64 {
-//   65   ParkWay_CLUSTERID
-//   66 };
-//   67 
+//   73 {
+//   74   ParkWay_CLUSTERID
+//   75 };
+//   76 
 
         RSEG XDATA_ROM_C:CONST:REORDER:NOROOT(0)
         DATA8
-//   68 const SimpleDescriptionFormat_t ParkWay_SimpleDesc =
+//   77 const SimpleDescriptionFormat_t ParkWay_SimpleDesc =
 ParkWay_SimpleDesc:
         DB 10
         DATA16
@@ -589,102 +686,126 @@ ParkWay_SimpleDesc:
         DB 1
         DATA16
         DW ParkWay_ClusterList
-//   69 {
-//   70   ParkWay_ENDPOINT,              //  int Endpoint;
-//   71   ParkWay_PROFID,                //  uint16 AppProfId[2];
-//   72   ParkWay_DEVICEID,              //  uint16 AppDeviceId[2];
-//   73   ParkWay_DEVICE_VERSION,        //  int   AppDevVer:4;
-//   74   ParkWay_FLAGS,                 //  int   AppFlags:4;
-//   75   ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
-//   76   (cId_t *)ParkWay_ClusterList,  //  byte *pAppInClusterList;
-//   77   ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
-//   78   (cId_t *)ParkWay_ClusterList   //  byte *pAppInClusterList;
-//   79 };
-//   80 
-//   81 // This is the Endpoint/Interface description.  It is defined here, but
-//   82 // filled-in in ParkWay_Init().  Another way to go would be to fill
-//   83 // in the structure here and make it a "const" (in code space).  The
-//   84 // way it's defined in this sample app it is define in RAM.
+//   78 {
+//   79   ParkWay_ENDPOINT,              //  int Endpoint;
+//   80   ParkWay_PROFID,                //  uint16 AppProfId[2];
+//   81   ParkWay_DEVICEID,              //  uint16 AppDeviceId[2];
+//   82   ParkWay_DEVICE_VERSION,        //  int   AppDevVer:4;
+//   83   ParkWay_FLAGS,                 //  int   AppFlags:4;
+//   84   ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
+//   85   (cId_t *)ParkWay_ClusterList,  //  byte *pAppInClusterList;
+//   86   ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
+//   87   (cId_t *)ParkWay_ClusterList   //  byte *pAppInClusterList;
+//   88 };
+//   89 
+
+        RSEG XDATA_I:XDATA:NOROOT(0)
+//   90 uint8 vaga='0';
+vaga:
+        DATA8
+        DS 1
+        REQUIRE `?<Initializer for vaga>`
+        REQUIRE __INIT_XDATA_I
+
+        RSEG XDATA_I:XDATA:NOROOT(0)
+//   91 uint8 fifo_ultra[12]={"000000000000"};
+fifo_ultra:
+        DATA8
+        DS 12
+        REQUIRE `?<Initializer for fifo_ultra>`
+        REQUIRE __INIT_XDATA_I
 
         RSEG XDATA_Z:XDATA:NOROOT(0)
         DATA8
-//   85 endPointDesc_t ParkWay_epDesc;
+//   92 uint8 index_flag=0;
+index_flag:
+        DS 1
+        REQUIRE __INIT_XDATA_Z
+//   93 
+//   94 // This is the Endpoint/Interface description.  It is defined here, but
+//   95 // filled-in in ParkWay_Init().  Another way to go would be to fill
+//   96 // in the structure here and make it a "const" (in code space).  The
+//   97 // way it's defined in this sample app it is define in RAM.
+
+        RSEG XDATA_Z:XDATA:NOROOT(0)
+        DATA8
+//   98 endPointDesc_t ParkWay_epDesc;
 ParkWay_epDesc:
         DS 6
         REQUIRE __INIT_XDATA_Z
-//   86 
-//   87 /*********************************************************************
-//   88  * EXTERNAL VARIABLES
-//   89  */
-//   90 
-//   91 /*********************************************************************
-//   92  * EXTERNAL FUNCTIONS
-//   93  */
-//   94 
-//   95 /*********************************************************************
-//   96  * LOCAL VARIABLES
-//   97  */
+//   99 
+//  100 /*********************************************************************
+//  101  * EXTERNAL VARIABLES
+//  102  */
+//  103 
+//  104 /*********************************************************************
+//  105  * EXTERNAL FUNCTIONS
+//  106  */
+//  107 
+//  108 /*********************************************************************
+//  109  * LOCAL VARIABLES
+//  110  */
 
         RSEG XDATA_Z:XDATA:NOROOT(0)
         DATA8
-//   98 byte ParkWay_TaskID;   // Task ID for internal task/event processing
+//  111 byte ParkWay_TaskID;   // Task ID for internal task/event processing
 ParkWay_TaskID:
         DS 1
         REQUIRE __INIT_XDATA_Z
-//   99                           // This variable will be received when
-//  100                           // ParkWay_Init() is called.
+//  112                           // This variable will be received when
+//  113                           // ParkWay_Init() is called.
 
         RSEG XDATA_Z:XDATA:NOROOT(0)
         DATA8
-//  101 devStates_t ParkWay_NwkState;
+//  114 devStates_t ParkWay_NwkState;
 ParkWay_NwkState:
         DS 1
         REQUIRE __INIT_XDATA_Z
-//  102 
-//  103 
+//  115 
+//  116 
 
         RSEG XDATA_Z:XDATA:NOROOT(0)
         DATA8
-//  104 byte ParkWay_TransID;  // This is the unique message ID (counter)
+//  117 byte ParkWay_TransID;  // This is the unique message ID (counter)
 ParkWay_TransID:
         DS 1
         REQUIRE __INIT_XDATA_Z
-//  105 
+//  118 
 
         RSEG XDATA_Z:XDATA:NOROOT(0)
         DATA8
-//  106 afAddrType_t ParkWay_DstAddr;
+//  119 afAddrType_t ParkWay_DstAddr;
 ParkWay_DstAddr:
         DS 12
         REQUIRE __INIT_XDATA_Z
-//  107 
-//  108 /*********************************************************************
-//  109  * LOCAL FUNCTIONS
-//  110  */
-//  111 void SendUART(uint8 *data,uint8 len);
-//  112 void uart_init(void);
-//  113 static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg );
-//  114 static void ParkWay_HandleKeys( byte shift, byte keys );
-//  115 static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pckt );
-//  116 static void ParkWay_SendTheMessage( void );
-//  117 
-//  118 /*********************************************************************
-//  119  * NETWORK LAYER CALLBACKS
-//  120  */
-//  121 
-//  122 /*********************************************************************
-//  123  * PUBLIC FUNCTIONS
-//  124  */
-//  125 
-//  126 //Initialization function for the Park Way task. This is called during initialization and should contain any application specific initialization (ie. hardware initialization/setup, table initialization, power up notificaiton ... )
+//  120 
+//  121 /*********************************************************************
+//  122  * LOCAL FUNCTIONS
+//  123  */
+//  124 void SendUART(uint8 *data,uint8 len);
+//  125 void uart_init(void);
+//  126 static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg );
+//  127 static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pckt );
+//  128 static void ParkWay_SendTheMessage( void );
+//  129 void read_ultrasonic(void);
+//  130 void control_fifo(uint16 ultra);
+//  131 /*********************************************************************
+//  132  * NETWORK LAYER CALLBACKS
+//  133  */
+//  134 
+//  135 /*********************************************************************
+//  136  * PUBLIC FUNCTIONS
+//  137  */
+//  138 
+//  139 //Initialization function for the Park Way task. This is called during initialization and should contain any application specific initialization (ie. hardware initialization/setup, table initialization, power up notificaiton ... )
 
         RSEG BANKED_CODE:CODE:NOROOT(0)
-//  127 void ParkWay_Init( uint8 task_id )
+//  140 void ParkWay_Init( uint8 task_id )
 ParkWay_Init:
           CFI Block cfiBlock0 Using cfiCommon0
           CFI Function ParkWay_Init
         CODE
-//  128 {
+//  141 {
         FUNCALL ParkWay_Init, afRegister
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
@@ -756,80 +877,80 @@ ParkWay_Init:
         ; Saved register size: 9
         ; Auto size: 0
         MOV     A,R1
-//  129   ParkWay_TaskID = task_id;
+//  142   ParkWay_TaskID = task_id;
         MOV     DPTR,#ParkWay_TaskID
         MOVX    @DPTR,A
-//  130   ParkWay_NwkState = DEV_INIT;
+//  143   ParkWay_NwkState = DEV_INIT;
         MOV     DPTR,#ParkWay_NwkState
         MOV     A,#0x1
         MOVX    @DPTR,A
-//  131   ParkWay_TransID = 0;
+//  144   ParkWay_TransID = 0;
         MOV     DPTR,#ParkWay_TransID
         CLR     A
         MOVX    @DPTR,A
-//  132 
-//  133   // Device hardware initialization can be added here or in main() (Zmain.c).
-//  134   // If the hardware is application specific - add it here.
-//  135   // If the hardware is other parts of the device add it in main().
-//  136 
-//  137   ParkWay_DstAddr.addrMode = (afAddrMode_t)AddrNotPresent;
+//  145 
+//  146   // Device hardware initialization can be added here or in main() (Zmain.c).
+//  147   // If the hardware is application specific - add it here.
+//  148   // If the hardware is other parts of the device add it in main().
+//  149 
+//  150   ParkWay_DstAddr.addrMode = (afAddrMode_t)AddrNotPresent;
         MOV     DPTR,#ParkWay_DstAddr + 8
         MOVX    @DPTR,A
-//  138   ParkWay_DstAddr.endPoint = 0;
+//  151   ParkWay_DstAddr.endPoint = 0;
         INC     DPTR
         MOVX    @DPTR,A
-//  139   ParkWay_DstAddr.addr.shortAddr = 0;
+//  152   ParkWay_DstAddr.addr.shortAddr = 0;
         MOV     DPTR,#ParkWay_DstAddr
         MOVX    @DPTR,A
         INC     DPTR
         MOVX    @DPTR,A
-//  140 
-//  141   // Fill out the endpoint description.
-//  142   ParkWay_epDesc.endPoint = ParkWay_ENDPOINT;
+//  153 
+//  154   // Fill out the endpoint description.
+//  155   ParkWay_epDesc.endPoint = ParkWay_ENDPOINT;
         MOV     DPTR,#ParkWay_epDesc
         MOV     A,#0xa
         MOVX    @DPTR,A
-//  143   ParkWay_epDesc.task_id = &ParkWay_TaskID;
+//  156   ParkWay_epDesc.task_id = &ParkWay_TaskID;
         INC     DPTR
         MOV     A,#ParkWay_TaskID & 0xff
         MOVX    @DPTR,A
         INC     DPTR
         MOV     A,#(ParkWay_TaskID >> 8) & 0xff
         MOVX    @DPTR,A
-//  144   ParkWay_epDesc.simpleDesc
-//  145             = (SimpleDescriptionFormat_t *)&ParkWay_SimpleDesc;
+//  157   ParkWay_epDesc.simpleDesc
+//  158             = (SimpleDescriptionFormat_t *)&ParkWay_SimpleDesc;
         INC     DPTR
         MOV     A,#ParkWay_SimpleDesc & 0xff
         MOVX    @DPTR,A
         INC     DPTR
         MOV     A,#(ParkWay_SimpleDesc >> 8) & 0xff
         MOVX    @DPTR,A
-//  146   ParkWay_epDesc.latencyReq = noLatencyReqs;
+//  159   ParkWay_epDesc.latencyReq = noLatencyReqs;
         INC     DPTR
         CLR     A
         MOVX    @DPTR,A
-//  147 
-//  148   // Register the endpoint description with the AF
-//  149   afRegister( &ParkWay_epDesc );
+//  160 
+//  161   // Register the endpoint description with the AF
+//  162   afRegister( &ParkWay_epDesc );
         ; Setup parameters for call to function afRegister
         MOV     R2,#ParkWay_epDesc & 0xff
         MOV     R3,#(ParkWay_epDesc >> 8) & 0xff
         LCALL   ??afRegister?relay   ; Banked call to: afRegister
-//  150 
-//  151   // Register for all key events - This app will handle all key events
-//  152   RegisterForKeys( ParkWay_TaskID );
+//  163 
+//  164   // Register for all key events - This app will handle all key events
+//  165   RegisterForKeys( ParkWay_TaskID );
         ; Setup parameters for call to function RegisterForKeys
         MOV     DPTR,#ParkWay_TaskID
         MOVX    A,@DPTR
         MOV     R1,A
         LCALL   ??RegisterForKeys?relay; Banked call to: RegisterForKeys
-//  153 
-//  154   // Update the display
-//  155 #if defined ( LCD_SUPPORTED )
-//  156   HalLcdWriteString( "ParkWay-Peer", HAL_LCD_LINE_1 );
-//  157 #endif
-//  158 
-//  159   ZDO_RegisterForZDOMsg( ParkWay_TaskID, End_Device_Bind_rsp );
+//  166 
+//  167   // Update the display
+//  168 #if defined ( LCD_SUPPORTED )
+//  169   HalLcdWriteString( "ParkWay-Peer", HAL_LCD_LINE_1 );
+//  170 #endif
+//  171 
+//  172   ZDO_RegisterForZDOMsg( ParkWay_TaskID, End_Device_Bind_rsp );
         ; Setup parameters for call to function ZDO_RegisterForZDOMsg
         MOV     R2,#0x20
         MOV     R3,#-0x80
@@ -837,7 +958,7 @@ ParkWay_Init:
         MOVX    A,@DPTR
         MOV     R1,A
         LCALL   ??ZDO_RegisterForZDOMsg?relay; Banked call to: ZDO_RegisterForZDOMsg
-//  160   ZDO_RegisterForZDOMsg( ParkWay_TaskID, Match_Desc_rsp );
+//  173   ZDO_RegisterForZDOMsg( ParkWay_TaskID, Match_Desc_rsp );
         ; Setup parameters for call to function ZDO_RegisterForZDOMsg
         MOV     R2,#0x6
         MOV     R3,#-0x80
@@ -845,10 +966,10 @@ ParkWay_Init:
         MOVX    A,@DPTR
         MOV     R1,A
         LCALL   ??ZDO_RegisterForZDOMsg?relay; Banked call to: ZDO_RegisterForZDOMsg
-//  161 
-//  162   osal_start_timerEx( ParkWay_TaskID,
-//  163                       POLLING_OF_DEV_EVT,
-//  164                       TIME_TO_CONNECT_COORD);
+//  174 
+//  175   osal_start_timerEx( ParkWay_TaskID,
+//  176                       POLLING_OF_DEV_EVT,
+//  177                       TIME_TO_CONNECT_COORD);
         ; Setup parameters for call to function osal_start_timerEx
         MOV     R4,#-0x18
         MOV     R5,#0x3
@@ -859,7 +980,7 @@ ParkWay_Init:
         MOV     R1,A
         LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
           CFI EndBlock cfiBlock0
-//  165 }
+//  178 }
         REQUIRE ?Subroutine0
         ; // Fall through to label ?Subroutine0
 
@@ -881,146 +1002,212 @@ ParkWay_Init:
         MOV     R7,#0x1
         LJMP    ?BANKED_LEAVE_XDATA
           CFI EndBlock cfiBlock1
-//  166 
-//  167 //Main function to proccess the timers and events 
+//  179 
+//  180 //Main function to proccess the timers and events 
 
         RSEG BANKED_CODE:CODE:NOROOT(0)
-//  168 uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
+//  181 uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
 ParkWay_ProcessEvent:
           CFI Block cfiBlock2 Using cfiCommon0
           CFI Function ParkWay_ProcessEvent
         CODE
-//  169 {
+//  182 {
         FUNCALL ParkWay_ProcessEvent, osal_msg_receive
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_start_timerEx
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL ParkWay_ProcessEvent, osal_start_timerEx
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 29, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_msg_deallocate
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_msg_receive
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, ZDO_ParseEPListRsp
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_stop_timerEx
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_mem_free
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
-        FUNCALL ParkWay_ProcessEvent, ParkWay_SendTheMessage
+        FUNCALL ParkWay_ProcessEvent, osal_strlen
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 34, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 34, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL ParkWay_ProcessEvent, AF_DataRequest
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 38, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 38, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL ParkWay_ProcessEvent, osal_stop_timerEx
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 29, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_start_timerEx
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL ParkWay_ProcessEvent, osal_start_timerEx
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 29, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 29, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL ParkWay_ProcessEvent, osal_start_timerEx
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 29, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 29, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL ParkWay_ProcessEvent, read_ultrasonic
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 29, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, ZDP_MatchDescReq
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 31, STACK
+        LOCFRAME XSTACK, 37, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 31, STACK
+        ARGFRAME XSTACK, 37, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, osal_start_timerEx
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         FUNCALL ParkWay_ProcessEvent, HalLedSet
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 23, STACK
+        LOCFRAME XSTACK, 29, STACK
         LOCFRAME IOVERLAY, 0, STATIC
         LOCFRAME DOVERLAY, 0, STATIC
         ARGFRAME ISTACK, 0, STACK
         ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 23, STACK
+        ARGFRAME XSTACK, 29, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         REQUIRE ?V0
@@ -1048,72 +1235,72 @@ ParkWay_ProcessEvent:
           CFI CFA_SP SP+0
           CFI CFA_XSP16 add(XSP16, 14)
         ; Saved register size: 14
-        ; Auto size: 9
-        MOV     A,#-0x9
+        ; Auto size: 15
+        MOV     A,#-0xf
         LCALL   ?ALLOC_XSTACK8
-          CFI CFA_XSP16 add(XSP16, 23)
+          CFI CFA_XSP16 add(XSP16, 29)
         MOV     A,R2
         MOV     R6,A
         MOV     A,R3
         MOV     R7,A
-//  170   afIncomingMSGPacket_t *MSGpkt;
-//  171   afDataConfirm_t *afDataConfirm;
-//  172   zAddrType_t dstAddr;
-//  173 
-//  174   // Data Confirmation message fields
-//  175   byte sentEP;
-//  176   ZStatus_t sentStatus;
-//  177   byte sentTransID;       // This should match the value sent
-//  178   (void)task_id;  // Intentionally unreferenced parameter
-//  179 
-//  180   if ( events & SYS_EVENT_MSG )
+//  183   afIncomingMSGPacket_t *MSGpkt;
+//  184   //afDataConfirm_t *afDataConfirm;
+//  185   zAddrType_t dstAddr;
+//  186 
+//  187   // Data Confirmation message fields
+//  188   //byte sentEP;
+//  189   //ZStatus_t sentStatus;
+//  190   //byte sentTransID;       // This should match the value sent
+//  191   (void)task_id;  // Intentionally unreferenced parameter
+//  192 
+//  193   if ( events & SYS_EVENT_MSG )
         ANL     A,#0x80
         JNZ     $+5
         LJMP    ??ParkWay_ProcessEvent_0 & 0xFFFF
-//  181   {
-//  182     MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
+//  194   {
+//  195     MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
         ; Setup parameters for call to function osal_msg_receive
         SJMP    ??ParkWay_ProcessEvent_1
-//  183     while ( MSGpkt )
-//  184     {
-//  185       switch ( MSGpkt->hdr.event )
-//  186       {
-//  187         case ZDO_CB_MSG: //Event trigger by ZigBee Device Object like connect, bind...etc
-//  188           ParkWay_ProcessZDOMsgs( (zdoIncomingMsg_t *)MSGpkt );
-//  189           break;
-//  190 
-//  191         case AF_DATA_CONFIRM_CMD: //Event trigger by a confirmation of sent message
-//  192           // This message is received as a confirmation of a data packet sent.
-//  193           // The status is of ZStatus_t type [defined in ZComDef.h]
-//  194           // The message fields are defined in AF.h
-//  195           // afDataConfirm = (afDataConfirm_t *)MSGpkt;
-//  196           // sentEP = afDataConfirm->endpoint;
-//  197           // sentStatus = afDataConfirm->hdr.status;
-//  198           // sentTransID = afDataConfirm->transID;
-//  199           // (void)sentEP;
-//  200           // (void)sentTransID;
-//  201 
-//  202           // // Action taken when confirmation is received.
-//  203           // if ( sentStatus != ZSuccess )
-//  204           // {
-//  205           //   // The data wasn't delivered -- Do something
-//  206           // }
-//  207           break;
-//  208 
-//  209         case AF_INCOMING_MSG_CMD: //Event trigger by a receive message
-//  210           ParkWay_MessageMSGCB( MSGpkt );
-//  211           break;
-//  212 
-//  213         case ZDO_STATE_CHANGE: //Event trigger by a connection to the coordinator or Router
-//  214           ParkWay_NwkState = (devStates_t)(MSGpkt->hdr.status);
+//  196     while ( MSGpkt )
+//  197     {
+//  198       switch ( MSGpkt->hdr.event )
+//  199       {
+//  200         case ZDO_CB_MSG: //Event trigger by ZigBee Device Object like connect, bind...etc
+//  201           ParkWay_ProcessZDOMsgs( (zdoIncomingMsg_t *)MSGpkt );
+//  202           break;
+//  203 
+//  204         case AF_DATA_CONFIRM_CMD: //Event trigger by a confirmation of sent message
+//  205           // This message is received as a confirmation of a data packet sent.
+//  206           // The status is of ZStatus_t type [defined in ZComDef.h]
+//  207           // The message fields are defined in AF.h
+//  208           // afDataConfirm = (afDataConfirm_t *)MSGpkt;
+//  209           // sentEP = afDataConfirm->endpoint;
+//  210           // sentStatus = afDataConfirm->hdr.status;
+//  211           // sentTransID = afDataConfirm->transID;
+//  212           // (void)sentEP;
+//  213           // (void)sentTransID;
+//  214 
+//  215           // // Action taken when confirmation is received.
+//  216           // if ( sentStatus != ZSuccess )
+//  217           // {
+//  218           //   // The data wasn't delivered -- Do something
+//  219           // }
+//  220           break;
+//  221 
+//  222         case AF_INCOMING_MSG_CMD: //Event trigger by a receive message
+//  223           ParkWay_MessageMSGCB( MSGpkt );
+//  224           break;
+//  225 
+//  226         case ZDO_STATE_CHANGE: //Event trigger by a connection to the coordinator or Router
+//  227           ParkWay_NwkState = (devStates_t)(MSGpkt->hdr.status);
 ??ParkWay_ProcessEvent_2:
         INC     DPTR
         MOVX    A,@DPTR
         MOV     DPTR,#ParkWay_NwkState
         MOVX    @DPTR,A
-//  215           if ( (ParkWay_NwkState == DEV_ZB_COORD)
-//  216               || (ParkWay_NwkState == DEV_ROUTER)
-//  217               || (ParkWay_NwkState == DEV_END_DEVICE) )
+//  228           if ( (ParkWay_NwkState == DEV_ZB_COORD)
+//  229               || (ParkWay_NwkState == DEV_ROUTER)
+//  230               || (ParkWay_NwkState == DEV_END_DEVICE) )
         XRL     A,#0x9
         JZ      ??ParkWay_ProcessEvent_3
         MOVX    A,@DPTR
@@ -1122,38 +1309,51 @@ ParkWay_ProcessEvent:
         MOVX    A,@DPTR
         XRL     A,#0x6
         JNZ     ??ParkWay_ProcessEvent_4
-//  218           {
-//  219             // Start sending "the" message in a regular interval.
-//  220             osal_start_timerEx( ParkWay_TaskID,
-//  221                                 ParkWay_SEND_MSG_EVT,
-//  222                                 ParkWay_SEND_MSG_TIMEOUT );
+//  231           {
+//  232             // Start sending the status message in a regular interval.
+//  233             osal_start_timerEx( ParkWay_TaskID,
+//  234                                 ParkWay_SEND_MSG_EVT,
+//  235                                 ParkWay_SEND_MSG_TIMEOUT );
 ??ParkWay_ProcessEvent_3:
         ; Setup parameters for call to function osal_start_timerEx
-        MOV     R4,#-0x24
-        MOV     R5,#0x5
+        MOV     R4,#0x20
+        MOV     R5,#0x3
         MOV     R2,#0x1
         MOV     R3,#0x0
         MOV     DPTR,#ParkWay_TaskID
         MOVX    A,@DPTR
         MOV     R1,A
         LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
-//  223           }
-//  224           break;
-//  225 
-//  226         default:
-//  227           break;
-//  228       }
-//  229 
-//  230       // Release the memory
-//  231       osal_msg_deallocate( (uint8 *)MSGpkt );
+//  236             // Start reading ultrasonic in a regular interval.
+//  237             osal_start_timerEx( ParkWay_TaskID,
+//  238                                 POLLING_ULTRASONIC,
+//  239                                 TIME_ULTRA);
+        ; Setup parameters for call to function osal_start_timerEx
+        MOV     R4,#-0x38
+        MOV     R5,#0x0
+        MOV     R2,#0x4
+        MOV     R3,#0x0
+        MOV     DPTR,#ParkWay_TaskID
+        MOVX    A,@DPTR
+        MOV     R1,A
+        LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
+//  240           }
+//  241           break;
+//  242 
+//  243         default:
+//  244           break;
+//  245       }
+//  246 
+//  247       // Release the memory
+//  248       osal_msg_deallocate( (uint8 *)MSGpkt );
 ??ParkWay_ProcessEvent_4:
         ; Setup parameters for call to function osal_msg_deallocate
         MOV     R2,?V2
         MOV     R3,?V3
         LCALL   ??osal_msg_deallocate?relay; Banked call to: osal_msg_deallocate
-//  232 
-//  233       // Next
-//  234       MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
+//  249 
+//  250       // Next
+//  251       MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
         ; Setup parameters for call to function osal_msg_receive
 ??ParkWay_ProcessEvent_1:
         MOV     DPTR,#ParkWay_TaskID
@@ -1243,368 +1443,74 @@ ParkWay_ProcessEvent:
         MOV     R3,?V1
         LCALL   ??osal_mem_free?relay; Banked call to: osal_mem_free
         LJMP    ??ParkWay_ProcessEvent_4 & 0xFFFF
-//  235     }
-//  236 
-//  237     // return unprocessed events
-//  238     return (events ^ SYS_EVENT_MSG);
+//  252     }
+//  253 
+//  254     // return unprocessed events
+//  255     return (events ^ SYS_EVENT_MSG);
 ??ParkWay_ProcessEvent_5:
         MOV     A,R6
         MOV     R2,A
         MOV     A,R7
         XRL     A,#0x80
-        SJMP    ??ParkWay_ProcessEvent_8
-//  239   }
-//  240 
-//  241   // Send to the coordinator the status of ultrasound
-//  242   if ( events & ParkWay_SEND_MSG_EVT )
+        LJMP    ??ParkWay_ProcessEvent_8 & 0xFFFF
+//  256   }
+//  257 
+//  258   // Send to the coordinator the status of ultrasound
+//  259   if ( events & ParkWay_SEND_MSG_EVT )
 ??ParkWay_ProcessEvent_0:
         MOV     A,R6
         MOV     C,0xE0 /* A   */.0
-        JNC     ??ParkWay_ProcessEvent_9
-//  243   {
-//  244     // Send "the" message
-//  245     ParkWay_SendTheMessage();
-        ; Setup parameters for call to function ParkWay_SendTheMessage
-        LCALL   ??ParkWay_SendTheMessage?relay; Banked call to: ParkWay_SendTheMessage
-//  246 
-//  247     // Setup to send message again
-//  248     osal_start_timerEx( ParkWay_TaskID,
-//  249                         ParkWay_SEND_MSG_EVT,
-//  250                         ParkWay_SEND_MSG_TIMEOUT );
-        ; Setup parameters for call to function osal_start_timerEx
-        MOV     R4,#-0x24
-        MOV     R5,#0x5
-        MOV     R2,#0x1
-        MOV     R3,#0x0
-        MOV     DPTR,#ParkWay_TaskID
-        MOVX    A,@DPTR
-        MOV     R1,A
-        LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
-//  251 
-//  252     // return unprocessed events
-//  253     return (events ^ ParkWay_SEND_MSG_EVT);
-        MOV     A,R6
-        XRL     A,#0x1
-        MOV     R2,A
-        MOV     A,R7
-??ParkWay_ProcessEvent_8:
-        MOV     R3,A
-        SJMP    ??ParkWay_ProcessEvent_10
-//  254   }
-//  255   
-//  256   if(events & POLLING_OF_DEV_EVT) //This force the auto bind to the coordinator or Router
-??ParkWay_ProcessEvent_9:
-        ANL     A,#0x2
-        JZ      ??ParkWay_ProcessEvent_11
-//  257   {
-//  258     //HalLedSet ( HAL_LED_1, HAL_LED_MODE_ON);
-//  259     // Initiate a Match Description Request (Service Discovery)
-//  260     dstAddr.addrMode = AddrBroadcast;
-        MOV     A,#0x8
-        LCALL   ?XSTACK_DISP0_8
-        MOV     A,#0xf
-        MOVX    @DPTR,A
-//  261     dstAddr.addr.shortAddr = NWK_BROADCAST_SHORTADDR;
-        MOV     DPL,?XSP + 0
-        MOV     DPH,?XSP + 1
-        MOV     A,#-0x1
-        MOVX    @DPTR,A
-        INC     DPTR
-        MOVX    @DPTR,A
-//  262     ZDP_MatchDescReq( &dstAddr, NWK_BROADCAST_SHORTADDR,
-//  263                       ParkWay_PROFID,
-//  264                       ParkWay_MAX_CLUSTERS, (cId_t *)ParkWay_ClusterList,
-//  265                       ParkWay_MAX_CLUSTERS, (cId_t *)ParkWay_ClusterList,
-//  266                       FALSE );
-        MOV     ?V0,#ParkWay_ClusterList & 0xff
-        MOV     ?V1,#(ParkWay_ClusterList >> 8) & 0xff
-        ; Setup parameters for call to function ZDP_MatchDescReq
-        MOV     ?V2,#0x0
-        MOV     R0,#?V2
-        LCALL   ?PUSH_XSTACK_I_ONE
-          CFI CFA_XSP16 add(XSP16, 24)
-        MOV     R0,#?V0
-        LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 26)
-        MOV     ?V2,#0x1
-        MOV     R0,#?V2
-        LCALL   ?PUSH_XSTACK_I_ONE
-          CFI CFA_XSP16 add(XSP16, 27)
-        MOV     R0,#?V0
-        LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 29)
-        MOV     ?V0,#0x4
-        MOV     ?V1,#0xf
-        MOV     R0,#?V0
-        LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 31)
-        MOV     R1,#0x1
-        MOV     R4,#-0x1
-        MOV     R5,#-0x1
-        MOV     A,#0x8
-        LCALL   ?XSTACK_DISP101_8
-        LCALL   ??ZDP_MatchDescReq?relay; Banked call to: ZDP_MatchDescReq
-        MOV     A,#0x8
-        LCALL   ?DEALLOC_XSTACK8
-          CFI CFA_XSP16 add(XSP16, 23)
-//  267     osal_start_timerEx( ParkWay_TaskID,
-//  268                         POLLING_OF_DEV_EVT,
-//  269                         TIME_TO_CONNECT_COORD);
-        ; Setup parameters for call to function osal_start_timerEx
-        MOV     R4,#-0x18
-        MOV     R5,#0x3
-        MOV     R2,#0x2
-        MOV     R3,#0x0
-        MOV     DPTR,#ParkWay_TaskID
-        MOVX    A,@DPTR
-        MOV     R1,A
-        LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
-//  270   } 
-//  271 
-//  272 
-//  273   HalLedSet( HAL_LED_ALL, HAL_LED_MODE_OFF ); //Shutdown all LEDS to reduce consumption of power
-??ParkWay_ProcessEvent_11:
-        ; Setup parameters for call to function HalLedSet
-        MOV     R2,#0x0
-        MOV     R1,#0xf
-        LCALL   ??HalLedSet?relay    ; Banked call to: HalLedSet
-//  274   
-//  275   // Discard unknown events
-//  276   return 0;
-        MOV     R2,#0x0
-        MOV     R3,#0x0
-??ParkWay_ProcessEvent_10:
-        MOV     A,#0x9
-        LCALL   ?DEALLOC_XSTACK8
-          CFI CFA_XSP16 add(XSP16, 14)
-        MOV     R7,#0x6
-        LJMP    ?BANKED_LEAVE_XDATA
-          CFI EndBlock cfiBlock2
-//  277 }
-//  278 
-//  279 /*********************************************************************
-//  280  * Event Generation Functions
-//  281  */
-//  282 
-//  283 /*********************************************************************
-//  284  */
-//  285 //This function process the ZDO events to bind
-//  286 static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg )
-//  287 {
-//  288   switch ( inMsg->clusterID )
-//  289   {
-//  290     case End_Device_Bind_rsp:
-//  291       if ( ZDO_ParseBindRsp( inMsg ) == ZSuccess )
-//  292       {
-//  293         // Light LED
-//  294         //HalLedSet ( HAL_LED_2, HAL_LED_MODE_FLASH );
-//  295       }
-//  296       break;
-//  297 
-//  298     case Match_Desc_rsp:
-//  299       {
-//  300         ZDO_ActiveEndpointRsp_t *pRsp = ZDO_ParseEPListRsp( inMsg );
-//  301         if ( pRsp )
-//  302         {
-//  303           if ( pRsp->status == ZSuccess && pRsp->cnt )
-//  304           {
-//  305             ParkWay_DstAddr.addrMode = (afAddrMode_t)Addr16Bit;
-//  306             ParkWay_DstAddr.addr.shortAddr = pRsp->nwkAddr;
-//  307             // Take the first endpoint, Can be changed to search through endpoints
-//  308             ParkWay_DstAddr.endPoint = pRsp->epList[0];
-//  309 
-//  310             // Light LED
-//  311             //HalLedSet( HAL_LED_2, HAL_LED_MODE_ON );
-//  312 
-//  313             //This stop the peer from send request do the coordinator
-//  314             //HalLedSet ( HAL_LED_1, HAL_LED_MODE_OFF);
-//  315             osal_stop_timerEx( ParkWay_TaskID,POLLING_OF_DEV_EVT);
-//  316           }
-//  317           osal_mem_free( pRsp );
-//  318         }
-//  319       }
-//  320       break;
-//  321   }
-//  322 }
-//  323 
-//  324 /*********************************************************************
-//  325  * LOCAL FUNCTIONS
-//  326  */
-//  327 //This function process the frames received by the application framework (source routers or the coordinator)
-//  328 
-//  329 static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pkt_1 )
-//  330 {
-//  331   /************************************************* This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
-//  332   // uint8* pkt;
-//  333   // pkt=(pkt_1->cmd.Data);
-//  334   
-//  335   // uint8 pin_ultra=4;
-//  336   
-//  337   // P0SEL &= (~BV(2));
-//  338   // P0DIR |= (BV(2));
-//  339     
-//  340   // if(*pkt==48||*(pkt+1)==48||*(pkt+2)==48)
-//  341   // {
-//  342   //  P0&=~pin_ultra;
-//  343   // }
-//  344   // else
-//  345   // {
-//  346   //   P0|=pin_ultra;
-//  347   // }
-//  348   /************************************************* This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
-//  349 }
-//  350 
-//  351 //This function send the status of own park to the coordinator
-
-        RSEG BANKED_CODE:CODE:NOROOT(0)
-//  352 static void ParkWay_SendTheMessage( void )
-ParkWay_SendTheMessage:
-          CFI Block cfiBlock3 Using cfiCommon0
-          CFI Function ParkWay_SendTheMessage
-        CODE
-//  353 {
-        FUNCALL ParkWay_SendTheMessage, osal_strlen
-        LOCFRAME ISTACK, 0, STACK
-        LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 21, STACK
-        LOCFRAME IOVERLAY, 0, STATIC
-        LOCFRAME DOVERLAY, 0, STATIC
-        ARGFRAME ISTACK, 0, STACK
-        ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 21, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
-        FUNCALL ParkWay_SendTheMessage, AF_DataRequest
-        LOCFRAME ISTACK, 0, STACK
-        LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 25, STACK
-        LOCFRAME IOVERLAY, 0, STATIC
-        LOCFRAME DOVERLAY, 0, STATIC
-        ARGFRAME ISTACK, 0, STACK
-        ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 25, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
-        FUNCALL ParkWay_SendTheMessage, osal_stop_timerEx
-        LOCFRAME ISTACK, 0, STACK
-        LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 16, STACK
-        LOCFRAME IOVERLAY, 0, STATIC
-        LOCFRAME DOVERLAY, 0, STATIC
-        ARGFRAME ISTACK, 0, STACK
-        ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 16, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
-        FUNCALL ParkWay_SendTheMessage, osal_start_timerEx
-        LOCFRAME ISTACK, 0, STACK
-        LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 16, STACK
-        LOCFRAME IOVERLAY, 0, STATIC
-        LOCFRAME DOVERLAY, 0, STATIC
-        ARGFRAME ISTACK, 0, STACK
-        ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 16, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
-        REQUIRE ?V0
-        REQUIRE ?V1
-        MOV     A,#-0xa
-        LCALL   ?BANKED_ENTER_XDATA
-          CFI DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
-          CFI DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
-          CFI ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
-          CFI ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
-          CFI ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
-          CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
-          CFI V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
-          CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
-          CFI VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
-          CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
-          CFI CFA_SP SP+0
-          CFI CFA_XSP16 add(XSP16, 10)
-        ; Saved register size: 10
-        ; Auto size: 6
-        MOV     A,#-0x6
-        LCALL   ?ALLOC_XSTACK8
-          CFI CFA_XSP16 add(XSP16, 16)
-//  354   uint8 pData[6], pin_ultra=4,vaga;
-//  355   P0SEL &= (~BV(2));
-        ANL     0xf3,#0xfb
-//  356   P0DIR &= (~BV(2));
-        ANL     0xfd,#0xfb
-//  357   vaga = (pin_ultra & P0);
-//  358   if(vaga)
-        MOV     C,0x80.2
-        JNC     ??ParkWay_SendTheMessage_0
-//  359   {
-//  360      vaga='1';
-        MOV     R0,#0x31
-        SJMP    ??ParkWay_SendTheMessage_1
-//  361   }
-//  362   else
-//  363   {
-//  364      vaga='0';
-??ParkWay_SendTheMessage_0:
-        MOV     R0,#0x30
-//  365   }
-//  366 
-//  367   pData[0] = 'E';
-??ParkWay_SendTheMessage_1:
+        JC      $+5
+        LJMP    ??ParkWay_ProcessEvent_9 & 0xFFFF
+//  260   {
+//  261     // Send "the" message
+//  262     ParkWay_SendTheMessage();
         MOV     DPL,?XSP + 0
         MOV     DPH,?XSP + 1
         MOV     A,#0x45
         MOVX    @DPTR,A
-//  368   pData[1] = 'D';
         MOV     A,#0x1
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x44
         MOVX    @DPTR,A
-//  369   pData[2] = DEVICE_PW_1;
         MOV     A,#0x2
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x30
         MOVX    @DPTR,A
-//  370   pData[3] = DEVICE_PW_2;
         MOV     A,#0x3
         LCALL   ?XSTACK_DISP0_8
-        MOV     A,#0x31
+        MOV     A,#0x36
         MOVX    @DPTR,A
-//  371   pData[4] = '-';
         MOV     A,#0x4
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x2d
         MOVX    @DPTR,A
-//  372   pData[5] = vaga;
+        MOV     DPTR,#vaga
+        MOVX    A,@DPTR
+        PUSH    A
+          CFI CFA_SP SP+-1
         MOV     A,#0x5
         LCALL   ?XSTACK_DISP0_8
-        MOV     A,R0
+        POP     A
+          CFI CFA_SP SP+0
         MOVX    @DPTR,A
-//  373 
-//  374   //Send data to the coordinator ADDRESS(0000)
-//  375   if ( AF_DataRequest( &ParkWay_DstAddr, &ParkWay_epDesc,
-//  376                        ParkWay_CLUSTERID,
-//  377                        (byte)osal_strlen( pData ) + 1,
-//  378                        (byte *)&pData,
-//  379                        &ParkWay_TransID,
-//  380                        AF_DISCV_ROUTE, AF_DEFAULT_RADIUS ) == afStatus_SUCCESS )
         ; Setup parameters for call to function AF_DataRequest
         MOV     ?V0,#0x1e
         MOV     R0,#?V0
         LCALL   ?PUSH_XSTACK_I_ONE
-          CFI CFA_XSP16 add(XSP16, 17)
+          CFI CFA_XSP16 add(XSP16, 30)
         MOV     ?V0,#ParkWay_TransID & 0xff
         MOV     ?V1,#(ParkWay_TransID >> 8) & 0xff
         MOV     R0,#?V0
         LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 19)
+          CFI CFA_XSP16 add(XSP16, 32)
         MOV     A,#0x3
         LCALL   ?XSTACK_DISP100_8
         MOV     ?V0,R0
         MOV     ?V1,R1
         MOV     R0,#?V0
         LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 21)
+          CFI CFA_XSP16 add(XSP16, 34)
         ; Setup parameters for call to function osal_strlen
         MOV     A,#0x5
         LCALL   ?XSTACK_DISP101_8
@@ -1617,12 +1523,12 @@ ParkWay_SendTheMessage:
         MOV     ?V1,A
         MOV     R0,#?V0
         LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 23)
+          CFI CFA_XSP16 add(XSP16, 36)
         MOV     ?V0,#0x1
         MOV     ?V1,#0x0
         MOV     R0,#?V0
         LCALL   ?PUSH_XSTACK_I_TWO
-          CFI CFA_XSP16 add(XSP16, 25)
+          CFI CFA_XSP16 add(XSP16, 38)
         MOV     R1,#0x20
         MOV     R4,#ParkWay_epDesc & 0xff
         MOV     R5,#(ParkWay_epDesc >> 8) & 0xff
@@ -1631,16 +1537,9 @@ ParkWay_SendTheMessage:
         LCALL   ??AF_DataRequest?relay; Banked call to: AF_DataRequest
         MOV     A,#0x9
         LCALL   ?DEALLOC_XSTACK8
-          CFI CFA_XSP16 add(XSP16, 16)
+          CFI CFA_XSP16 add(XSP16, 29)
         MOV     A,R1
-        JZ      ??ParkWay_SendTheMessage_2
-//  381   {
-//  382     // Successfully requested to be sent.
-//  383   }
-//  384   else
-//  385   {
-//  386     osal_stop_timerEx( ParkWay_TaskID,
-//  387                         ParkWay_SEND_MSG_EVT);
+        JZ      ??ParkWay_ProcessEvent_10
         ; Setup parameters for call to function osal_stop_timerEx
         MOV     R2,#0x1
         MOV     R3,#0x0
@@ -1648,9 +1547,6 @@ ParkWay_SendTheMessage:
         MOVX    A,@DPTR
         MOV     R1,A
         LCALL   ??osal_stop_timerEx?relay; Banked call to: osal_stop_timerEx
-//  388     osal_start_timerEx( ParkWay_TaskID,
-//  389                         POLLING_OF_DEV_EVT,
-//  390                         200);
         ; Setup parameters for call to function osal_start_timerEx
         MOV     R4,#-0x38
         MOV     R5,#0x0
@@ -1660,46 +1556,257 @@ ParkWay_SendTheMessage:
         MOVX    A,@DPTR
         MOV     R1,A
         LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
-//  391   }
-//  392 }
-??ParkWay_SendTheMessage_2:
+//  263     
+//  264     // Setup to send message again
+//  265     osal_start_timerEx( ParkWay_TaskID,
+//  266                         ParkWay_SEND_MSG_EVT,
+//  267                         ParkWay_SEND_MSG_TIMEOUT );
+??ParkWay_ProcessEvent_10:
+        ; Setup parameters for call to function osal_start_timerEx
+        MOV     R4,#0x20
+        MOV     R5,#0x3
+        MOV     R2,#0x1
+        MOV     R3,#0x0
+        MOV     DPTR,#ParkWay_TaskID
+        MOVX    A,@DPTR
+        MOV     R1,A
+        LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
+//  268 
+//  269     // return unprocessed events
+//  270     return (events ^ ParkWay_SEND_MSG_EVT);
+        MOV     A,R6
+        XRL     A,#0x1
+        MOV     R2,A
+        MOV     A,R7
+??ParkWay_ProcessEvent_8:
+        MOV     R3,A
+        LJMP    ??ParkWay_ProcessEvent_11 & 0xFFFF
+//  271   }
+//  272   
+//  273   if(events & POLLING_ULTRASONIC)
+??ParkWay_ProcessEvent_9:
+        ANL     A,#0x4
+        JZ      ??ParkWay_ProcessEvent_12
+//  274   {
+//  275     osal_start_timerEx( ParkWay_TaskID,
+//  276                         POLLING_ULTRASONIC,
+//  277                         TIME_ULTRA);
+        ; Setup parameters for call to function osal_start_timerEx
+        MOV     R4,#-0x38
+        MOV     R5,#0x0
+        MOV     R2,#0x4
+        MOV     R3,#0x0
+        MOV     DPTR,#ParkWay_TaskID
+        MOVX    A,@DPTR
+        MOV     R1,A
+        LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
+//  278     read_ultrasonic();
+        ; Setup parameters for call to function read_ultrasonic
+        LCALL   ??read_ultrasonic?relay; Banked call to: read_ultrasonic
+//  279   }
+//  280   
+//  281   if(events & POLLING_OF_DEV_EVT) //This force the auto bind to the coordinator or Router
+??ParkWay_ProcessEvent_12:
+        MOV     A,R6
+        ANL     A,#0x2
+        JZ      ??ParkWay_ProcessEvent_13
+//  282   {
+//  283     //HalLedSet ( HAL_LED_1, HAL_LED_MODE_ON);
+//  284     // Initiate a Match Description Request (Service Discovery)
+//  285     dstAddr.addrMode = AddrBroadcast;
+        MOV     A,#0xe
+        LCALL   ?XSTACK_DISP0_8
+        MOV     A,#0xf
+        MOVX    @DPTR,A
+//  286     dstAddr.addr.shortAddr = NWK_BROADCAST_SHORTADDR;
         MOV     A,#0x6
+        LCALL   ?XSTACK_DISP0_8
+        MOV     A,#-0x1
+        MOVX    @DPTR,A
+        INC     DPTR
+        MOVX    @DPTR,A
+//  287     ZDP_MatchDescReq( &dstAddr, NWK_BROADCAST_SHORTADDR,
+//  288                       ParkWay_PROFID,
+//  289                       ParkWay_MAX_CLUSTERS, (cId_t *)ParkWay_ClusterList,
+//  290                       ParkWay_MAX_CLUSTERS, (cId_t *)ParkWay_ClusterList,
+//  291                       FALSE );
+        MOV     ?V0,#ParkWay_ClusterList & 0xff
+        MOV     ?V1,#(ParkWay_ClusterList >> 8) & 0xff
+        ; Setup parameters for call to function ZDP_MatchDescReq
+        MOV     ?V2,#0x0
+        MOV     R0,#?V2
+        LCALL   ?PUSH_XSTACK_I_ONE
+          CFI CFA_XSP16 add(XSP16, 30)
+        MOV     R0,#?V0
+        LCALL   ?PUSH_XSTACK_I_TWO
+          CFI CFA_XSP16 add(XSP16, 32)
+        MOV     ?V2,#0x1
+        MOV     R0,#?V2
+        LCALL   ?PUSH_XSTACK_I_ONE
+          CFI CFA_XSP16 add(XSP16, 33)
+        MOV     R0,#?V0
+        LCALL   ?PUSH_XSTACK_I_TWO
+          CFI CFA_XSP16 add(XSP16, 35)
+        MOV     ?V0,#0x4
+        MOV     ?V1,#0xf
+        MOV     R0,#?V0
+        LCALL   ?PUSH_XSTACK_I_TWO
+          CFI CFA_XSP16 add(XSP16, 37)
+        MOV     R1,#0x1
+        MOV     R4,#-0x1
+        MOV     R5,#-0x1
+        MOV     A,#0xe
+        LCALL   ?XSTACK_DISP101_8
+        LCALL   ??ZDP_MatchDescReq?relay; Banked call to: ZDP_MatchDescReq
+        MOV     A,#0x8
         LCALL   ?DEALLOC_XSTACK8
-          CFI EndBlock cfiBlock3
-        REQUIRE ?Subroutine1
-        REQUIRE P0SEL
-        REQUIRE P0DIR
-        REQUIRE _A_P0
-        ; // Fall through to label ?Subroutine1
-
-        RSEG BANKED_CODE:CODE:NOROOT(0)
-?Subroutine1:
-          CFI Block cfiBlock4 Using cfiCommon0
-          CFI NoFunction
-          CFI CFA_SP SP+0
-          CFI CFA_XSP16 add(XSP16, 10)
-          CFI VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
-          CFI DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
-          CFI DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
-          CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
-          CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
-          CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
-          CFI V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
-          CFI ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
-          CFI ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
-          CFI ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
-        MOV     R7,#0x2
+          CFI CFA_XSP16 add(XSP16, 29)
+//  292     osal_start_timerEx( ParkWay_TaskID,
+//  293                         POLLING_OF_DEV_EVT,
+//  294                         TIME_TO_CONNECT_COORD);
+        ; Setup parameters for call to function osal_start_timerEx
+        MOV     R4,#-0x18
+        MOV     R5,#0x3
+        MOV     R2,#0x2
+        MOV     R3,#0x0
+        MOV     DPTR,#ParkWay_TaskID
+        MOVX    A,@DPTR
+        MOV     R1,A
+        LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
+//  295   } 
+//  296 
+//  297 
+//  298   HalLedSet( HAL_LED_ALL, HAL_LED_MODE_OFF ); //Shutdown all LEDS to reduce consumption of power
+??ParkWay_ProcessEvent_13:
+        ; Setup parameters for call to function HalLedSet
+        MOV     R2,#0x0
+        MOV     R1,#0xf
+        LCALL   ??HalLedSet?relay    ; Banked call to: HalLedSet
+//  299   
+//  300   // Discard unknown events
+//  301   return 0;
+        MOV     R2,#0x0
+        MOV     R3,#0x0
+??ParkWay_ProcessEvent_11:
+        MOV     A,#0xf
+        LCALL   ?DEALLOC_XSTACK8
+          CFI CFA_XSP16 add(XSP16, 14)
+        MOV     R7,#0x6
         LJMP    ?BANKED_LEAVE_XDATA
-          CFI EndBlock cfiBlock4
-//  393 
+          CFI EndBlock cfiBlock2
+//  302 }
+//  303 
+//  304 /*********************************************************************
+//  305  * Event Generation Functions
+//  306  */
+//  307 
+//  308 /*********************************************************************
+//  309  */
+//  310 //This function process the ZDO events to bind
+//  311 static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg )
+//  312 {
+//  313   switch ( inMsg->clusterID )
+//  314   {
+//  315     case End_Device_Bind_rsp:
+//  316       if ( ZDO_ParseBindRsp( inMsg ) == ZSuccess )
+//  317       {
+//  318         // Light LED
+//  319         //HalLedSet ( HAL_LED_2, HAL_LED_MODE_FLASH );
+//  320       }
+//  321       break;
+//  322 
+//  323     case Match_Desc_rsp:
+//  324       {
+//  325         ZDO_ActiveEndpointRsp_t *pRsp = ZDO_ParseEPListRsp( inMsg );
+//  326         if ( pRsp )
+//  327         {
+//  328           if ( pRsp->status == ZSuccess && pRsp->cnt )
+//  329           {
+//  330             ParkWay_DstAddr.addrMode = (afAddrMode_t)Addr16Bit;
+//  331             ParkWay_DstAddr.addr.shortAddr = pRsp->nwkAddr;
+//  332             // Take the first endpoint, Can be changed to search through endpoints
+//  333             ParkWay_DstAddr.endPoint = pRsp->epList[0];
+//  334 
+//  335             // Light LED
+//  336             //HalLedSet( HAL_LED_2, HAL_LED_MODE_ON );
+//  337 
+//  338             //This stop the peer from send request do the coordinator
+//  339             //HalLedSet ( HAL_LED_1, HAL_LED_MODE_OFF);
+//  340             osal_stop_timerEx( ParkWay_TaskID,POLLING_OF_DEV_EVT);
+//  341           }
+//  342           osal_mem_free( pRsp );
+//  343         }
+//  344       }
+//  345       break;
+//  346   }
+//  347 }
+//  348 
+//  349 /*********************************************************************
+//  350  * LOCAL FUNCTIONS
+//  351  */
+//  352 //This function process the frames received by the application framework (source routers or the coordinator)
+//  353 
+//  354 static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pkt_1 )
+//  355 {
+//  356   /************************************************* This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
+//  357   // uint8* pkt;
+//  358   // pkt=(pkt_1->cmd.Data);
+//  359   
+//  360   // uint8 pin_ultra=4;
+//  361   
+//  362   // P0SEL &= (~BV(2));
+//  363   // P0DIR |= (BV(2));
+//  364     
+//  365   // if(*pkt==48||*(pkt+1)==48||*(pkt+2)==48)
+//  366   // {
+//  367   //  P0&=~pin_ultra;
+//  368   // }
+//  369   // else
+//  370   // {
+//  371   //   P0|=pin_ultra;
+//  372   // }
+//  373   /************************************************* This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
+//  374 }
+//  375 
+//  376 //This function send the status of own park to the coordinator
+//  377 static void ParkWay_SendTheMessage( void )
+//  378 {
+//  379   uint8 pData[6];
+//  380   pData[0] = 'E';
+//  381   pData[1] = 'D';
+//  382   pData[2] = DEVICE_PW_1;
+//  383   pData[3] = DEVICE_PW_2;
+//  384   pData[4] = '-';
+//  385   pData[5] = vaga;
+//  386 
+//  387   //Send data to the coordinator ADDRESS(0000)
+//  388   if ( AF_DataRequest( &ParkWay_DstAddr, &ParkWay_epDesc,
+//  389                        ParkWay_CLUSTERID,
+//  390                        (byte)osal_strlen( pData ) + 1,
+//  391                        (byte *)&pData,
+//  392                        &ParkWay_TransID,
+//  393                        AF_DISCV_ROUTE, AF_DEFAULT_RADIUS ) == afStatus_SUCCESS )
+//  394   {
+//  395     // Successfully requested to be sent.
+//  396   }
+//  397   else
+//  398   {
+//  399     osal_stop_timerEx( ParkWay_TaskID,
+//  400                         ParkWay_SEND_MSG_EVT);
+//  401     osal_start_timerEx( ParkWay_TaskID,
+//  402                         POLLING_OF_DEV_EVT,
+//  403                         200);
+//  404   }
+//  405 }
+//  406 
 
         RSEG BANKED_CODE:CODE:NOROOT(0)
-//  394 static void UART_CallBack(uint8 port, uint8 event)
+//  407 static void UART_CallBack(uint8 port, uint8 event)
 UART_CallBack:
-          CFI Block cfiBlock5 Using cfiCommon0
+          CFI Block cfiBlock3 Using cfiCommon0
           CFI Function UART_CallBack
         CODE
-//  395 {
+//  408 {
         FUNCALL UART_CallBack, HalUARTRead
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
@@ -1742,44 +1849,44 @@ UART_CallBack:
           CFI CFA_XSP16 add(XSP16, 10)
         MOV     A,R2
         MOV     R7,A
-//  396   (void)port;
-//  397   uint8 cmdbuff[1];
-//  398   if (event & (HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT))
+//  409   (void)port;
+//  410   uint8 cmdbuff[1];
+//  411   if (event & (HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT))
         MOV     A,#0x7
         ANL     A,R7
         JZ      ??UART_CallBack_0
-//  399   {
-//  400     HalUARTRead(port, cmdbuff, 1);
+//  412   {
+//  413     HalUARTRead(port, cmdbuff, 1);
         ; Setup parameters for call to function HalUARTRead
         MOV     R4,#0x1
         MOV     R5,#0x0
         MOV     R2,?XSP + 0
         MOV     R3,?XSP + 1
         LCALL   ??HalUARTRead?relay  ; Banked call to: HalUARTRead
-//  401     SendUART(cmdbuff,1);
+//  414     SendUART(cmdbuff,1);
         ; Setup parameters for call to function SendUART
         MOV     R1,#0x1
         MOV     R2,?XSP + 0
         MOV     R3,?XSP + 1
         LCALL   ??SendUART?relay     ; Banked call to: SendUART
-//  402   }
-//  403 }
+//  415   }
+//  416 }
 ??UART_CallBack_0:
         MOV     A,#0x1
         LCALL   ?DEALLOC_XSTACK8
           CFI CFA_XSP16 add(XSP16, 9)
         LJMP    ?Subroutine0 & 0xFFFF
-          CFI EndBlock cfiBlock5
-//  404 
-//  405 //This function initializes the UART
+          CFI EndBlock cfiBlock3
+//  417 
+//  418 //This function initializes the UART
 
         RSEG BANKED_CODE:CODE:NOROOT(0)
-//  406 void uart_init()
+//  419 void uart_init()
 uart_init:
-          CFI Block cfiBlock6 Using cfiCommon0
+          CFI Block cfiBlock4 Using cfiCommon0
           CFI Function uart_init
         CODE
-//  407 {
+//  420 {
         FUNCALL uart_init, HalUARTOpen
         LOCFRAME ISTACK, 2, STACK
         LOCFRAME PSTACK, 0, STACK
@@ -1802,22 +1909,22 @@ uart_init:
         MOV     A,#-0x1d
         LCALL   ?ALLOC_XSTACK8
           CFI CFA_XSP16 add(XSP16, 29)
-//  408   halUARTCfg_t uartConfig;
-//  409   uartConfig.configured = TRUE; // 2x30 don't care - see uart driver.
+//  421   halUARTCfg_t uartConfig;
+//  422   uartConfig.configured = TRUE; // 2x30 don't care - see uart driver.
         MOV     DPL,?XSP + 0
         MOV     DPH,?XSP + 1
         MOV     A,#0x1
         MOVX    @DPTR,A
-//  410   uartConfig.baudRate = HAL_UART_BR_9600;
+//  423   uartConfig.baudRate = HAL_UART_BR_9600;
         LCALL   ?XSTACK_DISP0_8
         CLR     A
         MOVX    @DPTR,A
-//  411   uartConfig.flowControl = TRUE;
+//  424   uartConfig.flowControl = TRUE;
         MOV     A,#0x2
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x1
         MOVX    @DPTR,A
-//  412   uartConfig.flowControlThreshold = 48; // 2x30 don't care - see uart driver.
+//  425   uartConfig.flowControlThreshold = 48; // 2x30 don't care - see uart driver.
         MOV     A,#0x3
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x30
@@ -1825,7 +1932,7 @@ uart_init:
         INC     DPTR
         CLR     A
         MOVX    @DPTR,A
-//  413   uartConfig.rx.maxBufSize = 128; // 2x30 don't care - see uart driver.
+//  426   uartConfig.rx.maxBufSize = 128; // 2x30 don't care - see uart driver.
         MOV     A,#0xa
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#-0x80
@@ -1833,7 +1940,7 @@ uart_init:
         INC     DPTR
         CLR     A
         MOVX    @DPTR,A
-//  414   uartConfig.tx.maxBufSize = 128; // 2x30 don't care - see uart driver.
+//  427   uartConfig.tx.maxBufSize = 128; // 2x30 don't care - see uart driver.
         MOV     A,#0x12
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#-0x80
@@ -1841,17 +1948,17 @@ uart_init:
         INC     DPTR
         CLR     A
         MOVX    @DPTR,A
-//  415   uartConfig.idleTimeout = 6; // 2x30 don't care - see uart driver.
+//  428   uartConfig.idleTimeout = 6; // 2x30 don't care - see uart driver.
         MOV     A,#0x5
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x6
         MOVX    @DPTR,A
-//  416   uartConfig.intEnable = TRUE; // 2x30 don't care - see uart driver.
+//  429   uartConfig.intEnable = TRUE; // 2x30 don't care - see uart driver.
         MOV     A,#0x16
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#0x1
         MOVX    @DPTR,A
-//  417   uartConfig.callBackFunc = UART_CallBack;
+//  430   uartConfig.callBackFunc = UART_CallBack;
         MOV     A,#0x1b
         LCALL   ?XSTACK_DISP0_8
         MOV     A,#??UART_CallBack?relay & 0xff
@@ -1859,13 +1966,13 @@ uart_init:
         INC     DPTR
         MOV     A,#(??UART_CallBack?relay >> 8) & 0xff
         MOVX    @DPTR,A
-//  418   HalUARTOpen (HAL_UART_PORT_0, &uartConfig);
+//  431   HalUARTOpen (HAL_UART_PORT_0, &uartConfig);
         ; Setup parameters for call to function HalUARTOpen
         MOV     R2,?XSP + 0
         MOV     R3,?XSP + 1
         MOV     R1,#0x0
         LCALL   ??HalUARTOpen?relay  ; Banked call to: HalUARTOpen
-//  419 }
+//  432 }
         MOV     A,#0x1d
         LCALL   ?DEALLOC_XSTACK8
           CFI CFA_XSP16 XSP16+0
@@ -1876,16 +1983,464 @@ uart_init:
           CFI DPL0 SameValue
           CFI CFA_SP SP+-3
         LJMP    ?BRET
-          CFI EndBlock cfiBlock6
-//  420 
+          CFI EndBlock cfiBlock4
+//  433 
 
         RSEG BANKED_CODE:CODE:NOROOT(0)
-//  421 void SendUART(uint8 *data,uint8 len)
+//  434 void control_fifo(uint16 ultra)
+control_fifo:
+          CFI Block cfiBlock5 Using cfiCommon0
+          CFI Function control_fifo
+        CODE
+//  435 {
+        FUNCALL control_fifo, Onboard_wait
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 10, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 10, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL control_fifo, Onboard_wait
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 10, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 10, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        REQUIRE ?V0
+        REQUIRE ?V1
+        MOV     A,#-0xa
+        LCALL   ?BANKED_ENTER_XDATA
+          CFI DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
+          CFI DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
+          CFI ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
+          CFI ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
+          CFI ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
+          CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
+          CFI V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
+          CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
+          CFI VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
+          CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
+          CFI CFA_SP SP+0
+          CFI CFA_XSP16 add(XSP16, 10)
+        ; Saved register size: 10
+        ; Auto size: 0
+//  436 
+//  437   uint8 i,empty=0,full=0;
+        MOV     R5,#0x0
+        MOV     R4,#0x0
+//  438   
+//  439   if(ultra>DISTANCE_CONSTANT)
+        CLR     C
+        MOV     A,R2
+        SUBB    A,#0x11
+        MOV     A,R3
+        SUBB    A,#0x27
+        MOV     DPTR,#index_flag
+        MOVX    A,@DPTR
+        MOV     R0,A
+        MOV     A,#fifo_ultra & 0xff
+        JC      ??control_fifo_0
+//  440   {
+//  441     fifo_ultra[index_flag]='0';
+        LCALL   ?Subroutine2 & 0xFFFF
+//  442   }
+??CrossCallReturnLabel_0:
+        MOV     A,#0x30
+        SJMP    ??control_fifo_1
+//  443   else
+//  444   {
+//  445     fifo_ultra[index_flag]='1';
+??control_fifo_0:
+        LCALL   ?Subroutine2 & 0xFFFF
+//  446   }
+??CrossCallReturnLabel_1:
+        MOV     A,#0x31
+??control_fifo_1:
+        MOVX    @DPTR,A
+//  447 
+//  448   if(index_flag==11)
+        MOV     DPTR,#index_flag
+        MOVX    A,@DPTR
+        XRL     A,#0xb
+        JNZ     ??control_fifo_2
+//  449   {
+//  450     for(i=0;i<12;i++)
+        MOV     R0,#0x0
+//  451     {
+//  452       if(fifo_ultra[i]=='1')  full++;
+??control_fifo_3:
+        MOV     A,#fifo_ultra & 0xff
+        LCALL   ?Subroutine2 & 0xFFFF
+??CrossCallReturnLabel_2:
+        MOVX    A,@DPTR
+        XRL     A,#0x31
+        JNZ     ??control_fifo_4
+        INC     R4
+        SJMP    ??control_fifo_5
+//  453       else if (fifo_ultra[i]=='0')  empty++;
+??control_fifo_4:
+        MOVX    A,@DPTR
+        XRL     A,#0x30
+        JNZ     ??control_fifo_5
+        INC     R5
+//  454     }
+??control_fifo_5:
+        INC     R0
+        MOV     A,R0
+        CLR     C
+        SUBB    A,#0xc
+        JC      ??control_fifo_3
+//  455   }
+//  456 
+//  457   if(empty!=full)
+        MOV     A,R4
+        XRL     A,R5
+        JZ      ??control_fifo_2
+//  458   { 
+//  459     if(empty>full)  vaga='0';
+        MOV     A,R4
+        CLR     C
+        SUBB    A,R5
+        MOV     DPTR,#vaga
+        JNC     ??control_fifo_6
+        MOV     A,#0x30
+        MOVX    @DPTR,A
+//  460     else  vaga='1';
+//  461   }
+//  462   
+//  463   if(vaga=='1')
+//  464   {
+//  465     P0 &= ~PIN_RED_LED; 
+//  466     Onboard_wait(1); 
+//  467     P0 |= PIN_GREEN_LED;
+//  468   }
+//  469   else
+//  470   {
+//  471     P0 &= ~PIN_GREEN_LED; 
+??control_fifo_7:
+        CLR     0x80.3
+//  472     Onboard_wait(1); 
+        ; Setup parameters for call to function Onboard_wait
+        MOV     R2,#0x1
+        MOV     R3,#0x0
+        LCALL   ??Onboard_wait?relay ; Banked call to: Onboard_wait
+//  473     P0 |= PIN_RED_LED;
+        SETB    0x80.4
+//  474   }
+//  475 
+//  476   if(index_flag>=12) 
+??control_fifo_8:
+        MOV     DPTR,#index_flag
+        MOVX    A,@DPTR
+        CLR     C
+        SUBB    A,#0xc
+        JC      ??control_fifo_9
+//  477     index_flag = 0;
+        CLR     A
+        SJMP    ??control_fifo_10
+??control_fifo_6:
+        MOV     A,#0x31
+        MOVX    @DPTR,A
+        SJMP    ??control_fifo_11
+??control_fifo_2:
+        MOV     DPTR,#vaga
+        MOVX    A,@DPTR
+        XRL     A,#0x31
+        JNZ     ??control_fifo_7
+??control_fifo_11:
+        CLR     0x80.4
+        ; Setup parameters for call to function Onboard_wait
+        MOV     R2,#0x1
+        MOV     R3,#0x0
+        LCALL   ??Onboard_wait?relay ; Banked call to: Onboard_wait
+        SETB    0x80.3
+        SJMP    ??control_fifo_8
+//  478   else
+//  479     index_flag++;
+??control_fifo_9:
+        MOVX    A,@DPTR
+        INC     A
+??control_fifo_10:
+        MOVX    @DPTR,A
+          CFI EndBlock cfiBlock5
+//  480 
+//  481 }
+        REQUIRE ?Subroutine1
+        REQUIRE _A_P0
+        ; // Fall through to label ?Subroutine1
+
+        RSEG BANKED_CODE:CODE:NOROOT(0)
+?Subroutine1:
+          CFI Block cfiBlock6 Using cfiCommon0
+          CFI NoFunction
+          CFI CFA_SP SP+0
+          CFI CFA_XSP16 add(XSP16, 10)
+          CFI VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
+          CFI DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
+          CFI DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
+          CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
+          CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
+          CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
+          CFI V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
+          CFI ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
+          CFI ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
+          CFI ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
+        MOV     R7,#0x2
+        LJMP    ?BANKED_LEAVE_XDATA
+          CFI EndBlock cfiBlock6
+
+        RSEG BANKED_CODE:CODE:NOROOT(0)
+?Subroutine2:
+          CFI Block cfiCond7 Using cfiCommon0
+          CFI Function control_fifo
+          CFI Conditional ??CrossCallReturnLabel_0
+          CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
+          CFI VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
+          CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
+          CFI V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
+          CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
+          CFI ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
+          CFI ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
+          CFI ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
+          CFI DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
+          CFI DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
+          CFI CFA_SP SP+-2
+          CFI CFA_XSP16 add(XSP16, 10)
+          CFI Block cfiCond8 Using cfiCommon0
+          CFI (cfiCond8) Function control_fifo
+          CFI (cfiCond8) Conditional ??CrossCallReturnLabel_1
+          CFI (cfiCond8) R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
+          CFI (cfiCond8) VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
+          CFI (cfiCond8) V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
+          CFI (cfiCond8) V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
+          CFI (cfiCond8) R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
+          CFI (cfiCond8) ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
+          CFI (cfiCond8) ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
+          CFI (cfiCond8) ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
+          CFI (cfiCond8) DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
+          CFI (cfiCond8) DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
+          CFI (cfiCond8) CFA_SP SP+-2
+          CFI (cfiCond8) CFA_XSP16 add(XSP16, 10)
+          CFI Block cfiCond9 Using cfiCommon0
+          CFI (cfiCond9) Function control_fifo
+          CFI (cfiCond9) Conditional ??CrossCallReturnLabel_2
+          CFI (cfiCond9) R6 load(1, XDATA, add(CFA_XSP16, literal(-10)))
+          CFI (cfiCond9) VB load(1, XDATA, add(CFA_XSP16, literal(-9)))
+          CFI (cfiCond9) V0 load(1, XDATA, add(CFA_XSP16, literal(-8)))
+          CFI (cfiCond9) V1 load(1, XDATA, add(CFA_XSP16, literal(-7)))
+          CFI (cfiCond9) R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
+          CFI (cfiCond9) ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
+          CFI (cfiCond9) ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
+          CFI (cfiCond9) ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
+          CFI (cfiCond9) DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
+          CFI (cfiCond9) DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
+          CFI (cfiCond9) CFA_SP SP+-2
+          CFI (cfiCond9) CFA_XSP16 add(XSP16, 10)
+          CFI Block cfiPicker10 Using cfiCommon1
+          CFI (cfiPicker10) NoFunction
+          CFI (cfiPicker10) Picker
+        ADD     A,R0
+        MOV     DPL,A
+        CLR     A
+        ADDC    A,#(fifo_ultra >> 8) & 0xff
+        MOV     DPH,A
+        RET
+          CFI EndBlock cfiCond7
+          CFI EndBlock cfiCond8
+          CFI EndBlock cfiCond9
+          CFI EndBlock cfiPicker10
+//  482 
+
+        RSEG BANKED_CODE:CODE:NOROOT(0)
+//  483 void read_ultrasonic()
+read_ultrasonic:
+          CFI Block cfiBlock11 Using cfiCommon0
+          CFI Function read_ultrasonic
+        CODE
+//  484 {
+        FUNCALL read_ultrasonic, Onboard_wait
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 9, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 9, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL read_ultrasonic, Onboard_wait
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 9, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 9, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL read_ultrasonic, Onboard_wait
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 9, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 9, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL read_ultrasonic, Onboard_wait
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 9, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 9, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        FUNCALL read_ultrasonic, control_fifo
+        LOCFRAME ISTACK, 0, STACK
+        LOCFRAME PSTACK, 0, STACK
+        LOCFRAME XSTACK, 9, STACK
+        LOCFRAME IOVERLAY, 0, STATIC
+        LOCFRAME DOVERLAY, 0, STATIC
+        ARGFRAME ISTACK, 0, STACK
+        ARGFRAME PSTACK, 0, STACK
+        ARGFRAME XSTACK, 9, STACK
+        ARGFRAME IOVERLAY, 0, STATIC
+        ARGFRAME DOVERLAY, 0, STATIC
+        MOV     A,#-0x9
+        LCALL   ?BANKED_ENTER_XDATA
+          CFI DPH0 load(1, XDATA, add(CFA_XSP16, literal(-1)))
+          CFI DPL0 load(1, XDATA, add(CFA_XSP16, literal(-2)))
+          CFI ?BRET_EXT load(1, XDATA, add(CFA_XSP16, literal(-3)))
+          CFI ?RET_HIGH load(1, XDATA, add(CFA_XSP16, literal(-4)))
+          CFI ?RET_LOW load(1, XDATA, add(CFA_XSP16, literal(-5)))
+          CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
+          CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-7)))
+          CFI VB load(1, XDATA, add(CFA_XSP16, literal(-8)))
+          CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-9)))
+          CFI CFA_SP SP+0
+          CFI CFA_XSP16 add(XSP16, 9)
+        ; Saved register size: 9
+        ; Auto size: 0
+//  485     uint16 i;
+//  486 
+//  487     P0SEL &= ~(PIN_GREEN_LED+PIN_RED_LED);
+        ANL     0xf3,#0xe7
+//  488     P0DIR |= PIN_GREEN_LED+PIN_RED_LED;
+        ORL     0xfd,#0x18
+//  489     
+//  490     //Configure trigger
+//  491     P0SEL &= ~PIN_TRIGGER;   //P0_1 GPIO
+        ANL     0xf3,#0xfd
+//  492     P0DIR |= PIN_TRIGGER;    //P0_1 output
+        ORL     0xfd,#0x2
+//  493     //Onboard_wait(10);
+//  494     P0SEL &= ~PIN_ECHO;   //P0_2 GPIO
+        ANL     0xf3,#0xfb
+//  495     P0DIR &= ~PIN_ECHO;   //P0_2 input
+        ANL     0xfd,#0xfb
+//  496     Onboard_wait(1);
+        ; Setup parameters for call to function Onboard_wait
+        MOV     R2,#0x1
+        MOV     R3,#0x0
+        LCALL   ??Onboard_wait?relay ; Banked call to: Onboard_wait
+//  497 
+//  498     P0 &= ~PIN_TRIGGER;       //------> 0
+        CLR     0x80.1
+//  499     Onboard_wait(6);
+        ; Setup parameters for call to function Onboard_wait
+        MOV     R2,#0x6
+        MOV     R3,#0x0
+        LCALL   ??Onboard_wait?relay ; Banked call to: Onboard_wait
+//  500     P0 |= PIN_TRIGGER;        //------> 1
+        SETB    0x80.1
+//  501     Onboard_wait(6);      //------> 6us
+        ; Setup parameters for call to function Onboard_wait
+        MOV     R2,#0x6
+        MOV     R3,#0x0
+        LCALL   ??Onboard_wait?relay ; Banked call to: Onboard_wait
+//  502     P0 &= ~PIN_TRIGGER;       //------> 0 
+        CLR     0x80.1
+//  503     Onboard_wait(6); 
+        ; Setup parameters for call to function Onboard_wait
+        MOV     R2,#0x6
+        MOV     R3,#0x0
+        LCALL   ??Onboard_wait?relay ; Banked call to: Onboard_wait
+//  504 
+//  505     while((!(P0&PIN_ECHO)))/*||(timeout_1<65530)) timeout_1++*/;
+??read_ultrasonic_0:
+        MOV     C,0x80.2
+        JNC     ??read_ultrasonic_0
+//  506     while(P0&PIN_ECHO)
+??read_ultrasonic_1:
+        MOV     C,0x80.2
+        JNC     ??read_ultrasonic_2
+//  507     {
+//  508       if(i<65530) 
+        CLR     C
+        MOV     A,R6
+        SUBB    A,#-0x6
+        MOV     A,R7
+        SUBB    A,#-0x1
+        JNC     ??read_ultrasonic_2
+//  509         i++; 
+        INC     R6
+        MOV     A,R6
+        JNZ     ??read_ultrasonic_1
+        INC     R7
+        SJMP    ??read_ultrasonic_1
+//  510       else 
+//  511         break;
+//  512     }
+//  513         
+//  514     control_fifo(i);
+??read_ultrasonic_2:
+        ; Setup parameters for call to function control_fifo
+        MOV     A,R6
+        MOV     R2,A
+        MOV     A,R7
+        MOV     R3,A
+        LCALL   ??control_fifo?relay ; Banked call to: control_fifo
+//  515 
+//  516 
+//  517     #ifdef DEBUG_ULTRA
+//  518       char dist[5];
+//  519       dist[0] = (i/10000) + 0x30;
+//  520       dist[1] = (i%10000)/1000 + 0x30;
+//  521       dist[2] = (((i%10000)%1000)/100) + 0x30;
+//  522       dist[3] = ((((i%10000)%1000)%100)/10) +0x30; 
+//  523       dist[4] = ((((i%10000)%1000)%100)%10) + 0x30;
+//  524     #endif
+//  525 }
+        LJMP    ?Subroutine0 & 0xFFFF
+          CFI EndBlock cfiBlock11
+        REQUIRE P0SEL
+        REQUIRE P0DIR
+        REQUIRE _A_P0
+//  526 
+
+        RSEG BANKED_CODE:CODE:NOROOT(0)
+//  527 void SendUART(uint8 *data,uint8 len)
 SendUART:
-          CFI Block cfiBlock7 Using cfiCommon0
+          CFI Block cfiBlock12 Using cfiCommon0
           CFI Function SendUART
         CODE
-//  422 {
+//  528 {
         FUNCALL SendUART, HalUARTWrite
         LOCFRAME ISTACK, 0, STACK
         LOCFRAME PSTACK, 0, STACK
@@ -1916,15 +2471,25 @@ SendUART:
         ; Saved register size: 10
         ; Auto size: 0
         MOV     A,R1
-//  423   HalUARTWrite(HAL_UART_PORT_0, data, len);
+//  529   HalUARTWrite(HAL_UART_PORT_0, data, len);
         ; Setup parameters for call to function HalUARTWrite
         MOV     R4,A
         MOV     R5,#0x0
         MOV     R1,#0x0
         LCALL   ??HalUARTWrite?relay ; Banked call to: HalUARTWrite
-//  424 }
-        LJMP    ?Subroutine1 & 0xFFFF
-          CFI EndBlock cfiBlock7
+//  530 }
+        SJMP    ?Subroutine1
+          CFI EndBlock cfiBlock12
+
+        RSEG XDATA_ID:CODE:NOROOT(0)
+`?<Initializer for vaga>`:
+        DATA8
+        DB 48
+
+        RSEG XDATA_ID:CODE:NOROOT(0)
+`?<Initializer for fifo_ultra>`:
+        DB 30H, 30H, 30H, 30H, 30H, 30H, 30H, 30H
+        DB 30H, 30H, 30H, 30H
 
         RSEG BANK_RELAYS:CODE:REORDER:NOROOT(0)
 ??ParkWay_Init?relay:
@@ -1941,13 +2506,6 @@ SendUART:
         DC24    ParkWay_ProcessEvent
 
         RSEG BANK_RELAYS:CODE:REORDER:NOROOT(0)
-??ParkWay_SendTheMessage?relay:
-        CODE
-        LCALL   ?BDISPATCH
-        DATA24
-        DC24    ParkWay_SendTheMessage
-
-        RSEG BANK_RELAYS:CODE:REORDER:NOROOT(0)
 ??UART_CallBack?relay:
         CODE
         LCALL   ?BDISPATCH
@@ -1962,6 +2520,20 @@ SendUART:
         DC24    uart_init
 
         RSEG BANK_RELAYS:CODE:REORDER:NOROOT(0)
+??control_fifo?relay:
+        CODE
+        LCALL   ?BDISPATCH
+        DATA24
+        DC24    control_fifo
+
+        RSEG BANK_RELAYS:CODE:REORDER:NOROOT(0)
+??read_ultrasonic?relay:
+        CODE
+        LCALL   ?BDISPATCH
+        DATA24
+        DC24    read_ultrasonic
+
+        RSEG BANK_RELAYS:CODE:REORDER:NOROOT(0)
 ??SendUART?relay:
         CODE
         LCALL   ?BDISPATCH
@@ -1969,23 +2541,22 @@ SendUART:
         DC24    SendUART
 
         END
-//  425 
-//  426 static void ParkWay_HandleKeys( uint8 shift, uint8 keys )
-//  427 {
-//  428 }
-//  429 
-//  430 /*********************************************************************/
+//  531 
+//  532 
+//  533 /*********************************************************************/
 // 
-// 863 bytes in segment BANKED_CODE
-//  36 bytes in segment BANK_RELAYS
-//   3 bytes in segment SFR_AN
-//  14 bytes in segment XDATA_ROM_C
-//  21 bytes in segment XDATA_Z
+// 1 120 bytes in segment BANKED_CODE
+//    42 bytes in segment BANK_RELAYS
+//     3 bytes in segment SFR_AN
+//    13 bytes in segment XDATA_I
+//    13 bytes in segment XDATA_ID
+//    14 bytes in segment XDATA_ROM_C
+//    22 bytes in segment XDATA_Z
 // 
-// 899 bytes of CODE  memory
-//  14 bytes of CONST memory
-//   0 bytes of DATA  memory (+ 3 bytes shared)
-//  21 bytes of XDATA memory
+// 1 175 bytes of CODE  memory
+//    14 bytes of CONST memory
+//     0 bytes of DATA  memory (+ 3 bytes shared)
+//    35 bytes of XDATA memory
 //
 //Errors: none
-//Warnings: 6
+//Warnings: 1

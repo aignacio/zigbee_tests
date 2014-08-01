@@ -49,9 +49,9 @@ extern "C"
 
 // Application Events (OSAL) - These are bit weighted definitions.
 #define ParkWay_SEND_MSG_EVT       0x0001
-#define POLLING_OF_DEV_EVT         0x0002
+#define POLLING_OF_DEV_EVT         0x0002 
 #define POLL_PARWAY_EVT            0x0003
-
+#define POLLING_ULTRASONIC         0x0004
 /*********************************************************************
  * MACROS
  */

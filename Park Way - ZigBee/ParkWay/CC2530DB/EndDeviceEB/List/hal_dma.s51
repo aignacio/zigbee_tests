@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:01 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:36 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          arget\CC2530EB\hal_dma.c" -D NWK_AUTO_POLL -D     /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -327,7 +327,6 @@ halDmaIsr           SYMBOL "halDmaIsr"
         ARGFRAME XSTACK, 14, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
-        EXTERN halSleepPconValue
 
 // C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_dma.c
 //    1 /**************************************************************************************************
@@ -623,9 +622,8 @@ halDmaIsr:
 //  159 #endif // (defined HAL_IRGEN) && (HAL_IRGEN == TRUE)
 //  160 
 //  161   CLEAR_SLEEP_MODE();
-??halDmaIsr_0:
-        MOV     halSleepPconValue,#0x0
 //  162   HAL_EXIT_ISR();
+??halDmaIsr_0:
         MOV     A,R6
         MOV     C,0xE0 /* A   */.0
         MOV     0xa8.7,C
@@ -658,11 +656,11 @@ halDmaIsr:
 // 19 bytes in segment BANKED_CODE
 //  6 bytes in segment BANK_RELAYS
 //  3 bytes in segment INTVEC
-// 38 bytes in segment NEAR_CODE
+// 35 bytes in segment NEAR_CODE
 //  8 bytes in segment SFR_AN
 // 40 bytes in segment XDATA_Z
 // 
-// 63 bytes of CODE  memory (+ 3 bytes shared)
+// 60 bytes of CODE  memory (+ 3 bytes shared)
 //  0 bytes of DATA  memory (+ 8 bytes shared)
 // 40 bytes of XDATA memory
 //

@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:28:01 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:36 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Components\hal\co #
 #                          mmon\hal_drivers.c" -D NWK_AUTO_POLL -D ZTOOL_P1   #
 #                          -D MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC -D        #
-#                          xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC           #
+#                          xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC          #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -417,7 +417,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
    \   00001F   FA           MOV     R2,A
    \   000020   EF           MOV     A,R7
    \   000021   6480         XRL     A,#0x80
-   \   000023   803C         SJMP    ??Hal_ProcessEvent_3
+   \   000023   8030         SJMP    ??Hal_ProcessEvent_3
     212            }
     213          
     214            if ( events & HAL_LED_BLINK_EVENT )
@@ -434,14 +434,14 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
     219              return events ^ HAL_LED_BLINK_EVENT;
    \   00002D   EE           MOV     A,R6
    \   00002E   6402         XRL     A,#0x2
-   \   000030   802D         SJMP    ??Hal_ProcessEvent_5
+   \   000030   8021         SJMP    ??Hal_ProcessEvent_5
     220            }
     221          
     222            if (events & HAL_KEY_EVENT)
    \                     ??Hal_ProcessEvent_4:
    \   000032   EE           MOV     A,R6
    \   000033   A2E0         MOV     C,0xE0 /* A   */.0
-   \   000035   501E         JNC     ??Hal_ProcessEvent_6
+   \   000035   5021         JNC     ??Hal_ProcessEvent_6
     223            {
     224          
     225          #if (defined HAL_KEY) && (HAL_KEY == TRUE)
@@ -473,27 +473,19 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
    \                     ??Hal_ProcessEvent_7:
    \   000050   EE           MOV     A,R6
    \   000051   6401         XRL     A,#0x1
-   \   000053   800A         SJMP    ??Hal_ProcessEvent_5
+   \                     ??Hal_ProcessEvent_5:
+   \   000053   FA           MOV     R2,A
+   \   000054   EF           MOV     A,R7
+   \                     ??Hal_ProcessEvent_3:
+   \   000055   FB           MOV     R3,A
+   \   000056   8004         SJMP    ??Hal_ProcessEvent_8
     237            }
     238          
     239          #ifdef POWER_SAVING
     240            if ( events & HAL_SLEEP_TIMER_EVENT )
-   \                     ??Hal_ProcessEvent_6:
-   \   000055   5404         ANL     A,#0x4
-   \   000057   600B         JZ      ??Hal_ProcessEvent_8
     241            {
     242              halRestoreSleepLevel();
-   \   000059                ; Setup parameters for call to function halRestoreSleepLevel
-   \   000059   12....       LCALL   ??halRestoreSleepLevel?relay; Banked call to: halRestoreSleepLevel
     243              return events ^ HAL_SLEEP_TIMER_EVENT;
-   \   00005C   EE           MOV     A,R6
-   \   00005D   6404         XRL     A,#0x4
-   \                     ??Hal_ProcessEvent_5:
-   \   00005F   FA           MOV     R2,A
-   \   000060   EF           MOV     A,R7
-   \                     ??Hal_ProcessEvent_3:
-   \   000061   FB           MOV     R3,A
-   \   000062   8004         SJMP    ??Hal_ProcessEvent_9
     244            }
     245          #endif
     246          
@@ -507,12 +499,12 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
     254            
     255            /* Nothing interested, discard the message */
     256            return 0;
+   \                     ??Hal_ProcessEvent_6:
+   \   000058   7A00         MOV     R2,#0x0
+   \   00005A   7B00         MOV     R3,#0x0
    \                     ??Hal_ProcessEvent_8:
-   \   000064   7A00         MOV     R2,#0x0
-   \   000066   7B00         MOV     R3,#0x0
-   \                     ??Hal_ProcessEvent_9:
-   \   000068   7F02         MOV     R7,#0x2
-   \   00006A   02....       LJMP    ?BANKED_LEAVE_XDATA
+   \   00005C   7F02         MOV     R7,#0x2
+   \   00005E   02....       LJMP    ?BANKED_LEAVE_XDATA
     257          
     258          }
     259          
@@ -560,11 +552,10 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
     292          #if defined( POWER_SAVING )
     293            /* Allow sleep before the next OSAL event loop */
     294            ALLOW_SLEEP_MODE();
-   \   000007   75..01       MOV     halSleepPconValue,#0x1
     295          #endif
     296          
     297          }
-   \   00000A   02....       LJMP    ?Subroutine0 & 0xFFFF
+   \   000007   02....       LJMP    ?Subroutine0 & 0xFFFF
 
    \                                 In  segment BANK_RELAYS, align 1
    \                     ??Hal_Init?relay:
@@ -607,7 +598,6 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
       0     10   Hal_ProcessEvent
         0     10   -> HalKeyPoll
         0     10   -> HalLedUpdate
-        0     10   -> halRestoreSleepLevel
         0     10   -> osal_msg_deallocate
         0     10   -> osal_msg_receive
         0     10   -> osal_start_timerEx
@@ -626,16 +616,16 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\common\hal_drivers.c
        7  ?Subroutine0
       27  HalDriverInit
        9  Hal_Init
-     109  Hal_ProcessEvent
-      13  Hal_ProcessPoll
+      97  Hal_ProcessEvent
+      10  Hal_ProcessPoll
        1  Hal_TaskID
 
  
- 165 bytes in segment BANKED_CODE
+ 150 bytes in segment BANKED_CODE
   24 bytes in segment BANK_RELAYS
    1 byte  in segment XDATA_Z
  
- 189 bytes of CODE  memory
+ 174 bytes of CODE  memory
    1 byte  of XDATA memory
 
 Errors: none

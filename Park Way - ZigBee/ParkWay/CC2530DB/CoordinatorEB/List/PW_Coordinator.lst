@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  17:10:32 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:31:38 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -134,7 +134,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
       4          
       5            Ver.: 1.0
       6            Date: 27/06/14
-      7            Developer:  Ânderson Ignácio da Silva
+      7            Developer:  Ã‚nderson IgnÃ¡cio da Silva
       8            Obs.:
       9              -LCD_SUPPORTED=DEBUG or LCD_SUPPORTED must be disable in the CC2530 China 
      10              modules to work
@@ -143,65 +143,68 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
      13              programmer because the NV_RESTORE option is enabled  to restore the  End 
      14              Devices after the coordinator power down
      15          
-     16            Pre-processor directives:
-     17              ZTOOL_P1
-     18              MT_TASK
-     19              MT_SYS_FUNC
-     20              MT_ZDO_FUNC
-     21              xLCD_SUPPORTED
-     22              NV_RESTORE
-     23          
-     24          *****************************************************************************/
-     25          
+     16              -When the board has PA_LNA RANGE EXTENDER, it must be necessary to cut off
+     17              the 'x' from the defines of #define xHAL_PA_LNA of the hal_board_cfg.h
+     18          
+     19            Pre-processor directives:
+     20              ZTOOL_P1
+     21              MT_TASK
+     22              MT_SYS_FUNC
+     23              MT_ZDO_FUNC
+     24              xLCD_SUPPORTED
+     25              NV_RESTORE
      26          
-     27          /*********************************************************************
-     28           * INCLUDES
-     29           */
-     30          #include "OSAL.h"
-     31          #include "AF.h"
-     32          #include "ZDApp.h"
-     33          #include "ZDObject.h"
-     34          #include "ZDProfile.h"
-     35          #include "ParkWay.h"
-     36          #include "DebugTrace.h"
-     37          #include "OnBoard.h"
-     38          /* HAL */
-     39          #include "hal_lcd.h"
-     40          #include "hal_led.h"
-     41          #include "hal_key.h"
-     42          #include "hal_uart.h"
-     43           
-     44          
-     45          /*********************************************************************
-     46           * MACROS
-     47           */
-     48          
-     49          /*********************************************************************
-     50           * CONSTANTS
-     51           */
-     52          #define   TIME_PARKWAY_POLL   2000    //Control the time of polling of the read devices
-     53          /*********************************************************************
-     54           * TYPEDEFS
-     55           */
-     56          
-     57          /*********************************************************************
-     58           * GLOBAL VARIABLES
-     59           */
-     60          //afAddrType_t           teste;   //This store the address of the last peer connected to the coordinator
-     61          
-     62          // This list should be filled with Application specific Cluster IDs.
+     27          *****************************************************************************/
+     28          
+     29          
+     30          /*********************************************************************
+     31           * INCLUDES
+     32           */
+     33          #include "OSAL.h"
+     34          #include "AF.h"
+     35          #include "ZDApp.h"
+     36          #include "ZDObject.h"
+     37          #include "ZDProfile.h"
+     38          #include "ParkWay.h"
+     39          #include "DebugTrace.h"
+     40          #include "OnBoard.h"
+     41          /* HAL */
+     42          #include "hal_lcd.h"
+     43          #include "hal_led.h"
+     44          #include "hal_key.h"
+     45          #include "hal_uart.h"
+     46           
+     47          
+     48          /*********************************************************************
+     49           * MACROS
+     50           */
+     51          
+     52          /*********************************************************************
+     53           * CONSTANTS
+     54           */
+     55          #define   TIME_PARKWAY_POLL   2000    //Control the time of polling of the read devices
+     56          /*********************************************************************
+     57           * TYPEDEFS
+     58           */
+     59          
+     60          /*********************************************************************
+     61           * GLOBAL VARIABLES
+     62           */
+     63          //afAddrType_t           teste;   //This store the address of the last peer connected to the coordinator
+     64          
+     65          // This list should be filled with Application specific Cluster IDs.
 
    \                                 In  segment XDATA_ROM_C, align 1
-     63          const cId_t ParkWay_ClusterList[ParkWay_MAX_CLUSTERS] =
+     66          const cId_t ParkWay_ClusterList[ParkWay_MAX_CLUSTERS] =
    \                     ParkWay_ClusterList:
    \   000000   0100         DW 1
-     64          {
-     65            ParkWay_CLUSTERID
-     66          };
-     67          
+     67          {
+     68            ParkWay_CLUSTERID
+     69          };
+     70          
 
    \                                 In  segment XDATA_ROM_C, align 1
-     68          const SimpleDescriptionFormat_t ParkWay_SimpleDesc =
+     71          const SimpleDescriptionFormat_t ParkWay_SimpleDesc =
    \                     ParkWay_SimpleDesc:
    \   000000   0A           DB 10
    \   000001   040F         DW 3844
@@ -211,180 +214,180 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
    \   000007   ....         DW ParkWay_ClusterList
    \   000009   01           DB 1
    \   00000A   ....         DW ParkWay_ClusterList
-     69          {
-     70            ParkWay_ENDPOINT,              //  int Endpoint;
-     71            ParkWay_PROFID,                //  uint16 AppProfId[2];
-     72            ParkWay_DEVICEID,              //  uint16 AppDeviceId[2];
-     73            ParkWay_DEVICE_VERSION,        //  int   AppDevVer:4;
-     74            ParkWay_FLAGS,                 //  int   AppFlags:4;
-     75            ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
-     76            (cId_t *)ParkWay_ClusterList,  //  byte *pAppInClusterList;
-     77            ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
-     78            (cId_t *)ParkWay_ClusterList   //  byte *pAppInClusterList;
-     79          };
-     80          
-     81          // This is the Endpoint/Interface description.  It is defined here, but
-     82          // filled-in in ParkWay_Init().  Another way to go would be to fill
-     83          // in the structure here and make it a "const" (in code space).  The
-     84          // way it's defined in this sample app it is define in RAM.
+     72          {
+     73            ParkWay_ENDPOINT,              //  int Endpoint;
+     74            ParkWay_PROFID,                //  uint16 AppProfId[2];
+     75            ParkWay_DEVICEID,              //  uint16 AppDeviceId[2];
+     76            ParkWay_DEVICE_VERSION,        //  int   AppDevVer:4;
+     77            ParkWay_FLAGS,                 //  int   AppFlags:4;
+     78            ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
+     79            (cId_t *)ParkWay_ClusterList,  //  byte *pAppInClusterList;
+     80            ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
+     81            (cId_t *)ParkWay_ClusterList   //  byte *pAppInClusterList;
+     82          };
+     83          
+     84          // This is the Endpoint/Interface description.  It is defined here, but
+     85          // filled-in in ParkWay_Init().  Another way to go would be to fill
+     86          // in the structure here and make it a "const" (in code space).  The
+     87          // way it's defined in this sample app it is define in RAM.
 
    \                                 In  segment XDATA_Z, align 1, keep-with-next
-     85          endPointDesc_t ParkWay_epDesc;
+     88          endPointDesc_t ParkWay_epDesc;
    \                     ParkWay_epDesc:
    \   000000                DS 6
    \   000006                REQUIRE __INIT_XDATA_Z
-     86          
-     87          /*********************************************************************
-     88           * EXTERNAL VARIABLES
-     89           */
-     90          
-     91          /*********************************************************************
-     92           * EXTERNAL FUNCTIONS
-     93           */
-     94          
-     95          /*********************************************************************
-     96           * LOCAL VARIABLES
-     97           */
+     89          
+     90          /*********************************************************************
+     91           * EXTERNAL VARIABLES
+     92           */
+     93          
+     94          /*********************************************************************
+     95           * EXTERNAL FUNCTIONS
+     96           */
+     97          
+     98          /*********************************************************************
+     99           * LOCAL VARIABLES
+    100           */
 
    \                                 In  segment XDATA_Z, align 1, keep-with-next
-     98          byte ParkWay_TaskID;   // Task ID for internal task/event processing
+    101          byte ParkWay_TaskID;   // Task ID for internal task/event processing
    \                     ParkWay_TaskID:
    \   000000                DS 1
    \   000001                REQUIRE __INIT_XDATA_Z
-     99                                    // This variable will be received when
-    100                                    // ParkWay_Init() is called.
+    102                                    // This variable will be received when
+    103                                    // ParkWay_Init() is called.
 
    \                                 In  segment XDATA_Z, align 1, keep-with-next
-    101          devStates_t ParkWay_NwkState;
+    104          devStates_t ParkWay_NwkState;
    \                     ParkWay_NwkState:
    \   000000                DS 1
    \   000001                REQUIRE __INIT_XDATA_Z
-    102          
-    103          
+    105          
+    106          
 
    \                                 In  segment XDATA_Z, align 1, keep-with-next
-    104          byte ParkWay_TransID;  // This is the unique message ID (counter)
+    107          byte ParkWay_TransID;  // This is the unique message ID (counter)
    \                     ParkWay_TransID:
    \   000000                DS 1
    \   000001                REQUIRE __INIT_XDATA_Z
-    105          
+    108          
 
    \                                 In  segment XDATA_Z, align 1, keep-with-next
-    106          afAddrType_t ParkWay_DstAddr;
+    109          afAddrType_t ParkWay_DstAddr;
    \                     ParkWay_DstAddr:
    \   000000                DS 12
    \   00000C                REQUIRE __INIT_XDATA_Z
-    107          
-    108          /*********************************************************************
-    109           * LOCAL FUNCTIONS
-    110           */
-    111          void SendUART(uint8 *data,uint8 len);
-    112          void uart_init(void);
+    110          
+    111          /*********************************************************************
+    112           * LOCAL FUNCTIONS
+    113           */
+    114          void SendUART(uint8 *data,uint8 len);
+    115          void uart_init(void);
 
    \                                 In  segment XDATA_Z, align 1, keep-with-next
-    113          static uint8 DevListPW[20][6];        //Devices Vector for PARK WAY 
+    116          static uint8 DevListPW[20][6];        //Devices Vector for PARK WAY 
    \                     DevListPW:
    \   000000                DS 120
    \   000078                REQUIRE __INIT_XDATA_Z
-    114          
-    115          static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg );
-    116          static void ParkWay_HandleKeys( byte shift, byte keys );
-    117          static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pckt );
-    118          static void ParkWay_SendTheMessage( void );
-    119          
-    120          /*********************************************************************
-    121           * NETWORK LAYER CALLBACKS
-    122           */
-    123          
-    124          /*********************************************************************
-    125           * PUBLIC FUNCTIONS
-    126           */
-    127          
-    128          //Initialization function for the Park Way task. This is called during initialization and should contain any application specific initialization (ie. hardware initialization/setup, table initialization, power up notificaiton ... )
+    117          
+    118          static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg );
+    119          //static void ParkWay_HandleKeys( byte shift, byte keys );
+    120          static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pckt );
+    121          //static void ParkWay_SendTheMessage( void );
+    122          
+    123          /*********************************************************************
+    124           * NETWORK LAYER CALLBACKS
+    125           */
+    126          
+    127          /*********************************************************************
+    128           * PUBLIC FUNCTIONS
+    129           */
+    130          
+    131          //Initialization function for the Park Way task. This is called during initialization and should contain any application specific initialization (ie. hardware initialization/setup, table initialization, power up notificaiton ... )
 
    \                                 In  segment BANKED_CODE, align 1, keep-with-next
-    129          void ParkWay_Init( uint8 task_id )
+    132          void ParkWay_Init( uint8 task_id )
    \                     ParkWay_Init:
-    130          {
+    133          {
    \   000000   74F7         MOV     A,#-0x9
    \   000002   12....       LCALL   ?BANKED_ENTER_XDATA
    \   000005                ; Saved register size: 9
    \   000005                ; Auto size: 0
    \   000005   E9           MOV     A,R1
-    131            ParkWay_TaskID = task_id;
+    134            ParkWay_TaskID = task_id;
    \   000006   90....       MOV     DPTR,#ParkWay_TaskID
    \   000009   F0           MOVX    @DPTR,A
-    132            ParkWay_NwkState = DEV_INIT;
+    135            ParkWay_NwkState = DEV_INIT;
    \   00000A   90....       MOV     DPTR,#ParkWay_NwkState
    \   00000D   7401         MOV     A,#0x1
    \   00000F   F0           MOVX    @DPTR,A
-    133            ParkWay_TransID = 0;
+    136            ParkWay_TransID = 0;
    \   000010   90....       MOV     DPTR,#ParkWay_TransID
    \   000013   E4           CLR     A
    \   000014   F0           MOVX    @DPTR,A
-    134          
-    135            // Device hardware initialization can be added here or in main() (Zmain.c).
-    136            // If the hardware is application specific - add it here.
-    137            // If the hardware is other parts of the device add it in main().
-    138          
-    139            ParkWay_DstAddr.addrMode = (afAddrMode_t)AddrNotPresent;
+    137          
+    138            // Device hardware initialization can be added here or in main() (Zmain.c).
+    139            // If the hardware is application specific - add it here.
+    140            // If the hardware is other parts of the device add it in main().
+    141          
+    142            ParkWay_DstAddr.addrMode = (afAddrMode_t)AddrNotPresent;
    \   000015   90....       MOV     DPTR,#ParkWay_DstAddr + 8
    \   000018   F0           MOVX    @DPTR,A
-    140            ParkWay_DstAddr.endPoint = 0;
+    143            ParkWay_DstAddr.endPoint = 0;
    \   000019   A3           INC     DPTR
    \   00001A   F0           MOVX    @DPTR,A
-    141            ParkWay_DstAddr.addr.shortAddr = 0;
+    144            ParkWay_DstAddr.addr.shortAddr = 0;
    \   00001B   90....       MOV     DPTR,#ParkWay_DstAddr
    \   00001E   F0           MOVX    @DPTR,A
    \   00001F   A3           INC     DPTR
    \   000020   F0           MOVX    @DPTR,A
-    142          
-    143            // Fill out the endpoint description.
-    144            ParkWay_epDesc.endPoint = ParkWay_ENDPOINT;
+    145          
+    146            // Fill out the endpoint description.
+    147            ParkWay_epDesc.endPoint = ParkWay_ENDPOINT;
    \   000021   90....       MOV     DPTR,#ParkWay_epDesc
    \   000024   740A         MOV     A,#0xa
    \   000026   F0           MOVX    @DPTR,A
-    145            ParkWay_epDesc.task_id = &ParkWay_TaskID;
+    148            ParkWay_epDesc.task_id = &ParkWay_TaskID;
    \   000027   A3           INC     DPTR
    \   000028   74..         MOV     A,#ParkWay_TaskID & 0xff
    \   00002A   F0           MOVX    @DPTR,A
    \   00002B   A3           INC     DPTR
    \   00002C   74..         MOV     A,#(ParkWay_TaskID >> 8) & 0xff
    \   00002E   F0           MOVX    @DPTR,A
-    146            ParkWay_epDesc.simpleDesc
-    147                      = (SimpleDescriptionFormat_t *)&ParkWay_SimpleDesc;
+    149            ParkWay_epDesc.simpleDesc
+    150                      = (SimpleDescriptionFormat_t *)&ParkWay_SimpleDesc;
    \   00002F   A3           INC     DPTR
    \   000030   74..         MOV     A,#ParkWay_SimpleDesc & 0xff
    \   000032   F0           MOVX    @DPTR,A
    \   000033   A3           INC     DPTR
    \   000034   74..         MOV     A,#(ParkWay_SimpleDesc >> 8) & 0xff
    \   000036   F0           MOVX    @DPTR,A
-    148            ParkWay_epDesc.latencyReq = noLatencyReqs;
+    151            ParkWay_epDesc.latencyReq = noLatencyReqs;
    \   000037   A3           INC     DPTR
    \   000038   E4           CLR     A
    \   000039   F0           MOVX    @DPTR,A
-    149          
-    150            // Register the endpoint description with the AF
-    151            afRegister( &ParkWay_epDesc );
+    152          
+    153            // Register the endpoint description with the AF
+    154            afRegister( &ParkWay_epDesc );
    \   00003A                ; Setup parameters for call to function afRegister
    \   00003A   7A..         MOV     R2,#ParkWay_epDesc & 0xff
    \   00003C   7B..         MOV     R3,#(ParkWay_epDesc >> 8) & 0xff
    \   00003E   12....       LCALL   ??afRegister?relay   ; Banked call to: afRegister
-    152          
-    153            // Register for all key events - This app will handle all key events
-    154            RegisterForKeys( ParkWay_TaskID );
+    155          
+    156            // Register for all key events - This app will handle all key events
+    157            RegisterForKeys( ParkWay_TaskID );
    \   000041                ; Setup parameters for call to function RegisterForKeys
    \   000041   90....       MOV     DPTR,#ParkWay_TaskID
    \   000044   E0           MOVX    A,@DPTR
    \   000045   F9           MOV     R1,A
    \   000046   12....       LCALL   ??RegisterForKeys?relay; Banked call to: RegisterForKeys
-    155          
-    156            // Update the display
-    157          #if defined ( LCD_SUPPORTED )
-    158            HalLcdWriteString( "ParkWay-Coord", HAL_LCD_LINE_1 );
-    159          #endif
-    160          
-    161            ZDO_RegisterForZDOMsg( ParkWay_TaskID, End_Device_Bind_rsp );
+    158          
+    159            // Update the display
+    160          #if defined ( LCD_SUPPORTED )
+    161            HalLcdWriteString( "ParkWay-Coord", HAL_LCD_LINE_1 );
+    162          #endif
+    163          
+    164            ZDO_RegisterForZDOMsg( ParkWay_TaskID, End_Device_Bind_rsp );
    \   000049                ; Setup parameters for call to function ZDO_RegisterForZDOMsg
    \   000049   7A20         MOV     R2,#0x20
    \   00004B   7B80         MOV     R3,#-0x80
@@ -392,7 +395,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
    \   000050   E0           MOVX    A,@DPTR
    \   000051   F9           MOV     R1,A
    \   000052   12....       LCALL   ??ZDO_RegisterForZDOMsg?relay; Banked call to: ZDO_RegisterForZDOMsg
-    162            ZDO_RegisterForZDOMsg( ParkWay_TaskID, Match_Desc_rsp );
+    165            ZDO_RegisterForZDOMsg( ParkWay_TaskID, Match_Desc_rsp );
    \   000055                ; Setup parameters for call to function ZDO_RegisterForZDOMsg
    \   000055   7A06         MOV     R2,#0x6
    \   000057   7B80         MOV     R3,#-0x80
@@ -400,10 +403,10 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
    \   00005C   E0           MOVX    A,@DPTR
    \   00005D   F9           MOV     R1,A
    \   00005E   12....       LCALL   ??ZDO_RegisterForZDOMsg?relay; Banked call to: ZDO_RegisterForZDOMsg
-    163          
-    164            osal_start_timerEx(   ParkWay_TaskID,
-    165                                  POLL_PARWAY_EVT,
-    166                                  TIME_PARKWAY_POLL);
+    166          
+    167            osal_start_timerEx(   ParkWay_TaskID,
+    168                                  POLL_PARWAY_EVT,
+    169                                  TIME_PARKWAY_POLL);
    \   000061                ; Setup parameters for call to function osal_start_timerEx
    \   000061   7CD0         MOV     R4,#-0x30
    \   000063   7D07         MOV     R5,#0x7
@@ -413,7 +416,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
    \   00006C   E0           MOVX    A,@DPTR
    \   00006D   F9           MOV     R1,A
    \   00006E   12....       LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
-    167          }
+    170          }
    \   000071                REQUIRE ?Subroutine0
    \   000071                ; // Fall through to label ?Subroutine0
 
@@ -421,13 +424,13 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
    \                     ?Subroutine0:
    \   000000   7F01         MOV     R7,#0x1
    \   000002   02....       LJMP    ?BANKED_LEAVE_XDATA
-    168          
-    169          //Main function to proccess the timers and events 
+    171          
+    172          //Main function to proccess the timers and events 
 
    \                                 In  segment BANKED_CODE, align 1, keep-with-next
-    170          uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
+    173          uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
    \                     ParkWay_ProcessEvent:
-    171          {
+    174          {
    \   000000                REQUIRE ?V0
    \   000000                REQUIRE ?V1
    \   000000                REQUIRE ?V2
@@ -441,46 +444,36 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source
    \   000006   FE           MOV     R6,A
    \   000007   EB           MOV     A,R3
    \   000008   FF           MOV     R7,A
-    172            afIncomingMSGPacket_t *MSGpkt;
-    173            afDataConfirm_t *afDataConfirm;
-                                    ^
-Warning[Pe177]: variable "afDataConfirm" was declared but never referenced
-    174            zAddrType_t dstAddr;
-                               ^
-Warning[Pe177]: variable "dstAddr" was declared but never referenced
-    175            // Data Confirmation message fields
-    176            byte sentEP;
-                        ^
-Warning[Pe177]: variable "sentEP" was declared but never referenced
-    177            ZStatus_t sentStatus;
-                             ^
-Warning[Pe177]: variable "sentStatus" was declared but never referenced
-    178            byte sentTransID;       // This should match the value sent
-                        ^
-Warning[Pe177]: variable "sentTransID" was declared but never referenced
-    179            (void)task_id;  // Intentionally unreferenced parameter
-    180          
-    181            if ( events & SYS_EVENT_MSG )
+    175            afIncomingMSGPacket_t *MSGpkt;
+    176            //afDataConfirm_t *afDataConfirm;
+    177            //zAddrType_t dstAddr;
+    178            // Data Confirmation message fields
+    179            //byte sentEP;
+    180            //ZStatus_t sentStatus;
+    181            //byte sentTransID;       // This should match the value sent
+    182            (void)task_id;  // Intentionally unreferenced parameter
+    183          
+    184            if ( events & SYS_EVENT_MSG )
    \   000009   5480         ANL     A,#0x80
    \   00000B   7003         JNZ     $+5
    \   00000D   02....       LJMP    ??ParkWay_ProcessEvent_0 & 0xFFFF
-    182            {
-    183              MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
+    185            {
+    186              MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
    \   000010                ; Setup parameters for call to function osal_msg_receive
    \   000010   806B         SJMP    ??ParkWay_ProcessEvent_1
-    184              while ( MSGpkt )
-    185              {
-    186                switch ( MSGpkt->hdr.event )
-    187                {
-    188                  case ZDO_CB_MSG: //Event trigger by ZigBee Device Object like connect, bind...etc
-    189                    ParkWay_ProcessZDOMsgs( (zdoIncomingMsg_t *)MSGpkt );
-    190                    break;
-    191          
-    192                  case AF_DATA_CONFIRM_CMD: //Event trigger by a confirmation of sent message
+    187              while ( MSGpkt )
+    188              {
+    189                switch ( MSGpkt->hdr.event )
+    190                {
+    191                  case ZDO_CB_MSG: //Event trigger by ZigBee Device Object like connect, bind...etc
+    192                    ParkWay_ProcessZDOMsgs( (zdoIncomingMsg_t *)MSGpkt );
     193                    break;
     194          
-    195                  case AF_INCOMING_MSG_CMD: //Event trigger by a receive message
-    196                    ParkWay_MessageMSGCB( MSGpkt );
+    195                  case AF_DATA_CONFIRM_CMD: //Event trigger by a confirmation of sent message
+    196                    break;
+    197          
+    198                  case AF_INCOMING_MSG_CMD: //Event trigger by a receive message
+    199                    ParkWay_MessageMSGCB( MSGpkt );
    \                     ??ParkWay_ProcessEvent_2:
    \   000012   E5..         MOV     A,?V0
    \   000014   2422         ADD     A,#0x22
@@ -547,25 +540,25 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   000071   C3           CLR     C
    \   000072   9406         SUBB    A,#0x6
    \   000074   40C8         JC      ??ParkWay_ProcessEvent_3
-    197                    break;
-    198          
-    199                  // case ZDO_STATE_CHANGE:
-    200                  //   break;
+    200                    break;
     201          
-    202                  default:
-    203                    break;
-    204                }
-    205          
-    206                // Release the memory
-    207                osal_msg_deallocate( (uint8 *)MSGpkt );
+    202                  // case ZDO_STATE_CHANGE:
+    203                  //   break;
+    204          
+    205                  default:
+    206                    break;
+    207                }
+    208          
+    209                // Release the memory
+    210                osal_msg_deallocate( (uint8 *)MSGpkt );
    \                     ??ParkWay_ProcessEvent_4:
    \   000076                ; Setup parameters for call to function osal_msg_deallocate
    \   000076   AA..         MOV     R2,?V0
    \   000078   AB..         MOV     R3,?V1
    \   00007A   12....       LCALL   ??osal_msg_deallocate?relay; Banked call to: osal_msg_deallocate
-    208          
-    209                // Next
-    210                MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
+    211          
+    212                // Next
+    213                MSGpkt = (afIncomingMSGPacket_t *)osal_msg_receive( ParkWay_TaskID );
    \   00007D                ; Setup parameters for call to function osal_msg_receive
    \                     ??ParkWay_ProcessEvent_1:
    \   00007D   90....       MOV     DPTR,#ParkWay_TaskID
@@ -645,10 +638,10 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   0000F4                ; Setup parameters for call to function osal_mem_free
    \   0000F4   12....       LCALL   ??osal_mem_free?relay; Banked call to: osal_mem_free
    \   0000F7   02....       LJMP    ??ParkWay_ProcessEvent_4 & 0xFFFF
-    211              }
-    212          
-    213              // return unprocessed events
-    214              return (events ^ SYS_EVENT_MSG);
+    214              }
+    215          
+    216              // return unprocessed events
+    217              return (events ^ SYS_EVENT_MSG);
    \                     ??ParkWay_ProcessEvent_5:
    \   0000FA   EE           MOV     A,R6
    \   0000FB   FA           MOV     R2,A
@@ -656,18 +649,18 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   0000FD   6480         XRL     A,#0x80
    \   0000FF   FB           MOV     R3,A
    \   000100   02....       LJMP    ??ParkWay_ProcessEvent_8 & 0xFFFF
-    215            }
-    216          
-    217            if(events & POLL_PARWAY_EVT)    //This sequence poll the stack of devices connected, cleaning the flags after print in the UART port
+    218            }
+    219          
+    220            if(events & POLL_PARWAY_EVT)    //This sequence poll the stack of devices connected, cleaning the flags after print in the UART port
    \                     ??ParkWay_ProcessEvent_0:
    \   000103   EE           MOV     A,R6
    \   000104   5403         ANL     A,#0x3
    \   000106   7003         JNZ     $+5
    \   000108   02....       LJMP    ??ParkWay_ProcessEvent_9 & 0xFFFF
-    218            {
-    219              osal_start_timerEx( ParkWay_TaskID,
-    220                                  POLL_PARWAY_EVT,
-    221                                  TIME_PARKWAY_POLL);
+    221            {
+    222              osal_start_timerEx( ParkWay_TaskID,
+    223                                  POLL_PARWAY_EVT,
+    224                                  TIME_PARKWAY_POLL);
    \   00010B                ; Setup parameters for call to function osal_start_timerEx
    \   00010B   7CD0         MOV     R4,#-0x30
    \   00010D   7D07         MOV     R5,#0x7
@@ -677,20 +670,20 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   000116   E0           MOVX    A,@DPTR
    \   000117   F9           MOV     R1,A
    \   000118   12....       LCALL   ??osal_start_timerEx?relay; Banked call to: osal_start_timerEx
-    222              uart_init();
+    225              uint8 i,i2;
+    226              uart_init();
    \   00011B                ; Setup parameters for call to function uart_init
    \   00011B   12....       LCALL   ??uart_init?relay    ; Banked call to: uart_init
-    223              SendUART("\n\rAP-0001",9);  
+    227              SendUART("\n\rAP-0001",9);  
    \   00011E                ; Setup parameters for call to function SendUART
    \   00011E   7909         MOV     R1,#0x9
    \   000120   7A..         MOV     R2,#`?<Constant "\\n\\rAP-0001">` & 0xff
    \   000122   7B..         MOV     R3,#(`?<Constant "\\n\\rAP-0001">` >> 8) & 0xff
    \   000124   12....       LCALL   ??SendUART?relay     ; Banked call to: SendUART
-    224              uint8 i,i2;
-    225              for(i=0;i<20;i++)
+    228              for(i=0;i<20;i++)
    \   000127   75..00       MOV     ?V0,#0x0
-    226              {
-    227                if(DevListPW[i][0])
+    229              {
+    230                if(DevListPW[i][0])
    \                     ??ParkWay_ProcessEvent_10:
    \   00012A   E5..         MOV     A,?V0
    \   00012C   75F006       MOV     B,#0x6
@@ -705,14 +698,14 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   00013B   F583         MOV     DPH,A
    \   00013D   E0           MOVX    A,@DPTR
    \   00013E   603F         JZ      ??ParkWay_ProcessEvent_11
-    228                {
-    229                  SendUART(",",1);  
+    231                {
+    232                  SendUART(",",1);  
    \   000140                ; Setup parameters for call to function SendUART
    \   000140   7901         MOV     R1,#0x1
    \   000142   7A..         MOV     R2,#`?<Constant ",">` & 0xff
    \   000144   7B..         MOV     R3,#(`?<Constant ",">` >> 8) & 0xff
    \   000146   12....       LCALL   ??SendUART?relay     ; Banked call to: SendUART
-    230                  for(i2=0;i2<6;i2++)
+    233                  for(i2=0;i2<6;i2++)
    \   000149   75..00       MOV     ?V1,#0x0
    \                     ??ParkWay_ProcessEvent_12:
    \   00014C   85....       MOV     ?V2,?V1
@@ -739,114 +732,109 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   00016A   FA           MOV     R2,A
    \   00016B   EF           MOV     A,R7
    \   00016C   FB           MOV     R3,A
-    231                  {
-    232                    SendUART(&DevListPW[i][i2],1);  
+    234                  {
+    235                    SendUART(&DevListPW[i][i2],1);  
    \   00016D   12....       LCALL   ??SendUART?relay     ; Banked call to: SendUART
-    233                    DevListPW[i][i2] = 0;
+    236                    DevListPW[i][i2] = 0;
    \   000170   8E82         MOV     DPL,R6
    \   000172   8F83         MOV     DPH,R7
    \   000174   E4           CLR     A
    \   000175   F0           MOVX    @DPTR,A
-    234                  }
+    237                  }
    \   000176   05..         INC     ?V1
    \   000178   E5..         MOV     A,?V1
    \   00017A   C3           CLR     C
    \   00017B   9406         SUBB    A,#0x6
    \   00017D   40CD         JC      ??ParkWay_ProcessEvent_12
-    235                }
-    236              } 
+    238                }
+    239              } 
    \                     ??ParkWay_ProcessEvent_11:
    \   00017F   05..         INC     ?V0
    \   000181   E5..         MOV     A,?V0
    \   000183   C3           CLR     C
    \   000184   9414         SUBB    A,#0x14
    \   000186   40A2         JC      ??ParkWay_ProcessEvent_10
-    237              SendUART("@",1);
+    240              SendUART("@OK",3);
    \   000188                ; Setup parameters for call to function SendUART
-   \   000188   7901         MOV     R1,#0x1
-   \   00018A   7A..         MOV     R2,#`?<Constant "@">` & 0xff
-   \   00018C   7B..         MOV     R3,#(`?<Constant "@">` >> 8) & 0xff
+   \   000188   7903         MOV     R1,#0x3
+   \   00018A   7A..         MOV     R2,#`?<Constant "@OK">` & 0xff
+   \   00018C   7B..         MOV     R3,#(`?<Constant "@OK">` >> 8) & 0xff
    \   00018E   12....       LCALL   ??SendUART?relay     ; Banked call to: SendUART
-    238            }  
-    239           
-    240            return 0;
+    241            }  
+    242           
+    243            return 0;
    \                     ??ParkWay_ProcessEvent_9:
    \   000191   7A00         MOV     R2,#0x0
    \   000193   7B00         MOV     R3,#0x0
    \                     ??ParkWay_ProcessEvent_8:
    \   000195   7F05         MOV     R7,#0x5
    \   000197   02....       LJMP    ?BANKED_LEAVE_XDATA
-    241          }
-    242          
-    243          
-    244          //This function process the ZDO events to bind
-    245          static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg )
-    246          {
-    247            switch ( inMsg->clusterID )
-    248            {
-    249              case End_Device_Bind_rsp:
-    250                if ( ZDO_ParseBindRsp( inMsg ) == ZSuccess )
-    251                {
-    252                  // Light LED
-    253                  //HalLedSet( HAL_LED_1, HAL_LED_MODE_ON );
-    254                }
-    255          #if defined( BLINK_LEDS )
-    256                else
-    257                {
-    258                  // Flash LED to show failure
-    259                  //HalLedSet ( HAL_LED_1, HAL_LED_MODE_FLASH );
-    260                }
-    261          #endif
-    262                break;
-    263          
-    264              case Match_Desc_rsp:
-    265                {
-    266                  ZDO_ActiveEndpointRsp_t *pRsp = ZDO_ParseEPListRsp( inMsg );
-    267                  if ( pRsp )
-    268                  {
-    269                    if ( pRsp->status == ZSuccess && pRsp->cnt )
-    270                    {
-    271                      ParkWay_DstAddr.addrMode = (afAddrMode_t)Addr16Bit;
-    272                      ParkWay_DstAddr.addr.shortAddr = pRsp->nwkAddr;
-    273                      // Take the first endpoint, Can be changed to search through endpoints
-    274                      ParkWay_DstAddr.endPoint = pRsp->epList[0];
-    275          
-    276                      // Light LED
-    277                      //HalLedSet( HAL_LED_1, HAL_LED_MODE_ON );
-    278                    }
-    279                    osal_mem_free( pRsp );
-    280                  }
-    281                }
-    282                break;
-    283            }
-    284          }
-    285          
-    286          //This function process the frames received by the application framework (source routers and end devices)
-    287          static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pkt_1 )
-    288          {
-    289            uint8* pkt;
-    290            //teste=pkt_1->srcAddr;   //Used to collect que NETWORK ADDRESS of the device connected to the coordinator
-    291            pkt=(pkt_1->cmd.Data);    //Pointer to the data of packet
-    292            
-    293            uint8 i,dev=(((*(pkt+2)-48)*10)+(*(pkt+3)-48));
-    294            
-    295            for(i=0;i<6;i++)
-    296            {
-    297              DevListPW[dev][i]=*(pkt+i);
-    298            } 
-    299          }
-    300          
-    301          //Used to send a message to the devices
-    302          static void ParkWay_SendTheMessage( void )
-    303          {
-    304          }
-    305          
-    306          
+    244          }
+    245          
+    246          
+    247          //This function process the ZDO events to bind
+    248          static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg )
+    249          {
+    250            switch ( inMsg->clusterID )
+    251            {
+    252              case End_Device_Bind_rsp:
+    253                if ( ZDO_ParseBindRsp( inMsg ) == ZSuccess )
+    254                {
+    255                  // Light LED
+    256                  //HalLedSet( HAL_LED_1, HAL_LED_MODE_ON );
+    257                }
+    258          #if defined( BLINK_LEDS )
+    259                else
+    260                {
+    261                  // Flash LED to show failure
+    262                  //HalLedSet ( HAL_LED_1, HAL_LED_MODE_FLASH );
+    263                }
+    264          #endif
+    265                break;
+    266          
+    267              case Match_Desc_rsp:
+    268                {
+    269                  ZDO_ActiveEndpointRsp_t *pRsp = ZDO_ParseEPListRsp( inMsg );
+    270                  if ( pRsp )
+    271                  {
+    272                    if ( pRsp->status == ZSuccess && pRsp->cnt )
+    273                    {
+    274                      ParkWay_DstAddr.addrMode = (afAddrMode_t)Addr16Bit;
+    275                      ParkWay_DstAddr.addr.shortAddr = pRsp->nwkAddr;
+    276                      // Take the first endpoint, Can be changed to search through endpoints
+    277                      ParkWay_DstAddr.endPoint = pRsp->epList[0];
+    278          
+    279                      // Light LED
+    280                      //HalLedSet( HAL_LED_1, HAL_LED_MODE_ON );
+    281                    }
+    282                    osal_mem_free( pRsp );
+    283                  }
+    284                }
+    285                break;
+    286            }
+    287          }
+    288          
+    289          //This function process the frames received by the application framework (source routers and end devices)
+    290          static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pkt_1 )
+    291          {
+    292            uint8* pkt;
+    293            //teste=pkt_1->srcAddr;   //Used to collect que NETWORK ADDRESS of the device connected to the coordinator
+    294            pkt=(pkt_1->cmd.Data);    //Pointer to the data of packet
+    295            
+    296            uint8 i,dev=(((*(pkt+2)-48)*10)+(*(pkt+3)-48));
+    297            
+    298            for(i=0;i<6;i++)
+    299            {
+    300              DevListPW[dev][i]=*(pkt+i);
+    301            } 
+    302          }
+    303          
+    304          
 
    \                                 In  segment BANKED_CODE, align 1, keep-with-next
-    307          static void UART_CallBack(uint8 port, uint8 event)
+    305          static void UART_CallBack(uint8 port, uint8 event)
    \                     UART_CallBack:
-    308          {
+    306          {
    \   000000   74F7         MOV     A,#-0x9
    \   000002   12....       LCALL   ?BANKED_ENTER_XDATA
    \   000005                ; Saved register size: 9
@@ -855,84 +843,82 @@ Warning[Pe177]: variable "sentTransID" was declared but never referenced
    \   000007   12....       LCALL   ?ALLOC_XSTACK8
    \   00000A   EA           MOV     A,R2
    \   00000B   FF           MOV     R7,A
-    309            (void)port;
-    310            uint8 pData[1];
-                         ^
-Warning[Pe177]: variable "pData" was declared but never referenced
-    311            uint8 cmdbuff[1];
-    312          
-    313            if (event & (HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT))
+    307            (void)port;
+    308            //uint8 pData[1];
+    309            uint8 cmdbuff[1];
+    310          
+    311            if (event & (HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT))
    \   00000C   7407         MOV     A,#0x7
    \   00000E   5F           ANL     A,R7
    \   00000F   600B         JZ      ??UART_CallBack_0
-    314            {
-    315              HalUARTRead(port, cmdbuff, 1);
+    312            {
+    313              HalUARTRead(port, cmdbuff, 1);
    \   000011                ; Setup parameters for call to function HalUARTRead
    \   000011   7C01         MOV     R4,#0x1
    \   000013   7D00         MOV     R5,#0x0
    \   000015   AA..         MOV     R2,?XSP + 0
    \   000017   AB..         MOV     R3,?XSP + 1
    \   000019   12....       LCALL   ??HalUARTRead?relay  ; Banked call to: HalUARTRead
-    316              /************************************************* This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
-    317              // if(*cmdbuff==48)
-    318              // {
-    319              //   SendUART("  Desligar",10);
-    320              //   pData[0] = '0';
-    321              //   AF_DataRequest( &teste, &ParkWay_epDesc,
-    322              //                    ParkWay_CLUSTERID,
-    323              //                    (byte)osal_strlen( pData ) + 1,
-    324              //                    (byte *)&pData,
-    325              //                    &ParkWay_TransID,
-    326              //                    AF_DISCV_ROUTE, AF_DEFAULT_RADIUS ); 
-    327              // }
-    328              // else
-    329              // {
-    330              //   SendUART("  Ligar",7);
-    331              //   pData[0] = '1';
-    332              //   AF_DataRequest( &teste, &ParkWay_epDesc,
-    333              //                    ParkWay_CLUSTERID,
-    334              //                    (byte)osal_strlen( pData ) + 1,
-    335              //                    (byte *)&pData,
-    336              //                    &ParkWay_TransID,
-    337              //                    AF_DISCV_ROUTE, AF_DEFAULT_RADIUS ); 
-    338              // }
-    339              // SendUART(cmdbuff,1);
-    340              /*********************************************** This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
-    341            }
-    342          }
+    314              /************************************************* This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
+    315              // if(*cmdbuff==48)
+    316              // {
+    317              //   SendUART("  Desligar",10);
+    318              //   pData[0] = '0';
+    319              //   AF_DataRequest( &teste, &ParkWay_epDesc,
+    320              //                    ParkWay_CLUSTERID,
+    321              //                    (byte)osal_strlen( pData ) + 1,
+    322              //                    (byte *)&pData,
+    323              //                    &ParkWay_TransID,
+    324              //                    AF_DISCV_ROUTE, AF_DEFAULT_RADIUS ); 
+    325              // }
+    326              // else
+    327              // {
+    328              //   SendUART("  Ligar",7);
+    329              //   pData[0] = '1';
+    330              //   AF_DataRequest( &teste, &ParkWay_epDesc,
+    331              //                    ParkWay_CLUSTERID,
+    332              //                    (byte)osal_strlen( pData ) + 1,
+    333              //                    (byte *)&pData,
+    334              //                    &ParkWay_TransID,
+    335              //                    AF_DISCV_ROUTE, AF_DEFAULT_RADIUS ); 
+    336              // }
+    337              // SendUART(cmdbuff,1);
+    338              /*********************************************** This was used to send some specific data do the last device connected to the COORDINATOR (HDA)**************************************/
+    339            }
+    340          }
    \                     ??UART_CallBack_0:
    \   00001C   7401         MOV     A,#0x1
    \   00001E   12....       LCALL   ?DEALLOC_XSTACK8
    \   000021   02....       LJMP    ?Subroutine0 & 0xFFFF
-    343          
-    344          //This function initializes the UART
+    341          
+    342          //This function initializes the UART
 
    \                                 In  segment BANKED_CODE, align 1, keep-with-next
-    345          void uart_init()
+    343          void uart_init()
    \                     uart_init:
-    346          {
+    344          {
    \   000000   C082         PUSH    DPL
    \   000002   C083         PUSH    DPH
    \   000004                ; Saved register size: 2
    \   000004                ; Auto size: 29
    \   000004   74E3         MOV     A,#-0x1d
    \   000006   12....       LCALL   ?ALLOC_XSTACK8
-    347            halUARTCfg_t uartConfig;
-    348            uartConfig.configured = TRUE; // 2x30 don't care - see uart driver.
+    345            halUARTCfg_t uartConfig;
+    346            uartConfig.configured = TRUE; // 2x30 don't care - see uart driver.
    \   000009   85..82       MOV     DPL,?XSP + 0
    \   00000C   85..83       MOV     DPH,?XSP + 1
    \   00000F   7401         MOV     A,#0x1
    \   000011   F0           MOVX    @DPTR,A
-    349            uartConfig.baudRate = HAL_UART_BR_9600;
+    347            uartConfig.baudRate = HAL_UART_BR_9600;
    \   000012   12....       LCALL   ?XSTACK_DISP0_8
    \   000015   E4           CLR     A
    \   000016   F0           MOVX    @DPTR,A
-    350            uartConfig.flowControl = TRUE;
+    348            uartConfig.flowControl = TRUE;
    \   000017   7402         MOV     A,#0x2
    \   000019   12....       LCALL   ?XSTACK_DISP0_8
    \   00001C   7401         MOV     A,#0x1
    \   00001E   F0           MOVX    @DPTR,A
-    351            uartConfig.flowControlThreshold = 48; // 2x30 don't care - see uart driver.
+    349            uartConfig.flowControlThreshold = 48; // 2x30 don't care - see uart driver.
    \   00001F   7403         MOV     A,#0x3
    \   000021   12....       LCALL   ?XSTACK_DISP0_8
    \   000024   7430         MOV     A,#0x30
@@ -940,7 +926,7 @@ Warning[Pe177]: variable "pData" was declared but never referenced
    \   000027   A3           INC     DPTR
    \   000028   E4           CLR     A
    \   000029   F0           MOVX    @DPTR,A
-    352            uartConfig.rx.maxBufSize = 128; // 2x30 don't care - see uart driver.
+    350            uartConfig.rx.maxBufSize = 128; // 2x30 don't care - see uart driver.
    \   00002A   740A         MOV     A,#0xa
    \   00002C   12....       LCALL   ?XSTACK_DISP0_8
    \   00002F   7480         MOV     A,#-0x80
@@ -948,7 +934,7 @@ Warning[Pe177]: variable "pData" was declared but never referenced
    \   000032   A3           INC     DPTR
    \   000033   E4           CLR     A
    \   000034   F0           MOVX    @DPTR,A
-    353            uartConfig.tx.maxBufSize = 128; // 2x30 don't care - see uart driver.
+    351            uartConfig.tx.maxBufSize = 128; // 2x30 don't care - see uart driver.
    \   000035   7412         MOV     A,#0x12
    \   000037   12....       LCALL   ?XSTACK_DISP0_8
    \   00003A   7480         MOV     A,#-0x80
@@ -956,17 +942,17 @@ Warning[Pe177]: variable "pData" was declared but never referenced
    \   00003D   A3           INC     DPTR
    \   00003E   E4           CLR     A
    \   00003F   F0           MOVX    @DPTR,A
-    354            uartConfig.idleTimeout = 6; // 2x30 don't care - see uart driver.
+    352            uartConfig.idleTimeout = 6; // 2x30 don't care - see uart driver.
    \   000040   7405         MOV     A,#0x5
    \   000042   12....       LCALL   ?XSTACK_DISP0_8
    \   000045   7406         MOV     A,#0x6
    \   000047   F0           MOVX    @DPTR,A
-    355            uartConfig.intEnable = TRUE; // 2x30 don't care - see uart driver.
+    353            uartConfig.intEnable = TRUE; // 2x30 don't care - see uart driver.
    \   000048   7416         MOV     A,#0x16
    \   00004A   12....       LCALL   ?XSTACK_DISP0_8
    \   00004D   7401         MOV     A,#0x1
    \   00004F   F0           MOVX    @DPTR,A
-    356            uartConfig.callBackFunc = UART_CallBack;
+    354            uartConfig.callBackFunc = UART_CallBack;
    \   000050   741B         MOV     A,#0x1b
    \   000052   12....       LCALL   ?XSTACK_DISP0_8
    \   000055   74..         MOV     A,#??UART_CallBack?relay & 0xff
@@ -974,24 +960,24 @@ Warning[Pe177]: variable "pData" was declared but never referenced
    \   000058   A3           INC     DPTR
    \   000059   74..         MOV     A,#(??UART_CallBack?relay >> 8) & 0xff
    \   00005B   F0           MOVX    @DPTR,A
-    357            HalUARTOpen (HAL_UART_PORT_0, &uartConfig);
+    355            HalUARTOpen (HAL_UART_PORT_0, &uartConfig);
    \   00005C                ; Setup parameters for call to function HalUARTOpen
    \   00005C   AA..         MOV     R2,?XSP + 0
    \   00005E   AB..         MOV     R3,?XSP + 1
    \   000060   7900         MOV     R1,#0x0
    \   000062   12....       LCALL   ??HalUARTOpen?relay  ; Banked call to: HalUARTOpen
-    358          }
+    356          }
    \   000065   741D         MOV     A,#0x1d
    \   000067   12....       LCALL   ?DEALLOC_XSTACK8
    \   00006A   D083         POP     DPH
    \   00006C   D082         POP     DPL
    \   00006E   02....       LJMP    ?BRET
-    359          
+    357          
 
    \                                 In  segment BANKED_CODE, align 1, keep-with-next
-    360          void SendUART(uint8 *data,uint8 len)
+    358          void SendUART(uint8 *data,uint8 len)
    \                     SendUART:
-    361          {
+    359          {
    \   000000                REQUIRE ?V0
    \   000000                REQUIRE ?V1
    \   000000   74F6         MOV     A,#-0xa
@@ -999,13 +985,13 @@ Warning[Pe177]: variable "pData" was declared but never referenced
    \   000005                ; Saved register size: 10
    \   000005                ; Auto size: 0
    \   000005   E9           MOV     A,R1
-    362            HalUARTWrite(HAL_UART_PORT_0, data, len);
+    360            HalUARTWrite(HAL_UART_PORT_0, data, len);
    \   000006                ; Setup parameters for call to function HalUARTWrite
    \   000006   FC           MOV     R4,A
    \   000007   7D00         MOV     R5,#0x0
    \   000009   7900         MOV     R1,#0x0
    \   00000B   12....       LCALL   ??HalUARTWrite?relay ; Banked call to: HalUARTWrite
-    363          }
+    361          }
    \   00000E   7F02         MOV     R7,#0x2
    \   000010   02....       LJMP    ?BANKED_LEAVE_XDATA
 
@@ -1045,21 +1031,11 @@ Warning[Pe177]: variable "pData" was declared but never referenced
    \   000000   2C00         DB ","
 
    \                                 In  segment XDATA_ROM_C, align 1
-   \                     `?<Constant "@">`:
-   \   000000   4000         DB "@"
-    364          
-    365          
-    366          static void ParkWay_HandleKeys( uint8 shift, uint8 keys )
-                             ^
-Warning[Pe177]: function "ParkWay_HandleKeys" was declared but never referenced
-
-  static void ParkWay_SendTheMessage( void )
-              ^
-"C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Samples\ParkWay\Source\PW_Coordinator.c",302  Warning[Pe177]: 
-          function "ParkWay_SendTheMessage" was declared but never referenced
-    367          {
-    368          }
-    369          /*********************************************************************/
+   \                     `?<Constant "@OK">`:
+   \   000000   404F4B00     DB "@OK"
+    362          
+    363          
+    364          /*********************************************************************/
 
    Maximum stack usage in bytes:
 
@@ -1091,7 +1067,7 @@ Warning[Pe177]: function "ParkWay_HandleKeys" was declared but never referenced
    Bytes  Function/Label
    -----  --------------
        2  ?<Constant ",">
-       2  ?<Constant "@">
+       4  ?<Constant "@OK">
       10  ?<Constant "\n\rAP-0001">
        6  ??ParkWay_Init?relay
        6  ??ParkWay_ProcessEvent?relay
@@ -1116,12 +1092,12 @@ Warning[Pe177]: function "ParkWay_HandleKeys" was declared but never referenced
  
  696 bytes in segment BANKED_CODE
   30 bytes in segment BANK_RELAYS
-  28 bytes in segment XDATA_ROM_C
+  30 bytes in segment XDATA_ROM_C
  141 bytes in segment XDATA_Z
  
  726 bytes of CODE  memory
-  28 bytes of CONST memory
+  30 bytes of CONST memory
  141 bytes of XDATA memory
 
 Errors: none
-Warnings: 8
+Warnings: none

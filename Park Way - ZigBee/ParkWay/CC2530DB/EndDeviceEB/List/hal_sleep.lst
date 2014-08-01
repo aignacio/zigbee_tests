@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:28:02 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:38 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Components\hal\ta #
 #                          rget\CC2530EB\hal_sleep.c" -D NWK_AUTO_POLL -D     #
 #                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC  #
-#                          -D xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC        #
+#                          -D xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC       #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -1080,21 +1080,20 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_sle
     550          #endif
     551            
     552            CLEAR_SLEEP_MODE();
-   \   000010   75..00       MOV     halSleepPconValue,#0x0
     553            HAL_EXIT_ISR();
-   \   000013   A2E7         MOV     C,0xE0 /* A   */.7
-   \   000015   A2E7         MOV     C,0xE0 /* A   */.7
-   \   000017   92AF         MOV     0xa8.7,C
+   \   000010   A2E7         MOV     C,0xE0 /* A   */.7
+   \   000012   A2E7         MOV     C,0xE0 /* A   */.7
+   \   000014   92AF         MOV     0xa8.7,C
     554          }
+   \   000016   D0E0         POP     A
+   \   000018   F9           MOV     R1,A
    \   000019   D0E0         POP     A
-   \   00001B   F9           MOV     R1,A
-   \   00001C   D0E0         POP     A
-   \   00001E   F8           MOV     R0,A
-   \   00001F   D0D0         POP     PSW
-   \   000021   D0E0         POP     A
-   \   000023   32           RETI
-   \   000024                REQUIRE _A_IEN0
-   \   000024                REQUIRE _A_IRCON
+   \   00001B   F8           MOV     R0,A
+   \   00001C   D0D0         POP     PSW
+   \   00001E   D0E0         POP     A
+   \   000020   32           RETI
+   \   000021                REQUIRE _A_IEN0
+   \   000021                REQUIRE _A_IRCON
 
    \                                 In  segment INTVEC, offset 0x2b, root
    \                     `??halSleepTimerIsr??INTVEC 43`:
@@ -1237,7 +1236,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_sle
      293  halSleep
        1  halSleepPconValue
      132  halSleepSetTimer
-      36  halSleepTimerIsr
+      33  halSleepTimerIsr
        4  maxSleepLoopTime
 
  
@@ -1246,7 +1245,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_sle
    1 byte  in segment DATA_I
    1 byte  in segment DATA_ID
    3 bytes in segment INTVEC
-  36 bytes in segment NEAR_CODE
+  33 bytes in segment NEAR_CODE
   10 bytes in segment SFR_AN
    8 bytes in segment SLEEP_CODE
    4 bytes in segment XDATA_I
@@ -1254,7 +1253,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_sle
   32 bytes in segment XDATA_ROM_C
    1 byte  in segment XDATA_Z
  
- 572 bytes of CODE  memory (+  3 bytes shared)
+ 569 bytes of CODE  memory (+  3 bytes shared)
    0 bytes of CONST memory (+ 32 bytes shared)
    1 byte  of DATA  memory (+ 10 bytes shared)
    5 bytes of XDATA memory

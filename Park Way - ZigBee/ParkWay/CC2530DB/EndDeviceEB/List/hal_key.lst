@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:28:01 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:37 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Components\hal\ta #
 #                          rget\CC2530EB\hal_key.c" -D NWK_AUTO_POLL -D       #
 #                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC  #
-#                          -D xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC        #
+#                          -D xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC       #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -1049,22 +1049,21 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_key
    \   00001A   C2C5         CLR     0xc0.5
     499            
     500            CLEAR_SLEEP_MODE();
+    501            HAL_EXIT_ISR();
    \   00001C                REQUIRE ?Subroutine2
    \   00001C                REQUIRE _A_IEN0
    \   00001C                REQUIRE P0IFG
    \   00001C                REQUIRE _A_IRCON
    \   00001C                ; // Fall through to label ?Subroutine2
-    501            HAL_EXIT_ISR();
     502          }
 
    \                                 In  segment NEAR_CODE, align 1, keep-with-next
    \                     ?Subroutine2:
-   \   000000   75..00       MOV     halSleepPconValue,#0x0
-   \   000003   EE           MOV     A,R6
-   \   000004   A2E0         MOV     C,0xE0 /* A   */.0
-   \   000006   92AF         MOV     0xa8.7,C
-   \   000008   7F01         MOV     R7,#0x1
-   \   00000A   02....       LJMP    ?INTERRUPT_LEAVE_XSP
+   \   000000   EE           MOV     A,R6
+   \   000001   A2E0         MOV     C,0xE0 /* A   */.0
+   \   000003   92AF         MOV     0xa8.7,C
+   \   000005   7F01         MOV     R7,#0x1
+   \   000007   02....       LJMP    ?INTERRUPT_LEAVE_XSP
     503          
     504          
     505          /**************************************************************************************************
@@ -1115,11 +1114,11 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_key
    \   00001A   C2E8         CLR     0xe8.0
     530          
     531            CLEAR_SLEEP_MODE();
+    532            HAL_EXIT_ISR();
    \   00001C   80..         SJMP    ?Subroutine2
    \   00001E                REQUIRE _A_IEN0
    \   00001E                REQUIRE P2IFG
    \   00001E                REQUIRE _A_IRCON2
-    532            HAL_EXIT_ISR();
     533          }
 
    \                                 In  segment INTVEC, offset 0x33, root
@@ -1231,7 +1230,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_key
        6  ??halProcessKeyInterrupt?relay
        7  ?Subroutine0
        5  ?Subroutine1
-      13  ?Subroutine2
+      10  ?Subroutine2
      102  HalKeyConfig
        1  HalKeyConfigured
        3  HalKeyEnterSleep
@@ -1267,11 +1266,11 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\hal\target\CC2530EB\hal_key
  394 bytes in segment BANKED_CODE
   48 bytes in segment BANK_RELAYS
    6 bytes in segment INTVEC
-  71 bytes in segment NEAR_CODE
+  68 bytes in segment NEAR_CODE
   16 bytes in segment SFR_AN
    5 bytes in segment XDATA_Z
  
- 513 bytes of CODE  memory (+  6 bytes shared)
+ 510 bytes of CODE  memory (+  6 bytes shared)
    0 bytes of DATA  memory (+ 16 bytes shared)
    5 bytes of XDATA memory
 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:02 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:37 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          arget\CC2530EB\hal_led.c" -D NWK_AUTO_POLL -D     /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -2615,14 +2615,14 @@ HalLedOnOff:
         JNZ     ??HalLedOnOff_3
 //  395     {
 //  396       HAL_TURN_ON_LED2();
-        SETB    0x90.1
+        SETB    0x90.0
         SJMP    ??HalLedOnOff_2
 //  397     }
 //  398     else
 //  399     {
 //  400       HAL_TURN_OFF_LED2();
 ??HalLedOnOff_3:
-        CLR     0x90.1
+        CLR     0x90.0
 //  401     }
 //  402   }
 //  403 
@@ -2638,14 +2638,14 @@ HalLedOnOff:
         JNZ     ??HalLedOnOff_5
 //  407     {
 //  408       HAL_TURN_ON_LED3();
-        SETB    0x90.4
+        SETB    0x90.0
         SJMP    ??HalLedOnOff_4
 //  409     }
 //  410     else
 //  411     {
 //  412       HAL_TURN_OFF_LED3();
 ??HalLedOnOff_5:
-        CLR     0x90.4
+        CLR     0x90.0
 //  413     }
 //  414   }
 //  415 
@@ -2838,39 +2838,22 @@ HalLedEnterSleep:
         MOV     A,0x90
         MOV     R1,A
 //  480   HalSleepLedState |= HAL_STATE_LED4() << 3;
-        MOV     A,0x90
+        MOV     C,0x90.0
+        CLR     A
+        RLC     A
+        RLC     A
+        RLC     A
+        RLC     A
         MOV     R2,A
-        MOV     A,R0
-        MOV     C,0xE0 /* A   */.1
-        JNC     ??HalLedEnterSleep_0
-        SETB    B.0
-        SJMP    ??HalLedEnterSleep_1
-??HalLedEnterSleep_0:
-        CLR     B.0
-??HalLedEnterSleep_1:
         MOV     A,R1
-        MOV     C,0xE0 /* A   */.4
-        JNC     ??HalLedEnterSleep_2
-        SETB    B.1
-        SJMP    ??HalLedEnterSleep_3
-??HalLedEnterSleep_2:
-        CLR     B.1
-??HalLedEnterSleep_3:
-        MOV     A,R2
         MOV     C,0xE0 /* A   */.0
         CLR     A
         RLC     A
         RLC     A
         RLC     A
-        RLC     A
-        MOV     R2,A
-        MOV     C,B.1
-        CLR     A
-        RLC     A
-        RLC     A
-        RLC     A
         MOV     R1,A
-        MOV     C,B.0
+        MOV     A,R0
+        MOV     C,0xE0 /* A   */.0
         CLR     A
         RLC     A
         RLC     A
@@ -2964,7 +2947,7 @@ HalLedExitSleep:
 //  507 #ifdef BLINK_LEDS
 //  508   /* Sleep OFF */
 //  509   HalLedStatusControl.sleepActive = FALSE;
-        LJMP    ?Subroutine0 & 0xFFFF
+        SJMP    ?Subroutine0
           CFI EndBlock cfiBlock54
 //  510 #endif /* BLINK_LEDS */
 //  511 }
@@ -3039,13 +3022,13 @@ __Constant_64:
 //  517 
 //  518 
 // 
-// 1 235 bytes in segment BANKED_CODE
+// 1 210 bytes in segment BANKED_CODE
 //    48 bytes in segment BANK_RELAYS
 //     1 byte  in segment SFR_AN
 //     4 bytes in segment XDATA_ROM_C
 //    40 bytes in segment XDATA_Z
 // 
-// 1 283 bytes of CODE  memory
+// 1 258 bytes of CODE  memory
 //     0 bytes of CONST memory (+ 4 bytes shared)
 //     0 bytes of DATA  memory (+ 1 byte  shared)
 //    40 bytes of XDATA memory

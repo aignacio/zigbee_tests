@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:01 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:36 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          arget\CC2530EB\hal_key.c" -D NWK_AUTO_POLL -D     /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -420,7 +420,6 @@ halProcessKeyInterrupt SYMBOL "halProcessKeyInterrupt"
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN Hal_TaskID
-        EXTERN halSleepPconValue
         EXTERN osal_set_event
         FUNCTION osal_set_event,0202H
         ARGFRAME ISTACK, 0, STACK
@@ -1599,12 +1598,12 @@ halKeyPort0Isr:
           CFI EndBlock cfiBlock10
 //  499   
 //  500   CLEAR_SLEEP_MODE();
+//  501   HAL_EXIT_ISR();
         REQUIRE ?Subroutine2
         REQUIRE _A_IEN0
         REQUIRE P0IFG
         REQUIRE _A_IRCON
         ; // Fall through to label ?Subroutine2
-//  501   HAL_EXIT_ISR();
 //  502 }
 
         RSEG NEAR_CODE:CODE:NOROOT(0)
@@ -1628,7 +1627,6 @@ halKeyPort0Isr:
           CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-7)))
           CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
           CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-10)))
-        MOV     halSleepPconValue,#0x0
         MOV     A,R6
         MOV     C,0xE0 /* A   */.0
         MOV     0xa8.7,C
@@ -1716,12 +1714,12 @@ halKeyPort2Isr:
         CLR     0xe8.0
 //  530 
 //  531   CLEAR_SLEEP_MODE();
+//  532   HAL_EXIT_ISR();
         SJMP    ?Subroutine2
           CFI EndBlock cfiBlock12
         REQUIRE _A_IEN0
         REQUIRE P2IFG
         REQUIRE _A_IRCON2
-//  532   HAL_EXIT_ISR();
 //  533 }
 
         COMMON INTVEC:CODE:ROOT(0)
@@ -1815,11 +1813,11 @@ halKeyPort2Isr:
 // 394 bytes in segment BANKED_CODE
 //  48 bytes in segment BANK_RELAYS
 //   6 bytes in segment INTVEC
-//  71 bytes in segment NEAR_CODE
+//  68 bytes in segment NEAR_CODE
 //  16 bytes in segment SFR_AN
 //   5 bytes in segment XDATA_Z
 // 
-// 513 bytes of CODE  memory (+  6 bytes shared)
+// 510 bytes of CODE  memory (+  6 bytes shared)
 //   0 bytes of DATA  memory (+ 16 bytes shared)
 //   5 bytes of XDATA memory
 //

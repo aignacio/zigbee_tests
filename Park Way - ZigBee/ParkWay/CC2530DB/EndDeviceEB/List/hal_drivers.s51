@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:01 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:36 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          ommon\hal_drivers.c" -D NWK_AUTO_POLL -D          /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -279,8 +279,6 @@ HalUARTInit         SYMBOL "HalUARTInit"
 ??HalUARTInit?relay SYMBOL "?relay", HalUARTInit
 HalUARTPoll         SYMBOL "HalUARTPoll"
 ??HalUARTPoll?relay SYMBOL "?relay", HalUARTPoll
-halRestoreSleepLevel SYMBOL "halRestoreSleepLevel"
-??halRestoreSleepLevel?relay SYMBOL "?relay", halRestoreSleepLevel
 osal_msg_deallocate SYMBOL "osal_msg_deallocate"
 ??osal_msg_deallocate?relay SYMBOL "?relay", osal_msg_deallocate
 osal_msg_receive    SYMBOL "osal_msg_receive"
@@ -316,8 +314,6 @@ Hal_ProcessPoll     SYMBOL "Hal_ProcessPoll"
         FUNCTION ??HalUARTInit?relay,00H
         EXTERN ??HalUARTPoll?relay
         FUNCTION ??HalUARTPoll?relay,00H
-        EXTERN ??halRestoreSleepLevel?relay
-        FUNCTION ??halRestoreSleepLevel?relay,00H
         EXTERN ??osal_msg_deallocate?relay
         FUNCTION ??osal_msg_deallocate?relay,00H
         EXTERN ??osal_msg_receive?relay
@@ -395,14 +391,6 @@ Hal_ProcessPoll     SYMBOL "Hal_ProcessPoll"
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN Hal_KeyIntEnable
-        EXTERN halRestoreSleepLevel
-        FUNCTION halRestoreSleepLevel,0202H
-        ARGFRAME ISTACK, 0, STACK
-        ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 10, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
-        EXTERN halSleepPconValue
         EXTERN osal_msg_deallocate
         FUNCTION osal_msg_deallocate,0202H
         ARGFRAME ISTACK, 0, STACK
@@ -840,17 +828,6 @@ Hal_ProcessEvent:
         ARGFRAME XSTACK, 10, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
-        FUNCALL Hal_ProcessEvent, halRestoreSleepLevel
-        LOCFRAME ISTACK, 0, STACK
-        LOCFRAME PSTACK, 0, STACK
-        LOCFRAME XSTACK, 10, STACK
-        LOCFRAME IOVERLAY, 0, STATIC
-        LOCFRAME DOVERLAY, 0, STATIC
-        ARGFRAME ISTACK, 0, STACK
-        ARGFRAME PSTACK, 0, STACK
-        ARGFRAME XSTACK, 10, STACK
-        ARGFRAME IOVERLAY, 0, STATIC
-        ARGFRAME DOVERLAY, 0, STATIC
         REQUIRE ?V0
         REQUIRE ?V1
         MOV     A,#-0xa
@@ -967,27 +944,19 @@ Hal_ProcessEvent:
 ??Hal_ProcessEvent_7:
         MOV     A,R6
         XRL     A,#0x1
-        SJMP    ??Hal_ProcessEvent_5
-//  237   }
-//  238 
-//  239 #ifdef POWER_SAVING
-//  240   if ( events & HAL_SLEEP_TIMER_EVENT )
-??Hal_ProcessEvent_6:
-        ANL     A,#0x4
-        JZ      ??Hal_ProcessEvent_8
-//  241   {
-//  242     halRestoreSleepLevel();
-        ; Setup parameters for call to function halRestoreSleepLevel
-        LCALL   ??halRestoreSleepLevel?relay; Banked call to: halRestoreSleepLevel
-//  243     return events ^ HAL_SLEEP_TIMER_EVENT;
-        MOV     A,R6
-        XRL     A,#0x4
 ??Hal_ProcessEvent_5:
         MOV     R2,A
         MOV     A,R7
 ??Hal_ProcessEvent_3:
         MOV     R3,A
-        SJMP    ??Hal_ProcessEvent_9
+        SJMP    ??Hal_ProcessEvent_8
+//  237   }
+//  238 
+//  239 #ifdef POWER_SAVING
+//  240   if ( events & HAL_SLEEP_TIMER_EVENT )
+//  241   {
+//  242     halRestoreSleepLevel();
+//  243     return events ^ HAL_SLEEP_TIMER_EVENT;
 //  244   }
 //  245 #endif
 //  246 
@@ -1001,10 +970,10 @@ Hal_ProcessEvent:
 //  254   
 //  255   /* Nothing interested, discard the message */
 //  256   return 0;
-??Hal_ProcessEvent_8:
+??Hal_ProcessEvent_6:
         MOV     R2,#0x0
         MOV     R3,#0x0
-??Hal_ProcessEvent_9:
+??Hal_ProcessEvent_8:
         MOV     R7,#0x2
         LJMP    ?BANKED_LEAVE_XDATA
           CFI EndBlock cfiBlock3
@@ -1073,7 +1042,6 @@ Hal_ProcessPoll:
 //  292 #if defined( POWER_SAVING )
 //  293   /* Allow sleep before the next OSAL event loop */
 //  294   ALLOW_SLEEP_MODE();
-        MOV     halSleepPconValue,#0x1
 //  295 #endif
 //  296 
 //  297 }
@@ -1115,11 +1083,11 @@ Hal_ProcessPoll:
 //  301 **************************************************************************************************/
 //  302 
 // 
-// 165 bytes in segment BANKED_CODE
+// 150 bytes in segment BANKED_CODE
 //  24 bytes in segment BANK_RELAYS
 //   1 byte  in segment XDATA_Z
 // 
-// 189 bytes of CODE  memory
+// 174 bytes of CODE  memory
 //   1 byte  of XDATA memory
 //
 //Errors: none

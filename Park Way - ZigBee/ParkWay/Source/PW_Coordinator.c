@@ -116,9 +116,9 @@ void uart_init(void);
 static uint8 DevListPW[20][6];        //Devices Vector for PARK WAY 
 
 static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg );
-static void ParkWay_HandleKeys( byte shift, byte keys );
+//static void ParkWay_HandleKeys( byte shift, byte keys );
 static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pckt );
-static void ParkWay_SendTheMessage( void );
+//static void ParkWay_SendTheMessage( void );
 
 /*********************************************************************
  * NETWORK LAYER CALLBACKS
@@ -173,12 +173,12 @@ void ParkWay_Init( uint8 task_id )
 uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
 {
   afIncomingMSGPacket_t *MSGpkt;
-  afDataConfirm_t *afDataConfirm;
-  zAddrType_t dstAddr;
+  //afDataConfirm_t *afDataConfirm;
+  //zAddrType_t dstAddr;
   // Data Confirmation message fields
-  byte sentEP;
-  ZStatus_t sentStatus;
-  byte sentTransID;       // This should match the value sent
+  //byte sentEP;
+  //ZStatus_t sentStatus;
+  //byte sentTransID;       // This should match the value sent
   (void)task_id;  // Intentionally unreferenced parameter
 
   if ( events & SYS_EVENT_MSG )
@@ -222,9 +222,9 @@ uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
     osal_start_timerEx( ParkWay_TaskID,
                         POLL_PARWAY_EVT,
                         TIME_PARKWAY_POLL);
+    uint8 i,i2;
     uart_init();
     SendUART("\n\rAP-0001",9);  
-    uint8 i,i2;
     for(i=0;i<20;i++)
     {
       if(DevListPW[i][0])
@@ -301,16 +301,11 @@ static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pkt_1 )
   } 
 }
 
-//Used to send a message to the devices
-static void ParkWay_SendTheMessage( void )
-{
-}
-
 
 static void UART_CallBack(uint8 port, uint8 event)
 {
   (void)port;
-  uint8 pData[1];
+  //uint8 pData[1];
   uint8 cmdbuff[1];
 
   if (event & (HAL_UART_RX_FULL | HAL_UART_RX_ABOUT_FULL | HAL_UART_RX_TIMEOUT))
@@ -366,7 +361,4 @@ void SendUART(uint8 *data,uint8 len)
 }
 
 
-static void ParkWay_HandleKeys( uint8 shift, uint8 keys )
-{
-}
 /*********************************************************************/

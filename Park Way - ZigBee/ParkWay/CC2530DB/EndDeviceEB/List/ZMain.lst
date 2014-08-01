@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:28:01 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:35 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\Z #
 #                          Main\TI2530DB\ZMain.c" -D NWK_AUTO_POLL -D         #
 #                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC  #
-#                          -D xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC        #
+#                          -D xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC       #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -182,11 +182,6 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
    \                     P0INP:
    \   000000                DS 1
 
-   \                                 In  segment SFR_AN, at 0x90
-   \   union <unnamed> volatile __sfr _A_P1
-   \                     _A_P1:
-   \   000000                DS 1
-
    \                                 In  segment SFR_AN, at 0x9d
    \   unsigned char volatile __sfr SLEEPSTA
    \                     SLEEPSTA:
@@ -205,6 +200,11 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
    \                                 In  segment SFR_AN, at 0xc6
    \   unsigned char volatile __sfr CLKCONCMD
    \                     CLKCONCMD:
+   \   000000                DS 1
+
+   \                                 In  segment SFR_AN, at 0xfd
+   \   unsigned char volatile __sfr P0DIR
+   \                     P0DIR:
    \   000000                DS 1
 
    \                                 In  segment SFR_AN, at 0xfe
@@ -281,54 +281,52 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
    \   00002A   906270       MOV     DPTR,#0x6270
    \   00002D   7408         MOV     A,#0x8
    \   00002F   F0           MOVX    @DPTR,A
-   \   000030   C290         CLR     0x90.0
-   \   000032   43FE01       ORL     0xfe,#0x1
-   \   000035   C291         CLR     0x90.1
-   \   000037   43FE02       ORL     0xfe,#0x2
-   \   00003A   C294         CLR     0x90.4
-   \   00003C   43FE10       ORL     0xfe,#0x10
-   \   00003F   438F01       ORL     0x8f,#0x1
+   \   000030   43FE01       ORL     0xfe,#0x1
+   \   000033   43FD80       ORL     0xfd,#0x80
+   \   000036   438F01       ORL     0x8f,#0x1
+   \   000039                ; Setup parameters for call to function MAC_RfFrontendSetup
+   \   000039   12....       LCALL   ??MAC_RfFrontendSetup?relay; Banked call to: MAC_RfFrontendSetup
      85              
      86            // Make sure supply voltage is high enough to run
      87            zmain_vdd_check();
-   \   000042   7E10         MOV     R6,#0x10
+   \   00003C   7E10         MOV     R6,#0x10
    \                     ??main_3:
-   \   000044                ; Setup parameters for call to function HalAdcCheckVdd
-   \   000044   794A         MOV     R1,#0x4a
-   \   000046   12....       LCALL   ??HalAdcCheckVdd?relay; Banked call to: HalAdcCheckVdd
-   \   000049   E9           MOV     A,R1
-   \   00004A   60F8         JZ      ??main_3
-   \   00004C   1E           DEC     R6
-   \   00004D   EE           MOV     A,R6
-   \   00004E   70F4         JNZ     ??main_3
+   \   00003E                ; Setup parameters for call to function HalAdcCheckVdd
+   \   00003E   794A         MOV     R1,#0x4a
+   \   000040   12....       LCALL   ??HalAdcCheckVdd?relay; Banked call to: HalAdcCheckVdd
+   \   000043   E9           MOV     A,R1
+   \   000044   60F8         JZ      ??main_3
+   \   000046   1E           DEC     R6
+   \   000047   EE           MOV     A,R6
+   \   000048   70F4         JNZ     ??main_3
      88          
      89            // Initialize board I/O
      90            InitBoard( OB_COLD );
-   \   000050                ; Setup parameters for call to function InitBoard
-   \   000050   7900         MOV     R1,#0x0
-   \   000052   12....       LCALL   ??InitBoard?relay    ; Banked call to: InitBoard
+   \   00004A                ; Setup parameters for call to function InitBoard
+   \   00004A   7900         MOV     R1,#0x0
+   \   00004C   12....       LCALL   ??InitBoard?relay    ; Banked call to: InitBoard
      91          
      92            // Initialze HAL drivers
      93            HalDriverInit();
-   \   000055                ; Setup parameters for call to function HalDriverInit
-   \   000055   12....       LCALL   ??HalDriverInit?relay; Banked call to: HalDriverInit
+   \   00004F                ; Setup parameters for call to function HalDriverInit
+   \   00004F   12....       LCALL   ??HalDriverInit?relay; Banked call to: HalDriverInit
      94          
      95            // Initialize NV System
      96            osal_nv_init( NULL );
-   \   000058                ; Setup parameters for call to function osal_nv_init
-   \   000058   7A00         MOV     R2,#0x0
-   \   00005A   7B00         MOV     R3,#0x0
-   \   00005C   12....       LCALL   ??osal_nv_init?relay ; Banked call to: osal_nv_init
+   \   000052                ; Setup parameters for call to function osal_nv_init
+   \   000052   7A00         MOV     R2,#0x0
+   \   000054   7B00         MOV     R3,#0x0
+   \   000056   12....       LCALL   ??osal_nv_init?relay ; Banked call to: osal_nv_init
      97          
      98            // Initialize the MAC
      99            ZMacInit();
-   \   00005F                ; Setup parameters for call to function ZMacInit
-   \   00005F   12....       LCALL   ??ZMacInit?relay     ; Banked call to: ZMacInit
+   \   000059                ; Setup parameters for call to function ZMacInit
+   \   000059   12....       LCALL   ??ZMacInit?relay     ; Banked call to: ZMacInit
     100          
     101            // Determine the extended address
     102            zmain_ext_addr();
-   \   000062                ; Setup parameters for call to function zmain_ext_addr
-   \   000062   12....       LCALL   ??zmain_ext_addr?relay; Banked call to: zmain_ext_addr
+   \   00005C                ; Setup parameters for call to function zmain_ext_addr
+   \   00005C   12....       LCALL   ??zmain_ext_addr?relay; Banked call to: zmain_ext_addr
     103          
     104          #if defined ZCL_KEY_ESTABLISH
     105            // Initialize the Certicom certificate information.
@@ -337,8 +335,8 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
     108          
     109            // Initialize basic NV items
     110            zgInit();
-   \   000065                ; Setup parameters for call to function zgInit
-   \   000065   12....       LCALL   ??zgInit?relay       ; Banked call to: zgInit
+   \   00005F                ; Setup parameters for call to function zgInit
+   \   00005F   12....       LCALL   ??zgInit?relay       ; Banked call to: zgInit
     111          
     112          #ifndef NONWK
     113            // Since the AF isn't a task, call it's initialization routine
@@ -347,20 +345,20 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
     116          
     117            // Initialize the operating system
     118            osal_init_system();
-   \   000068                ; Setup parameters for call to function osal_init_system
-   \   000068   12....       LCALL   ??osal_init_system?relay; Banked call to: osal_init_system
+   \   000062                ; Setup parameters for call to function osal_init_system
+   \   000062   12....       LCALL   ??osal_init_system?relay; Banked call to: osal_init_system
     119          
     120            // Allow interrupts
     121            osal_int_enable( INTS_ALL );
-   \   00006B                ; Setup parameters for call to function osal_int_enable
-   \   00006B   79FF         MOV     R1,#-0x1
-   \   00006D   12....       LCALL   ??osal_int_enable?relay; Banked call to: osal_int_enable
+   \   000065                ; Setup parameters for call to function osal_int_enable
+   \   000065   79FF         MOV     R1,#-0x1
+   \   000067   12....       LCALL   ??osal_int_enable?relay; Banked call to: osal_int_enable
     122          
     123            // Final board initialization
     124            InitBoard( OB_READY );
-   \   000070                ; Setup parameters for call to function InitBoard
-   \   000070   7902         MOV     R1,#0x2
-   \   000072   12....       LCALL   ??InitBoard?relay    ; Banked call to: InitBoard
+   \   00006A                ; Setup parameters for call to function InitBoard
+   \   00006A   7902         MOV     R1,#0x2
+   \   00006C   12....       LCALL   ??InitBoard?relay    ; Banked call to: InitBoard
     125          
     126            // Display information about this device
     127            zmain_dev_info();
@@ -376,20 +374,20 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
     137          #endif
     138          
     139            osal_start_system(); // No Return from here
-   \   000075                ; Setup parameters for call to function osal_start_system
-   \   000075   12....       LCALL   ??osal_start_system?relay; Banked call to: osal_start_system
+   \   00006F                ; Setup parameters for call to function osal_start_system
+   \   00006F   12....       LCALL   ??osal_start_system?relay; Banked call to: osal_start_system
     140          
     141            return 0;  // Shouldn't get here.
-   \   000078   7A00         MOV     R2,#0x0
-   \   00007A   7B00         MOV     R3,#0x0
-   \   00007C   02....       LJMP    ?BRET
-   \   00007F                REQUIRE SLEEPCMD
-   \   00007F                REQUIRE SLEEPSTA
-   \   00007F                REQUIRE CLKCONCMD
-   \   00007F                REQUIRE CLKCONSTA
-   \   00007F                REQUIRE _A_P1
-   \   00007F                REQUIRE P1DIR
-   \   00007F                REQUIRE P0INP
+   \   000072   7A00         MOV     R2,#0x0
+   \   000074   7B00         MOV     R3,#0x0
+   \   000076   02....       LJMP    ?BRET
+   \   000079                REQUIRE SLEEPCMD
+   \   000079                REQUIRE SLEEPSTA
+   \   000079                REQUIRE CLKCONCMD
+   \   000079                REQUIRE CLKCONSTA
+   \   000079                REQUIRE P1DIR
+   \   000079                REQUIRE P0DIR
+   \   000079                REQUIRE P0INP
     142          } // main()
     143          
     144          /*********************************************************************
@@ -841,6 +839,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
         0      0   -> HalAdcCheckVdd
         0      0   -> HalDriverInit
         0      0   -> InitBoard
+        0      0   -> MAC_RfFrontendSetup
         0      0   -> ZMacInit
         0      0   -> osal_init_system
         0      0   -> osal_int_disable
@@ -870,21 +869,21 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ZMain\TI2530DB\ZMain.c
       11  ?Subroutine0
        1  CLKCONCMD
        1  CLKCONSTA
+       1  P0DIR
        1  P0INP
        1  P1DIR
        1  SLEEPCMD
        1  SLEEPSTA
-       1  _A_P1
-     127  main
+     121  main
      355  zmain_ext_addr
 
  
- 493 bytes in segment BANKED_CODE
+ 487 bytes in segment BANKED_CODE
   12 bytes in segment BANK_RELAYS
    7 bytes in segment SFR_AN
    8 bytes in segment XDATA_ROM_C
  
- 505 bytes of CODE  memory
+ 499 bytes of CODE  memory
    8 bytes of CONST memory
    0 bytes of DATA  memory (+ 7 bytes shared)
 

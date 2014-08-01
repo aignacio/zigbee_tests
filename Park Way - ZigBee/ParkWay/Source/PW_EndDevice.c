@@ -3,7 +3,7 @@
   End Device Firmware
 
   Ver.: 1.0
-  Date: 27/06/14
+  Date: 31/07/14
   Developer:  Ânderson Ignácio da Silva
   Obs.:
     -LCD_SUPPORTED=DEBUG or LCD_SUPPORTED must be disable in the CC2530 China 
@@ -23,7 +23,7 @@
     MT_SYS_FUNC
     MT_ZDO_FUNC
     xLCD_SUPPORTED=DEBUG
-    POWER_SAVING
+    xPOWER_SAVING
 
 *****************************************************************************/
 
@@ -52,9 +52,15 @@
  * CONSTANTS
  */
 #define   DEVICE_PW_1                  '0'     //(first char)Tag of the device 
-#define   DEVICE_PW_2                  '1'     //(second char)Tag of the device
-#define   ParkWay_SEND_MSG_TIMEOUT    1500     //Time to send data to the coordinator(poll ultrasound)
-#define   TIME_TO_CONNECT_COORD       1000     //Time to connect (auto bind) the device to the coord.
+#define   DEVICE_PW_2                  '6'     //(second char)Tag of the device
+#define   ParkWay_SEND_MSG_TIMEOUT     800     //Time to send data to the coordinator(poll ultrasound-ms)
+#define   TIME_TO_CONNECT_COORD       1000     //Time to connect (auto bind) the device to the coord(ms).
+#define   PIN_TRIGGER                 0x02     //Ultrasonic pin trigger - P0.1
+#define   PIN_ECHO                    0x04     //Ultrasonic pin trigger - P0.2
+#define   DISTANCE_CONSTANT          10000     //Distance measured by the ultrasonic
+#define   PIN_GREEN_LED               0x08     //P0.3
+#define   PIN_RED_LED                 0x10     //P0.4
+#define   TIME_ULTRA                   200     //Poll time to read ultrasonic
 /*********************************************************************
  * TYPEDEFS
  */
@@ -80,6 +86,10 @@ const SimpleDescriptionFormat_t ParkWay_SimpleDesc =
   ParkWay_MAX_CLUSTERS,          //  byte  AppNumInClusters;
   (cId_t *)ParkWay_ClusterList   //  byte *pAppInClusterList;
 };
+
+uint8 vaga='0';
+uint8 fifo_ultra[12]={"000000000000"};
+uint8 index_flag=0;
 
 // This is the Endpoint/Interface description.  It is defined here, but
 // filled-in in ParkWay_Init().  Another way to go would be to fill
@@ -114,10 +124,10 @@ afAddrType_t ParkWay_DstAddr;
 void SendUART(uint8 *data,uint8 len);
 void uart_init(void);
 static void ParkWay_ProcessZDOMsgs( zdoIncomingMsg_t *inMsg );
-static void ParkWay_HandleKeys( byte shift, byte keys );
 static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pckt );
 static void ParkWay_SendTheMessage( void );
-
+void read_ultrasonic(void);
+void control_fifo(uint16 ultra);
 /*********************************************************************
  * NETWORK LAYER CALLBACKS
  */
@@ -171,13 +181,13 @@ void ParkWay_Init( uint8 task_id )
 uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
 {
   afIncomingMSGPacket_t *MSGpkt;
-  afDataConfirm_t *afDataConfirm;
+  //afDataConfirm_t *afDataConfirm;
   zAddrType_t dstAddr;
 
   // Data Confirmation message fields
-  byte sentEP;
-  ZStatus_t sentStatus;
-  byte sentTransID;       // This should match the value sent
+  //byte sentEP;
+  //ZStatus_t sentStatus;
+  //byte sentTransID;       // This should match the value sent
   (void)task_id;  // Intentionally unreferenced parameter
 
   if ( events & SYS_EVENT_MSG )
@@ -219,10 +229,14 @@ uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
               || (ParkWay_NwkState == DEV_ROUTER)
               || (ParkWay_NwkState == DEV_END_DEVICE) )
           {
-            // Start sending "the" message in a regular interval.
+            // Start sending the status message in a regular interval.
             osal_start_timerEx( ParkWay_TaskID,
                                 ParkWay_SEND_MSG_EVT,
                                 ParkWay_SEND_MSG_TIMEOUT );
+            // Start reading ultrasonic in a regular interval.
+            osal_start_timerEx( ParkWay_TaskID,
+                                POLLING_ULTRASONIC,
+                                TIME_ULTRA);
           }
           break;
 
@@ -246,7 +260,7 @@ uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
   {
     // Send "the" message
     ParkWay_SendTheMessage();
-
+    
     // Setup to send message again
     osal_start_timerEx( ParkWay_TaskID,
                         ParkWay_SEND_MSG_EVT,
@@ -254,6 +268,14 @@ uint16 ParkWay_ProcessEvent( uint8 task_id, uint16 events )
 
     // return unprocessed events
     return (events ^ ParkWay_SEND_MSG_EVT);
+  }
+  
+  if(events & POLLING_ULTRASONIC)
+  {
+    osal_start_timerEx( ParkWay_TaskID,
+                        POLLING_ULTRASONIC,
+                        TIME_ULTRA);
+    read_ultrasonic();
   }
   
   if(events & POLLING_OF_DEV_EVT) //This force the auto bind to the coordinator or Router
@@ -354,19 +376,7 @@ static void ParkWay_MessageMSGCB( afIncomingMSGPacket_t *pkt_1 )
 //This function send the status of own park to the coordinator
 static void ParkWay_SendTheMessage( void )
 {
-  uint8 pData[6], pin_ultra=4,vaga;
-  P0SEL &= (~BV(2));
-  P0DIR &= (~BV(2));
-  vaga = (pin_ultra & P0);
-  if(vaga)
-  {
-     vaga='1';
-  }
-  else
-  {
-     vaga='0';
-  }
-
+  uint8 pData[6];
   pData[0] = 'E';
   pData[1] = 'D';
   pData[2] = DEVICE_PW_1;
@@ -421,13 +431,103 @@ void uart_init()
   HalUARTOpen (HAL_UART_PORT_0, &uartConfig);
 }
 
+void control_fifo(uint16 ultra)
+{
+
+  uint8 i,empty=0,full=0;
+  
+  if(ultra>DISTANCE_CONSTANT)
+  {
+    fifo_ultra[index_flag]='0';
+  }
+  else
+  {
+    fifo_ultra[index_flag]='1';
+  }
+
+  if(index_flag==11)
+  {
+    for(i=0;i<12;i++)
+    {
+      if(fifo_ultra[i]=='1')  full++;
+      else if (fifo_ultra[i]=='0')  empty++;
+    }
+  }
+
+  if(empty!=full)
+  { 
+    if(empty>full)  vaga='0';
+    else  vaga='1';
+  }
+  
+  if(vaga=='1')
+  {
+    P0 &= ~PIN_RED_LED; 
+    Onboard_wait(1); 
+    P0 |= PIN_GREEN_LED;
+  }
+  else
+  {
+    P0 &= ~PIN_GREEN_LED; 
+    Onboard_wait(1); 
+    P0 |= PIN_RED_LED;
+  }
+
+  if(index_flag>=12) 
+    index_flag = 0;
+  else
+    index_flag++;
+
+}
+
+void read_ultrasonic()
+{
+    uint16 i;
+
+    P0SEL &= ~(PIN_GREEN_LED+PIN_RED_LED);
+    P0DIR |= PIN_GREEN_LED+PIN_RED_LED;
+    
+    //Configure trigger
+    P0SEL &= ~PIN_TRIGGER;   //P0_1 GPIO
+    P0DIR |= PIN_TRIGGER;    //P0_1 output
+    //Onboard_wait(10);
+    P0SEL &= ~PIN_ECHO;   //P0_2 GPIO
+    P0DIR &= ~PIN_ECHO;   //P0_2 input
+    Onboard_wait(1);
+
+    P0 &= ~PIN_TRIGGER;       //------> 0
+    Onboard_wait(6);
+    P0 |= PIN_TRIGGER;        //------> 1
+    Onboard_wait(6);      //------> 6us
+    P0 &= ~PIN_TRIGGER;       //------> 0 
+    Onboard_wait(6); 
+
+    while((!(P0&PIN_ECHO)))/*||(timeout_1<65530)) timeout_1++*/;
+    while(P0&PIN_ECHO)
+    {
+      if(i<65530) 
+        i++; 
+      else 
+        break;
+    }
+        
+    control_fifo(i);
+
+
+    #ifdef DEBUG_ULTRA
+      char dist[5];
+      dist[0] = (i/10000) + 0x30;
+      dist[1] = (i%10000)/1000 + 0x30;
+      dist[2] = (((i%10000)%1000)/100) + 0x30;
+      dist[3] = ((((i%10000)%1000)%100)/10) +0x30; 
+      dist[4] = ((((i%10000)%1000)%100)%10) + 0x30;
+    #endif
+}
+
 void SendUART(uint8 *data,uint8 len)
 {
   HalUARTWrite(HAL_UART_PORT_0, data, len);
 }
 
-static void ParkWay_HandleKeys( uint8 shift, uint8 keys )
-{
-}
 
 /*********************************************************************/

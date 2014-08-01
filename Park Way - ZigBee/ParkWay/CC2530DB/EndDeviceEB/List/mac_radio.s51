@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:04 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:40 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          ow_level\srf04\mac_radio.c" -D NWK_AUTO_POLL -D   /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -446,7 +446,9 @@ macRadioUpdateTxPower SYMBOL "macRadioUpdateTxPower"
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
         EXTERN macPib
-        EXTERN macRadioDefsTxPwrBare
+        EXTERN macRadioDefsRefTableId
+        EXTERN macRadioDefsRssiAdj
+        EXTERN macRadioDefsTxPwrTables
         EXTERN macRxFilter
         EXTERN macRxHaltCleanup
         FUNCTION macRxHaltCleanup,0202H
@@ -1027,13 +1029,21 @@ macRadioSetTxPower:
 //  243   const uint8 CODE *pTable = macRadioDefsTxPwrTables[macRadioDefsRefTableId >> 4];
 //  244 #elif defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590
 //  245   const uint8 CODE *pTable = macRadioDefsTxPwrTables[0];
+        MOV     DPTR,#macRadioDefsTxPwrTables
+        CLR     A
+        MOVC    A,@A+DPTR
+        MOV     R0,A
+        MOV     A,#0x1
+        MOVC    A,@A+DPTR
+        MOV     R1,A
 //  246 #else
 //  247   const uint8 CODE *pTable = macRadioDefsTxPwrBare;
 //  248 #endif
 //  249 
 //  250   /* if the selected dBm is out of range, use the closest available */
 //  251   if ((int8)txPower > (int8)pTable[MAC_RADIO_DEFS_TBL_TXPWR_FIRST_ENTRY])
-        MOV     DPTR,#macRadioDefsTxPwrBare
+        MOV     DPL,R0
+        MOV     DPH,R1
         CLR     A
         MOVC    A,@A+DPTR
         CLR     C
@@ -1050,10 +1060,10 @@ macRadioSetTxPower:
         INC     DPTR
         CLR     A
         MOVC    A,@A+DPTR
-        MOV     R0,A
+        MOV     R2,A
         MOV     A,R6
         CLR     C
-        SUBB    A,R0
+        SUBB    A,R2
         MOV     C,0xD0 /* PSW */.2
         XRL     A,PSW
         RLC     A
@@ -1061,6 +1071,9 @@ macRadioSetTxPower:
 //  257   {
 //  258     /* smaller than the lowest power level -- out of table range */
 //  259     txPower = pTable[MAC_RADIO_DEFS_TBL_TXPWR_LAST_ENTRY];
+        MOV     DPL,R0
+        MOV     DPH,R1
+        INC     DPTR
 ??macRadioSetTxPower_0:
         CLR     A
         MOVC    A,@A+DPTR
@@ -1077,7 +1090,7 @@ macRadioSetTxPower:
 //  269   HAL_ENTER_CRITICAL_SECTION(s);
 ??macRadioSetTxPower_1:
         MOV     A,0xa8
-        MOV     R2,A
+        MOV     R4,A
         CLR     0xa8.7
 //  270   /* When calculating index to the power register value table,
 //  271    * either txPower (of uint8 type) has to be explicitly type-casted to int8
@@ -1089,18 +1102,19 @@ macRadioSetTxPower:
 //  277     uint8 index = pTable[MAC_RADIO_DEFS_TBL_TXPWR_FIRST_ENTRY] - txPower
 //  278       + MAC_RADIO_DEFS_TBL_TXPWR_ENTRIES;
 //  279     reqTxPower = pTable[index];
-        MOV     DPTR,#macRadioDefsTxPwrBare
+        MOV     DPL,R0
+        MOV     DPH,R1
         CLR     A
         MOVC    A,@A+DPTR
         CLR     C
         SUBB    A,R6
         ADD     A,#0x2
-        MOV     R0,A
-        MOV     A,#macRadioDefsTxPwrBare & 0xff
-        ADD     A,R0
+        MOV     R2,A
+        MOV     A,R0
+        ADD     A,R2
         MOV     DPL,A
         CLR     A
-        ADDC    A,#(macRadioDefsTxPwrBare >> 8) & 0xff
+        ADDC    A,R1
         MOV     DPH,A
         CLR     A
         MOVC    A,@A+DPTR
@@ -1108,7 +1122,7 @@ macRadioSetTxPower:
         MOVX    @DPTR,A
 //  280   }
 //  281   HAL_EXIT_CRITICAL_SECTION(s);
-        MOV     A,R2
+        MOV     A,R4
         MOV     C,0xE0 /* A   */.7
         MOV     C,0xE0 /* A   */.7
         MOV     0xa8.7,C
@@ -1800,6 +1814,8 @@ macRadioEnergyDetectStop:
 //  517   uint8 energyDetectMeasurement;
 //  518 
 //  519   rssiDbm = MAC_RADIO_RECORD_MAX_RSSI_STOP() + MAC_RADIO_RSSI_OFFSET;
+        ; Setup parameters for call to function macMcuRecordMaxRssiStop
+        LCALL   ??macMcuRecordMaxRssiStop?relay; Banked call to: macMcuRecordMaxRssiStop
 //  520   MAC_RADIO_RSSI_LNA_OFFSET(rssiDbm);
 //  521   energyDetectMeasurement = radioComputeED(rssiDbm);
 //  522 
@@ -1808,9 +1824,19 @@ macRadioEnergyDetectStop:
 //  525 
 //  526   return(energyDetectMeasurement);
         ; Setup parameters for call to function radioComputeED
-        ; Setup parameters for call to function macMcuRecordMaxRssiStop
-        LCALL   ??macMcuRecordMaxRssiStop?relay; Banked call to: macMcuRecordMaxRssiStop
-        MOV     A,R1
+        MOV     DPTR,#macRadioDefsRefTableId
+        MOVX    A,@DPTR
+        ANL     A,#0xf
+        MOV     R0,A
+        MOV     A,#macRadioDefsRssiAdj & 0xff
+        ADD     A,R0
+        MOV     DPL,A
+        CLR     A
+        ADDC    A,#(macRadioDefsRssiAdj >> 8) & 0xff
+        MOV     DPH,A
+        CLR     A
+        MOVC    A,@A+DPTR
+        ADD     A,R1
         ADD     A,#-0x49
         MOV     R1,A
         LCALL   ??radioComputeED?relay; Banked call to: radioComputeED
@@ -2096,12 +2122,12 @@ macRadioComputeLQI:
 //  593 /**************************************************************************************************
 //  594 */
 // 
-// 602 bytes in segment BANKED_CODE
+// 636 bytes in segment BANKED_CODE
 // 102 bytes in segment BANK_RELAYS
 //   1 byte  in segment SFR_AN
 //   4 bytes in segment XDATA_Z
 // 
-// 704 bytes of CODE  memory
+// 738 bytes of CODE  memory
 //   0 bytes of DATA  memory (+ 1 byte shared)
 //   4 bytes of XDATA memory
 //

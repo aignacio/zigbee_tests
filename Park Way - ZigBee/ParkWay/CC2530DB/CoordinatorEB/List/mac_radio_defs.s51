@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:51:39 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:30:37 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -149,6 +149,7 @@
 
         EXTERN ?BDISPATCH
         EXTERN ?BRET
+        EXTERN __INIT_XDATA_Z
 
         PUBLIC ??MAC_SetRadioRegTable?relay
         FUNCTION ??MAC_SetRadioRegTable?relay,0203H
@@ -159,7 +160,11 @@
         PUBLIC MAC_SetRadioRegTable
         FUNCTION MAC_SetRadioRegTable,0203H
         ARGFRAME XSTACK, 0, STACK
-        PUBLIC macRadioDefsTxPwrBare
+        LOCFRAME ISTACK, 2, STACK
+        PUBLIC macRadioDefsRefTableId
+        PUBLIC macRadioDefsRssiAdj
+        PUBLIC macRadioDefsTxPwrCC2591
+        PUBLIC macRadioDefsTxPwrTables
         PUBLIC macRadioTurnOffPower
         FUNCTION macRadioTurnOffPower,0203H
         ARGFRAME XSTACK, 0, STACK
@@ -360,39 +365,7 @@ macRadioTurnOnPower SYMBOL "macRadioTurnOnPower"
 //   88   /* -21 dBm */   0x0C
 //   89 };
 //   90 #else /* HAL_MCU_CC2533 */
-
-        RSEG CODE_C:CODE:REORDER:NOROOT(0)
-        DATA8
 //   91 const uint8 CODE macRadioDefsTxPwrBare[] =
-macRadioDefsTxPwrBare:
-        DB 3
-        DB 234
-        DB 245
-        DB 229
-        DB 213
-        DB 213
-        DB 197
-        DB 181
-        DB 165
-        DB 149
-        DB 149
-        DB 133
-        DB 133
-        DB 117
-        DB 117
-        DB 101
-        DB 101
-        DB 85
-        DB 85
-        DB 69
-        DB 69
-        DB 53
-        DB 53
-        DB 37
-        DB 37
-        DB 21
-        DB 21
-        DB 5
 //   92 {
 //   93   3,  /* tramsmit power level of the first entry */
 //   94   (uint8)(int8)-22, /* transmit power level of the last entry */
@@ -428,7 +401,24 @@ macRadioDefsTxPwrBare:
 //  124           (!defined HAL_PA_LNA && !defined HAL_PA_LNA_CC2590) */
 //  125 
 //  126 #if defined HAL_PA_LNA || defined MAC_RUNTIME_CC2591
+
+        RSEG CODE_C:CODE:REORDER:NOROOT(0)
+        DATA8
 //  127 const uint8 CODE macRadioDefsTxPwrCC2591[] =
+macRadioDefsTxPwrCC2591:
+        DB 20
+        DB 10
+        DB 229
+        DB 213
+        DB 197
+        DB 181
+        DB 165
+        DB 165
+        DB 149
+        DB 133
+        DB 133
+        DB 117
+        DB 101
 //  128 {
 //  129   20,  /* tramsmit power level of the first entry */
 //  130   (uint8)(int8)10, /* transmit power level of the last entry */
@@ -485,7 +475,12 @@ macRadioDefsTxPwrBare:
 //  181   defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590
 //  182 
 //  183 /* TX power table array */
+
+        RSEG CODE_C:CODE:REORDER:NOROOT(0)
+        DATA16
 //  184 const uint8 CODE *const CODE macRadioDefsTxPwrTables[] =
+macRadioDefsTxPwrTables:
+        DW macRadioDefsTxPwrCC2591
 //  185 {
 //  186 #if defined MAC_RUNTIME_CC2591 || defined MAC_RUNTIME_CC2590 || \ 
 //  187   (!defined HAL_PA_LNA && !defined HAL_PA_LNA_CC2590)
@@ -502,7 +497,14 @@ macRadioDefsTxPwrBare:
 //  198 };
 //  199 
 //  200 /* RSSI offset adjustment value array */
+
+        RSEG CODE_C:CODE:REORDER:NOROOT(0)
+        DATA16
 //  201 const int8 CODE macRadioDefsRssiAdj[] =
+macRadioDefsRssiAdj:
+        DATA8
+        DB -6
+        DB 6
 //  202 {
 //  203 #if defined MAC_RUNTIME_CC2591 || defined MAC_RUNTIME_CC2590 || \ 
 //  204   (!defined HAL_PA_LNA && !defined HAL_PA_LNA_CC2590)
@@ -524,7 +526,13 @@ macRadioDefsTxPwrBare:
 //  220 
 //  221 #if defined MAC_RUNTIME_CC2591 || defined MAC_RUNTIME_CC2590 || \ 
 //  222   defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590
+
+        RSEG XDATA_Z:XDATA:NOROOT(0)
+        DATA8
 //  223 uint8 macRadioDefsRefTableId = 0;
+macRadioDefsRefTableId:
+        DS 1
+        REQUIRE __INIT_XDATA_Z
 //  224 #endif
 //  225 
 //  226 /* RF observable control register value to output PA signal */
@@ -560,7 +568,13 @@ MAC_SetRadioRegTable:
           CFI Function MAC_SetRadioRegTable
         CODE
 //  252 {
-        ; Saved register size: 0
+        PUSH    DPL
+          CFI DPL0 Frame(CFA_SP, 4)
+          CFI CFA_SP SP+-4
+        PUSH    DPH
+          CFI DPH0 Frame(CFA_SP, 5)
+          CFI CFA_SP SP+-5
+        ; Saved register size: 2
         ; Auto size: 0
 //  253   /* Depending on compile flags, the parameters may not be used */
 //  254   (void) txPwrTblIdx;
@@ -577,16 +591,45 @@ MAC_SetRadioRegTable:
 //  265   defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590
 //  266 
 //  267   if (rssiAdjIdx >= sizeof(macRadioDefsRssiAdj)/sizeof(macRadioDefsRssiAdj[0]))
+        MOV     A,R2
+        CLR     C
+        SUBB    A,#0x2
+        JC      ??MAC_SetRadioRegTable_0
 //  268   {
 //  269     rssiAdjIdx = 0;
+        MOV     R2,#0x0
 //  270   }
 //  271 
 //  272   macRadioDefsRefTableId = (txPwrTblIdx << 4) | rssiAdjIdx;
+??MAC_SetRadioRegTable_0:
+        MOV     A,R1
+        SWAP    A
+        ANL     A,#0xf0
+        ORL     A,R2
+        MOV     DPTR,#macRadioDefsRefTableId
+          CFI EndBlock cfiBlock0
+        REQUIRE ?Subroutine0
+        ; // Fall through to label ?Subroutine0
 //  273 
 //  274 #endif /* defined MAC_RUNTIME_CC2591 || defined MAC_RUNTIME_CC2590 || .. */
 //  275 }
+
+        RSEG BANKED_CODE:CODE:NOROOT(0)
+?Subroutine0:
+          CFI Block cfiBlock1 Using cfiCommon0
+          CFI NoFunction
+          CFI CFA_SP SP+-5
+          CFI DPL0 Frame(CFA_SP, 4)
+          CFI DPH0 Frame(CFA_SP, 5)
+        MOVX    @DPTR,A
+        POP     DPH
+          CFI CFA_SP SP+-4
+          CFI DPH0 SameValue
+        POP     DPL
+          CFI CFA_SP SP+-3
+          CFI DPL0 SameValue
         LJMP    ?BRET
-          CFI EndBlock cfiBlock0
+          CFI EndBlock cfiBlock1
 //  276 
 //  277 
 //  278 /**************************************************************************************************
@@ -603,7 +646,7 @@ MAC_SetRadioRegTable:
         RSEG BANKED_CODE:CODE:NOROOT(0)
 //  288 MAC_INTERNAL_API void macRadioTurnOnPower(void)
 macRadioTurnOnPower:
-          CFI Block cfiBlock1 Using cfiCommon0
+          CFI Block cfiBlock2 Using cfiCommon0
           CFI Function macRadioTurnOnPower
         CODE
 //  289 {
@@ -648,11 +691,23 @@ macRadioTurnOnPower:
 //  305 
 //  306     /* P1_1 -> PAEN */
 //  307     RFC_OBS_CTRL0 = RFC_OBS_CTRL_PA_PD_INV;
+        MOV     DPTR,#0x61eb
+        MOV     A,#0x68
+        MOVX    @DPTR,A
 //  308     OBSSEL1       = OBSSEL_OBS_CTRL0;
+        MOV     DPTR,#0x6244
+        MOV     A,#-0x5
+        MOVX    @DPTR,A
 //  309 
 //  310     /* P1_4 -> EN (LNA control) */
 //  311     RFC_OBS_CTRL1 = RFC_OBS_CTRL_LNAMIX_PD_INV;
+        MOV     DPTR,#0x61ec
+        MOV     A,#0x6a
+        MOVX    @DPTR,A
 //  312     OBSSEL4       = OBSSEL_OBS_CTRL1;
+        MOV     DPTR,#0x6247
+        MOV     A,#-0x4
+        MOVX    @DPTR,A
 //  313     
 //  314     /* For any RX, change CCA settings for CC2591 compression workaround.
 //  315      * This will override LNA control if CC2591_COMPRESSION_WORKAROUND 
@@ -706,27 +761,9 @@ macRadioTurnOnPower:
         MOVX    @DPTR,A
         MOVX    A,@DPTR
         ORL     A,#0x5
-          CFI EndBlock cfiBlock1
-        REQUIRE ?Subroutine0
-        ; // Fall through to label ?Subroutine0
-//  332 }
-
-        RSEG BANKED_CODE:CODE:NOROOT(0)
-?Subroutine0:
-          CFI Block cfiBlock2 Using cfiCommon0
-          CFI NoFunction
-          CFI CFA_SP SP+-5
-          CFI DPL0 Frame(CFA_SP, 4)
-          CFI DPH0 Frame(CFA_SP, 5)
-        MOVX    @DPTR,A
-        POP     DPH
-          CFI CFA_SP SP+-4
-          CFI DPH0 SameValue
-        POP     DPL
-          CFI CFA_SP SP+-3
-          CFI DPL0 SameValue
-        LJMP    ?BRET
+        SJMP    ?Subroutine0
           CFI EndBlock cfiBlock2
+//  332 }
 //  333 
 //  334 
 //  335 /**************************************************************************************************
@@ -823,11 +860,13 @@ macRadioTurnOffPower:
 //  384 /**************************************************************************************************
 //  385  */
 // 
-// 96 bytes in segment BANKED_CODE
-// 18 bytes in segment BANK_RELAYS
-// 28 bytes in segment CODE_C
+// 139 bytes in segment BANKED_CODE
+//  18 bytes in segment BANK_RELAYS
+//  17 bytes in segment CODE_C
+//   1 byte  in segment XDATA_Z
 // 
-// 142 bytes of CODE memory
+// 174 bytes of CODE  memory
+//   1 byte  of XDATA memory
 //
 //Errors: none
 //Warnings: none

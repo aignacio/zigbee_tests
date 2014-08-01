@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:02 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:38 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          arget\CC2530EB\hal_sleep.c" -D NWK_AUTO_POLL -D   /
 //                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D             /
 //                          MT_ZDO_FUNC -D xLCD_SUPPORTED=DEBUG -D            /
-//                          POWER_SAVING -lC "C:\Texas                        /
+//                          xPOWER_SAVING -lC "C:\Texas                       /
 //                          Instruments\ZStack-CC2530-2.5.1a\Projects\zstack\ /
 //                          Samples\ParkWay\CC2530DB\EndDeviceEB\List\" -lA   /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
@@ -1877,7 +1877,6 @@ halSleepTimerIsr:
 //  550 #endif
 //  551   
 //  552   CLEAR_SLEEP_MODE();
-        MOV     halSleepPconValue,#0x0
 //  553   HAL_EXIT_ISR();
         MOV     C,0xE0 /* A   */.7
         MOV     C,0xE0 /* A   */.7
@@ -2009,7 +2008,7 @@ __Constant_ffffffe9:
 //   1 byte  in segment DATA_I
 //   1 byte  in segment DATA_ID
 //   3 bytes in segment INTVEC
-//  36 bytes in segment NEAR_CODE
+//  33 bytes in segment NEAR_CODE
 //  10 bytes in segment SFR_AN
 //   8 bytes in segment SLEEP_CODE
 //   4 bytes in segment XDATA_I
@@ -2017,7 +2016,7 @@ __Constant_ffffffe9:
 //  32 bytes in segment XDATA_ROM_C
 //   1 byte  in segment XDATA_Z
 // 
-// 572 bytes of CODE  memory (+  3 bytes shared)
+// 569 bytes of CODE  memory (+  3 bytes shared)
 //   0 bytes of CONST memory (+ 32 bytes shared)
 //   1 byte  of DATA  memory (+ 10 bytes shared)
 //   5 bytes of XDATA memory

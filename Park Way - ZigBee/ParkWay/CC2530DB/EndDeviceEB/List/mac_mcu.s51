@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V8.30.1.41636 for 8051            27/Jun/2014  11:28:04 /
+// IAR C/C++ Compiler V8.30.1.41636 for 8051            31/Jul/2014  18:32:39 /
 // Copyright 2004-2013 IAR Systems AB.                                        /
 //                                                                            /
 //    Core               =  plain                                             /
@@ -47,7 +47,7 @@
 //                          ow_level\srf04\single_chip\mac_mcu.c" -D          /
 //                          NWK_AUTO_POLL -D ZTOOL_P1 -D MT_TASK -D           /
 //                          MT_SYS_FUNC -D MT_ZDO_FUNC -D                     /
-//                          xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC          /
+//                          xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC         /
 //                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Projec /
 //                          ts\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\Li /
 //                          st\" -lA "C:\Texas Instruments\ZStack-CC2530-2.5. /
@@ -554,7 +554,6 @@ macMcuTimerForceDelay SYMBOL "macMcuTimerForceDelay"
         ARGFRAME XSTACK, 16, STACK
         ARGFRAME IOVERLAY, 0, STATIC
         ARGFRAME DOVERLAY, 0, STATIC
-        EXTERN halSleepPconValue
         EXTERN macBackoffTimerCompareIsr
         FUNCTION macBackoffTimerCompareIsr,0202H
         ARGFRAME ISTACK, 0, STACK
@@ -1107,9 +1106,6 @@ macMcuInit:
 //  163   /* Raises the CCA threshold from about -108 dBm to about -80 dBm input level.
 //  164    */
 //  165   CCACTRL0 = CCA_THR;
-        MOV     DPTR,#0x6196
-        MOV     A,#-0x4
-        MOVX    @DPTR,A
 //  166 #endif
 //  167 
 //  168 #ifdef CC2591_COMPRESSION_WORKAROUND
@@ -2658,13 +2654,13 @@ macMcuTimer2Isr:
 //  720   }
 //  721   
 //  722   CLEAR_SLEEP_MODE();
+//  723   HAL_EXIT_ISR();  
 ??macMcuTimer2Isr_2:
         REQUIRE ?Subroutine2
         REQUIRE _A_IEN0
         REQUIRE T2IRQM
         REQUIRE T2IRQF
         ; // Fall through to label ?Subroutine2
-//  723   HAL_EXIT_ISR();  
 //  724 }
 
         RSEG NEAR_CODE:CODE:NOROOT(0)
@@ -2688,7 +2684,6 @@ macMcuTimer2Isr:
           CFI R6 load(1, XDATA, add(CFA_XSP16, literal(-7)))
           CFI R7 load(1, XDATA, add(CFA_XSP16, literal(-6)))
           CFI V0 load(1, XDATA, add(CFA_XSP16, literal(-10)))
-        MOV     halSleepPconValue,#0x0
         MOV     A,R6
         MOV     C,0xE0 /* A   */.0
         MOV     0xa8.7,C
@@ -3337,6 +3332,7 @@ macMcuRfIsr:
 //  874   }
 //  875   
 //  876   CLEAR_SLEEP_MODE();
+//  877   HAL_EXIT_ISR();  
 ??macMcuRfIsr_3:
         SJMP    ?Subroutine2
           CFI EndBlock cfiBlock35
@@ -3344,7 +3340,6 @@ macMcuRfIsr:
         REQUIRE S1CON
         REQUIRE RFIRQF1
         REQUIRE RFIRQF0
-//  877   HAL_EXIT_ISR();  
 //  878 }
 //  879 
 //  880 
@@ -3428,12 +3423,12 @@ macMcuRfErrIsr:
 //  904   }
 //  905 
 //  906   CLEAR_SLEEP_MODE();
+//  907   HAL_EXIT_ISR();  
 ??macMcuRfErrIsr_0:
         LJMP    ?Subroutine2
           CFI EndBlock cfiBlock36
         REQUIRE _A_IEN0
         REQUIRE RFERRF
-//  907   HAL_EXIT_ISR();  
 //  908 }
 //  909 
 //  910 
@@ -3787,15 +3782,15 @@ __Constant_ff000000:
 // 1015 /**************************************************************************************************
 // 1016 */
 // 
-// 1 330 bytes in segment BANKED_CODE
+// 1 324 bytes in segment BANKED_CODE
 //    96 bytes in segment BANK_RELAYS
 //     9 bytes in segment INTVEC
-//   231 bytes in segment NEAR_CODE
+//   228 bytes in segment NEAR_CODE
 //    22 bytes in segment SFR_AN
 //     4 bytes in segment XDATA_ROM_C
 //    17 bytes in segment XDATA_Z
 // 
-// 1 657 bytes of CODE  memory (+  9 bytes shared)
+// 1 648 bytes of CODE  memory (+  9 bytes shared)
 //     0 bytes of CONST memory (+  4 bytes shared)
 //     0 bytes of DATA  memory (+ 22 bytes shared)
 //    17 bytes of XDATA memory

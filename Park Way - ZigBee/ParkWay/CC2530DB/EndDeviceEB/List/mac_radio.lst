@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# IAR C/C++ Compiler V8.30.1.41636 for 8051             27/Jun/2014  11:28:04 #
+# IAR C/C++ Compiler V8.30.1.41636 for 8051             31/Jul/2014  18:32:40 #
 # Copyright 2004-2013 IAR Systems AB.                                         #
 #                                                                             #
 #    Core               =  plain                                              #
@@ -46,7 +46,7 @@
 #                          Instruments\ZStack-CC2530-2.5.1a\Components\mac\lo #
 #                          w_level\srf04\mac_radio.c" -D NWK_AUTO_POLL -D     #
 #                          ZTOOL_P1 -D MT_TASK -D MT_SYS_FUNC -D MT_ZDO_FUNC  #
-#                          -D xLCD_SUPPORTED=DEBUG -D POWER_SAVING -lC        #
+#                          -D xLCD_SUPPORTED=DEBUG -D xPOWER_SAVING -lC       #
 #                          "C:\Texas Instruments\ZStack-CC2530-2.5.1a\Project #
 #                          s\zstack\Samples\ParkWay\CC2530DB\EndDeviceEB\List #
 #                          \" -lA "C:\Texas Instruments\ZStack-CC2530-2.5.1a\ #
@@ -529,44 +529,55 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
     243            const uint8 CODE *pTable = macRadioDefsTxPwrTables[macRadioDefsRefTableId >> 4];
     244          #elif defined HAL_PA_LNA || defined HAL_PA_LNA_CC2590
     245            const uint8 CODE *pTable = macRadioDefsTxPwrTables[0];
+   \   000007   90....       MOV     DPTR,#macRadioDefsTxPwrTables
+   \   00000A   E4           CLR     A
+   \   00000B   93           MOVC    A,@A+DPTR
+   \   00000C   F8           MOV     R0,A
+   \   00000D   7401         MOV     A,#0x1
+   \   00000F   93           MOVC    A,@A+DPTR
+   \   000010   F9           MOV     R1,A
     246          #else
     247            const uint8 CODE *pTable = macRadioDefsTxPwrBare;
     248          #endif
     249          
     250            /* if the selected dBm is out of range, use the closest available */
     251            if ((int8)txPower > (int8)pTable[MAC_RADIO_DEFS_TBL_TXPWR_FIRST_ENTRY])
-   \   000007   90....       MOV     DPTR,#macRadioDefsTxPwrBare
-   \   00000A   E4           CLR     A
-   \   00000B   93           MOVC    A,@A+DPTR
-   \   00000C   C3           CLR     C
-   \   00000D   9E           SUBB    A,R6
-   \   00000E   A2D2         MOV     C,0xD0 /* PSW */.2
-   \   000010   65D0         XRL     A,PSW
-   \   000012   33           RLC     A
-   \   000013   400E         JC      ??macRadioSetTxPower_0
+   \   000011   8882         MOV     DPL,R0
+   \   000013   8983         MOV     DPH,R1
+   \   000015   E4           CLR     A
+   \   000016   93           MOVC    A,@A+DPTR
+   \   000017   C3           CLR     C
+   \   000018   9E           SUBB    A,R6
+   \   000019   A2D2         MOV     C,0xD0 /* PSW */.2
+   \   00001B   65D0         XRL     A,PSW
+   \   00001D   33           RLC     A
+   \   00001E   4013         JC      ??macRadioSetTxPower_0
     252            {
     253              /* greater than base value -- out of table range */
     254              txPower = pTable[MAC_RADIO_DEFS_TBL_TXPWR_FIRST_ENTRY];
     255            }
     256            else if ((int8)txPower < (int8)pTable[MAC_RADIO_DEFS_TBL_TXPWR_LAST_ENTRY])
-   \   000015   A3           INC     DPTR
-   \   000016   E4           CLR     A
-   \   000017   93           MOVC    A,@A+DPTR
-   \   000018   F8           MOV     R0,A
-   \   000019   EE           MOV     A,R6
-   \   00001A   C3           CLR     C
-   \   00001B   98           SUBB    A,R0
-   \   00001C   A2D2         MOV     C,0xD0 /* PSW */.2
-   \   00001E   65D0         XRL     A,PSW
-   \   000020   33           RLC     A
-   \   000021   5003         JNC     ??macRadioSetTxPower_1
+   \   000020   A3           INC     DPTR
+   \   000021   E4           CLR     A
+   \   000022   93           MOVC    A,@A+DPTR
+   \   000023   FA           MOV     R2,A
+   \   000024   EE           MOV     A,R6
+   \   000025   C3           CLR     C
+   \   000026   9A           SUBB    A,R2
+   \   000027   A2D2         MOV     C,0xD0 /* PSW */.2
+   \   000029   65D0         XRL     A,PSW
+   \   00002B   33           RLC     A
+   \   00002C   5008         JNC     ??macRadioSetTxPower_1
     257            {
     258              /* smaller than the lowest power level -- out of table range */
     259              txPower = pTable[MAC_RADIO_DEFS_TBL_TXPWR_LAST_ENTRY];
+   \   00002E   8882         MOV     DPL,R0
+   \   000030   8983         MOV     DPH,R1
+   \   000032   A3           INC     DPTR
    \                     ??macRadioSetTxPower_0:
-   \   000023   E4           CLR     A
-   \   000024   93           MOVC    A,@A+DPTR
-   \   000025   FE           MOV     R6,A
+   \   000033   E4           CLR     A
+   \   000034   93           MOVC    A,@A+DPTR
+   \   000035   FE           MOV     R6,A
     260            }
     261          
     262            /*
@@ -578,9 +589,9 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
     268             */
     269            HAL_ENTER_CRITICAL_SECTION(s);
    \                     ??macRadioSetTxPower_1:
-   \   000026   E5A8         MOV     A,0xa8
-   \   000028   FA           MOV     R2,A
-   \   000029   C2AF         CLR     0xa8.7
+   \   000036   E5A8         MOV     A,0xa8
+   \   000038   FC           MOV     R4,A
+   \   000039   C2AF         CLR     0xa8.7
     270            /* When calculating index to the power register value table,
     271             * either txPower (of uint8 type) has to be explicitly type-casted to int8
     272             * or the subtraction expression has to be type-casted to uint8 to work
@@ -591,40 +602,41 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
     277              uint8 index = pTable[MAC_RADIO_DEFS_TBL_TXPWR_FIRST_ENTRY] - txPower
     278                + MAC_RADIO_DEFS_TBL_TXPWR_ENTRIES;
     279              reqTxPower = pTable[index];
-   \   00002B   90....       MOV     DPTR,#macRadioDefsTxPwrBare
-   \   00002E   E4           CLR     A
-   \   00002F   93           MOVC    A,@A+DPTR
-   \   000030   C3           CLR     C
-   \   000031   9E           SUBB    A,R6
-   \   000032   2402         ADD     A,#0x2
-   \   000034   F8           MOV     R0,A
-   \   000035   74..         MOV     A,#macRadioDefsTxPwrBare & 0xff
-   \   000037   28           ADD     A,R0
-   \   000038   F582         MOV     DPL,A
-   \   00003A   E4           CLR     A
-   \   00003B   34..         ADDC    A,#(macRadioDefsTxPwrBare >> 8) & 0xff
-   \   00003D   F583         MOV     DPH,A
+   \   00003B   8882         MOV     DPL,R0
+   \   00003D   8983         MOV     DPH,R1
    \   00003F   E4           CLR     A
    \   000040   93           MOVC    A,@A+DPTR
-   \   000041   90....       MOV     DPTR,#reqTxPower
-   \   000044   F0           MOVX    @DPTR,A
+   \   000041   C3           CLR     C
+   \   000042   9E           SUBB    A,R6
+   \   000043   2402         ADD     A,#0x2
+   \   000045   FA           MOV     R2,A
+   \   000046   E8           MOV     A,R0
+   \   000047   2A           ADD     A,R2
+   \   000048   F582         MOV     DPL,A
+   \   00004A   E4           CLR     A
+   \   00004B   39           ADDC    A,R1
+   \   00004C   F583         MOV     DPH,A
+   \   00004E   E4           CLR     A
+   \   00004F   93           MOVC    A,@A+DPTR
+   \   000050   90....       MOV     DPTR,#reqTxPower
+   \   000053   F0           MOVX    @DPTR,A
     280            }
     281            HAL_EXIT_CRITICAL_SECTION(s);
-   \   000045   EA           MOV     A,R2
-   \   000046   A2E7         MOV     C,0xE0 /* A   */.7
-   \   000048   A2E7         MOV     C,0xE0 /* A   */.7
-   \   00004A   92AF         MOV     0xa8.7,C
+   \   000054   EC           MOV     A,R4
+   \   000055   A2E7         MOV     C,0xE0 /* A   */.7
+   \   000057   A2E7         MOV     C,0xE0 /* A   */.7
+   \   000059   92AF         MOV     0xa8.7,C
     282          
     283            /* update the radio power setting */
     284            macRadioUpdateTxPower();
-   \   00004C                ; Setup parameters for call to function macRadioUpdateTxPower
-   \   00004C   12....       LCALL   ??macRadioUpdateTxPower?relay; Banked call to: macRadioUpdateTxPower
+   \   00005B                ; Setup parameters for call to function macRadioUpdateTxPower
+   \   00005B   12....       LCALL   ??macRadioUpdateTxPower?relay; Banked call to: macRadioUpdateTxPower
     285          
     286            return txPower;
-   \   00004F   EE           MOV     A,R6
-   \   000050   F9           MOV     R1,A
-   \   000051   02....       LJMP    ?Subroutine1 & 0xFFFF
-   \   000054                REQUIRE _A_IEN0
+   \   00005E   EE           MOV     A,R6
+   \   00005F   F9           MOV     R1,A
+   \   000060   02....       LJMP    ?Subroutine1 & 0xFFFF
+   \   000063                REQUIRE _A_IEN0
     287          }
 
    \                                 In  segment BANKED_CODE, align 1, keep-with-next
@@ -1079,6 +1091,8 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
     517            uint8 energyDetectMeasurement;
     518          
     519            rssiDbm = MAC_RADIO_RECORD_MAX_RSSI_STOP() + MAC_RADIO_RSSI_OFFSET;
+   \   000004                ; Setup parameters for call to function macMcuRecordMaxRssiStop
+   \   000004   12....       LCALL   ??macMcuRecordMaxRssiStop?relay; Banked call to: macMcuRecordMaxRssiStop
     520            MAC_RADIO_RSSI_LNA_OFFSET(rssiDbm);
     521            energyDetectMeasurement = radioComputeED(rssiDbm);
     522          
@@ -1086,14 +1100,24 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
     524            COMPRESSION_WORKAROUND_ON();
     525          
     526            return(energyDetectMeasurement);
-   \   000004                ; Setup parameters for call to function radioComputeED
-   \   000004                ; Setup parameters for call to function macMcuRecordMaxRssiStop
-   \   000004   12....       LCALL   ??macMcuRecordMaxRssiStop?relay; Banked call to: macMcuRecordMaxRssiStop
-   \   000007   E9           MOV     A,R1
-   \   000008   24B7         ADD     A,#-0x49
-   \   00000A   F9           MOV     R1,A
-   \   00000B   12....       LCALL   ??radioComputeED?relay; Banked call to: radioComputeED
-   \   00000E   02....       LJMP    ??Subroutine3_0 & 0xFFFF
+   \   000007                ; Setup parameters for call to function radioComputeED
+   \   000007   90....       MOV     DPTR,#macRadioDefsRefTableId
+   \   00000A   E0           MOVX    A,@DPTR
+   \   00000B   540F         ANL     A,#0xf
+   \   00000D   F8           MOV     R0,A
+   \   00000E   74..         MOV     A,#macRadioDefsRssiAdj & 0xff
+   \   000010   28           ADD     A,R0
+   \   000011   F582         MOV     DPL,A
+   \   000013   E4           CLR     A
+   \   000014   34..         ADDC    A,#(macRadioDefsRssiAdj >> 8) & 0xff
+   \   000016   F583         MOV     DPH,A
+   \   000018   E4           CLR     A
+   \   000019   93           MOVC    A,@A+DPTR
+   \   00001A   29           ADD     A,R1
+   \   00001B   24B7         ADD     A,#-0x49
+   \   00001D   F9           MOV     R1,A
+   \   00001E   12....       LCALL   ??radioComputeED?relay; Banked call to: radioComputeED
+   \   000021   02....       LJMP    ??Subroutine3_0 & 0xFFFF
     527          }
     528          
     529          /*=================================================================================================
@@ -1377,7 +1401,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
        1  macPhyTxPower
       11  macRadioComputeLQI
       10  macRadioEnergyDetectStart
-      17  macRadioEnergyDetectStop
+      36  macRadioEnergyDetectStop
       25  macRadioInit
        9  macRadioRandomByte
       12  macRadioReset
@@ -1386,7 +1410,7 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
       30  macRadioSetPanCoordinator
       10  macRadioSetPanID
       10  macRadioSetShortAddr
-      84  macRadioSetTxPower
+      99  macRadioSetTxPower
       76  macRadioStartScan
       27  macRadioStopScan
       76  macRadioUpdateChannel
@@ -1396,12 +1420,12 @@ C:\Texas Instruments\ZStack-CC2530-2.5.1a\Components\mac\low_level\srf04\mac_rad
        1  reqTxPower
 
  
- 602 bytes in segment BANKED_CODE
+ 636 bytes in segment BANKED_CODE
  102 bytes in segment BANK_RELAYS
    1 byte  in segment SFR_AN
    4 bytes in segment XDATA_Z
  
- 704 bytes of CODE  memory
+ 738 bytes of CODE  memory
    0 bytes of DATA  memory (+ 1 byte shared)
    4 bytes of XDATA memory
 
