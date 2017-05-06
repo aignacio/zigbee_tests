@@ -1,0 +1,101 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="style.css" type="text/css" rel="stylesheet" />
+	<link rel="icon" type="image/jpeg" href="images/logo/favicon.jpg"/>
+	<script type="text/javascript" src="ajax.js"></script> 
+	<title>Homestark</title> 
+</head> 
+<body> 
+	<div id ="logo_scr">
+	</div>
+	<div id="scr_login">
+		<form class="adj" action="" method="post">
+			<fieldset>
+				<legend align="center">Login:</legend>
+				<p><label class="field" for="txUsuario">Username</label><input type="text" id="username"  /></p>
+				<p><label class="field" for="txSenha">Password</label><input type="password" id="password" /></p>
+				<p><input type="submit" value="Enter" id="enter" onclick="ValidLogin()"></p>
+				<div id="login_res"></div>
+			</fieldset>
+		</form>
+	</div>
+</body> 
+</html>
+
+
+
+@charset "utf-8";
+/* CSS Document */
+
+body
+{
+	background-color: black;
+}
+
+label.field
+{	
+	text-align:	right;
+	width:	80px;
+	margin-right: 5px;
+	font-weight: bold;
+	float:	left;
+	font-family: Arial, Helvetica, sans-serif;
+	color:	white;
+}
+
+form.adj
+{
+	width:	350px;
+	height:	100px;
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+	color:	white;
+}
+
+input[type=submit] 
+{
+	height:50px; 
+	width:150px; 
+	margin-left: 60px;
+	font-size: 15px; 
+	font-weight: bold; 
+	font-family: Arial, Helvetica, sans-serif;
+	color:	black;
+}
+
+#logo_scr
+{
+	text-align:	center;
+	float:center;
+	margin-left: auto ;
+	margin-right: auto ;
+	width:	283px;
+	height:	297px;
+	background:url(images/logo/logo_symbol_small.png);
+	background-repeat: no-repeat;
+*/
+}
+
+#scr_login
+{	
+	position: relative;
+	float:center;
+	width:	350px;
+	height:	100px;
+	margin-left: auto ;
+	margin-right: auto ;
+}
+
+#login_res
+{
+	height:	20px;
+	width:	250px;
+	text-align: center;
+	float: center;
+	margin-left: auto ;
+	margin-right: auto ;
+	border: 2px solid #a1a1a1;
+	background-color: white;
+}

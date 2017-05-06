@@ -1,0 +1,103 @@
+@charset "utf-8";
+/* CSS Document */
+
+body
+{
+	background-color: white;
+	/*background:url(/images/background_transistor.png);*/
+}
+
+label.field
+{	
+	text-align:	right;
+	width:	80px;
+	margin-right: 5px;
+	font-weight: bold;
+	float:	left;
+	font-family: Arial, Helvetica, sans-serif;
+	color:	black;
+	font-weight: bold; 
+}
+
+form.adj
+{
+	width:	350px;
+	height:	100px;
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+	color:	black;
+}
+
+input[type=text]
+{
+	background-color : black;
+	color: white;
+	font-weight: bold;
+}
+
+input[type=password]
+{
+	background-color : black;
+	color: white;
+}
+
+input[type=submit] 
+{
+	height:50px; 
+	width:150px; 
+	margin-left: 85px;
+	font-size: 15px; 
+	font-weight: bold; 
+	text-align: center;
+	float:	center;
+	font-family: Arial, Helvetica, sans-serif;
+	color:	black;
+}
+
+#logo_scr
+{
+	text-align:	center;
+	float:center;
+	margin-left: auto ;
+	margin-right: auto ;
+	margin-bottom: auto;
+	margin-top:	100px;
+	width:	350px;
+	height:	96px;
+	background:url(images/logo/logo_index.png);
+	background-repeat: no-repeat;
+	background-color: white;
+
+}
+
+#scr_login
+{	
+	padding-top: 10px;
+	position: relative;
+	float:center;
+	width:	355px;
+	height:	195px;
+	margin-left: auto ;
+	margin-right: auto ;
+	margin-bottom: auto;
+	margin-top:	auto;
+	background-color: white;
+	background:url(/images/login_bkg.png);
+	background-repeat: no-repeat;
+}
+
+#login_res
+{
+	height:	20px;
+	width:	250px;
+	text-align: center;
+	float: center;
+	margin-left: auto ;
+	margin-right: auto ;
+	color: red;
+	border: 2px solid #a1a1a1;
+	background-color: black;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: center;
+	font-weight: bold; 
+}

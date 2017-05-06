@@ -1,0 +1,459 @@
+@charset "utf-8";
+/* CSS Document */
+
+body
+{
+	background-color: white;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#st
+{
+	min-width: 1280px;
+	min-height: 800px;
+}
+
+#tab
+{	
+	top: 0px;
+	left: 0px;
+	width:	100%;
+	height: 30px;
+	text-align: center;	
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold; 
+	color:	black;
+	/*background-color: black; */
+	background-image: url('../images/tab_bkp.png');
+	position: fixed;
+	float: center;
+	z-index: 1;
+}
+	#menus
+	{
+		position: relative;
+		float: center;
+		margin-left: auto;
+		margin-right: auto;
+		width: 900px;
+		height: 30px;
+		text-align: center;
+		/*border-style: solid;
+		border-width: 1px;
+    	border-color: yellow;*/
+	}
+
+		#username
+		{	
+			text-align: center;
+			margin-top: 4px;
+			margin-left: 30px;
+			height: 20px;
+			width: 150px;
+			float: left;
+		 	/*border-style: solid;
+		    border-width: 1px;*/
+		    color: white;
+		    border-color: red;
+		    font-size: medium;
+		    text-decoration: none;
+		}
+		#level
+		{
+			margin-top: 4px;
+			margin-left: 20px;
+			height:20px;
+			width: 150px;
+			float: left;
+		 	/*border-style: solid;
+		    border-width: 1px;*/
+		    border-color: blue;
+		    color: white;
+		    font-size: medium;
+		}
+		#register
+		{
+			margin-top: 4px;
+			margin-left: 20px;
+			height:20px;
+			width: 150px;
+			float: left;
+		 	/*border-style: solid;
+		    border-width: 1px;
+		    border-color: orange;*/
+		    background-image: url('../images/button/background_default.png');
+
+		    color: #C0C0C0;
+		    font-weight: bold;
+		    text-decoration: none;
+		    font-size: small;
+
+			-webkit-transition-property:color, text;
+			-webkit-transition-duration: 0.25s;
+			-webkit-transition-timing-function: linear, ease-in;
+
+			-moz-transition-property:color, text;
+			-moz-transition-duration:0.25s;
+			-moz-transition-timing-function: linear, ease-in;
+
+			-o-transition-property:color, text;
+			-o-transition-duration:0.25s;
+			-o-transition-timing-function: linear, ease-in;
+		}
+		#register:hover
+		{
+			color: white;
+		}
+
+		#delete
+		{
+			margin-top: 4px;
+			margin-left: 20px;
+			height:20px;
+			width: 150px;
+			float: left;
+		 	/*border-style: solid;
+		    border-width: 1px;
+		    border-color: orange;*/
+		    color: #C0C0C0;
+		    font-weight: bold;
+		    text-decoration: none;
+		    background-image: url('../images/button/background_default.png');
+		    font-size: small;
+
+			-webkit-transition-property:color, text;
+			-webkit-transition-duration: 0.25s;
+			-webkit-transition-timing-function: linear, ease-in;
+
+			-moz-transition-property:color, text;
+			-moz-transition-duration:0.25s;
+			-moz-transition-timing-function: linear, ease-in;
+
+			-o-transition-property:color, text;
+			-o-transition-duration:0.25s;
+			-o-transition-timing-function: linear, ease-in;
+		}
+		#delete:hover
+		{
+		    color: white;
+		}
+
+		#logout
+		{
+			margin-top: 4px;
+			margin-left: 20px;
+			height:20px;
+			width: 150px;
+			float: left;
+		 	/*border-style: solid;
+		    border-width: 1px;
+		    border-color: orange;*/
+		    color: #C0C0C0;
+		    font-weight: bold;
+		    text-decoration: none;
+		    background-image: url('../images/button/background_default.png');
+		    font-size: small;
+
+			-webkit-transition-property:color, text;
+			-webkit-transition-duration: 0.25s;
+			-webkit-transition-timing-function: linear, ease-in;
+
+			-moz-transition-property:color, text;
+			-moz-transition-duration:0.25s;
+			-moz-transition-timing-function: linear, ease-in;
+
+			-o-transition-property:color, text;
+			-o-transition-duration:0.25s;
+			-o-transition-timing-function: linear, ease-in;
+		}
+		#logout:hover 
+		{
+		    color: white;
+		}
+
+#center
+{
+	text-align: center;
+	position: relative;
+	float: center;
+	margin-top: 40px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 1200px;
+	height: 800px;
+	/*background-color: red;*/
+}
+	#loc_text
+	{
+		margin-top: 5px;
+		font-weight: bold;
+	}
+	#sensors_panel
+	{
+		position: relative;
+		float: left;
+		/*margin-top: 40px;*/
+		margin-left: auto;
+		margin-right: auto;
+		width: 300px;
+		height: 800px;
+		text-align: center;
+		/*background-color: blue;*/
+		background-image: url(../images/border_menu.png);
+		background-repeat: no-repeat;
+	}
+		.sensor_button
+		{	
+			width: 250px;
+			height: 35px;
+			background-image: url(../images/Icons_location/button_sensor_panel.png);
+			float: center;
+			text-align: center;
+			margin-right: auto;
+			margin-left: auto;
+			background-repeat: no-repeat;
+			margin-top: 5px;
+			padding-top: 7px;
+
+			color: white;
+		    font-weight: bold;
+		    text-decoration: none;
+		    font-size: small;
+
+			-webkit-transition-property:color, text;
+			-webkit-transition-duration: 0.25s;
+			-webkit-transition-timing-function: linear, ease-in;
+
+			-moz-transition-property:color, text;
+			-moz-transition-duration:0.25s;
+			-moz-transition-timing-function: linear, ease-in;
+
+			-o-transition-property:color, text;
+			-o-transition-duration:0.25s;
+			-o-transition-timing-function: linear, ease-in;
+		}
+		.sensor_button:hover
+		{
+			color: orange;
+		}
+
+	#list_sensors
+	{
+		width: 900px;
+		height: 800px;
+		position: relative;
+		float: right;
+		/*background-color: green;*/
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+	}
+	.sensor_home
+	{
+		position: relative;
+		text-align: center; 
+		font-size: big; 
+		font-weight: bold; 
+		color: white; 
+		margin-left:auto; 
+		margin-right:auto; 
+		width:800px; 
+		height:50px; 
+		float:center; 
+		background-repeat: no-repeat; 
+	}
+	#text
+	{
+		margin-left:auto; 
+		margin-right:auto; 
+		text-align: center;
+		padding-top: 15px;
+		width: 500px;
+		height: 20px;
+	}
+	.red
+	{
+		font-family: Arial, Helvetica, sans-serif;
+		margin-top: 30px;
+		color: white;
+		font-size: medium; 
+		font-weight: bold; 
+		float: center;
+		background-color: red;
+	}
+	.green
+	{
+		font-family: Arial, Helvetica, sans-serif;
+		margin-top: 30px;
+		color: white;
+		font-size: medium; 
+		font-weight: bold; 
+		float: center;
+		background-color: green;
+	}
+/*****************USED INTO REGISTER.PHP*****************/
+#forms
+{
+	text-align: center;
+	float: center;
+	margin-left: auto;
+	margin-right: auto;
+	width: 1000px;
+	height: 800px;
+	color: black;
+	/*background-color: green;*/
+}
+
+	#user_reg
+	{
+		text-align: center;
+		float: left;
+		margin-top: 40px;
+		margin-left: auto;
+		width: 500px;
+		height: 340px;
+		/*background-color: red;*/
+	}
+		input[type=text] 
+		{
+			text-align: left;
+			font-family: Arial, Helvetica, sans-serif;
+			color:	black;
+			width: 200px;
+			height: 15px;
+		}
+
+		input[type=password] 
+		{
+			font-weight: bold; 
+			text-align: left;
+			font-family: Arial, Helvetica, sans-serif;
+			color:	black;
+			width: 200px;
+			height: 15px;
+		}
+
+		input[type=submit] 
+		{	
+			font-weight: bold; 
+			text-align: center;
+			font-family: Arial, Helvetica, sans-serif;
+			color:	black;
+		}
+
+	#sensor_reg
+	{
+		text-align: center;
+		float: left;
+		margin-top: 40px;
+		width: 500px;
+		height: 340px;
+		/*background-color: blue;*/
+	}
+
+	#location_reg
+	{
+		text-align: center;
+		float: left;
+		margin-top: 5px;
+		width: 1000px;
+		height: 200px;
+		/*background-color: yellow;*/
+	}
+
+	.submit
+	{
+		font-weight: bold; 
+		text-align: center;
+		font-family: Arial, Helvetica, sans-serif;
+		color:	black;
+		width: 200px;	
+		height: 50px;
+		margin-left: 155px;
+	}
+
+	label.field
+	{	
+		text-align:	right;
+		width:	150px;
+		margin-right: 1px;
+		font-weight: bold;
+		float:	left;
+		font-family: Arial, Helvetica, sans-serif;
+		color:	black;
+		font-weight: bold; 
+	}
+
+	label.field_loc_id
+	{	
+		text-align:	right;
+		width:	250px;
+		margin-right: 1px;
+		font-weight: bold;
+		float:	left;
+		font-family: Arial, Helvetica, sans-serif;
+		color:	black;
+		font-weight: bold; 
+	}
+
+/*************************USED INTO DELETE.PHP*************************/
+#forms
+{
+	text-align: center;
+	float: center;
+	margin-left: auto;
+	margin-right: auto;
+	width: 1000px;
+	height: 800px;
+	color: black;
+	/*background-color: green;*/
+}
+	#delete_user
+	{
+		text-align: center;
+		float: left;
+		margin-top: 40px;
+		margin-left: auto;
+		width: 500px;
+		height: 150px;
+		font-weight: bold; 
+		/*background-color: red;*/
+	}
+
+	#delete_sensor
+	{
+		text-align: center;
+		float: left;
+		margin-top: 40px;
+		width: 500px;
+		height: 150px;
+		font-weight: bold; 
+		/*background-color: blue;*/
+	}
+
+	#delete_loc
+	{
+		text-align: center;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 40px;
+		width: 500px;
+		height: 150px;
+		font-weight: bold; 
+		/*background-color: orange;*/
+		float: left;
+	}
+
+	input[type=submit].delete
+	{	
+		font-weight: bold; 
+		text-align: center;
+		font-family: Arial, Helvetica, sans-serif;
+		color:	black;
+		width: 200px;	
+		height: 50px;
+		margin-left: auto;
+		margin-right: auto;
+
+		position: relative;
+	}

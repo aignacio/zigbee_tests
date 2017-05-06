@@ -1,0 +1,25 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="style.css" type="text/css" rel="stylesheet" />
+	<link rel="icon" type="image/jpeg" href="images/logo/favicon.jpg"/>
+	<script type="text/javascript" src="ajax.js"></script> 
+	<title>Homestark</title> 
+</head> 
+<body> 
+	<div id ="logo_scr">
+	</div>
+	<div id="scr_login">
+		<form class="adj" action="" method="post">
+			<fieldset>
+				<legend align="center">Login:</legend>
+				<p><label class="field" for="txUsuario">Username</label><input type="text" id="username"  /></p>
+				<p><label class="field" for="txSenha">Password</label><input type="password" id="password" /></p>
+				<p><input type="submit" value="Enter" id="enter" onclick="ValidLogin()"></p>
+			</fieldset>
+		</form>
+	</div>
+	<div id="login_res"></div>
+</body> 
+</html>
